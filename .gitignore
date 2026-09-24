@@ -1,0 +1,14 @@
+.cache/
+node_modules/
+*.pt
+__pycache__/
+# internal design + recon notes stay local (GitHub gets code only)
+DESIGN.md
+recon/
+
+# not published yet — the symmetric game (engine supports it; assets stay local)
+assets/scene/sym/
+assets/policies/sym_*
+
+# generated screenshots (two are force-added for the README)
+tests/shots/

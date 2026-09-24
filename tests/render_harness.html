@@ -1,0 +1,275 @@
+<!doctype html>
+<!--
+  tests/render_harness.html — drives app/render.js with the REAL sim (MuJoCo
+  WASM + the exported scene) and a few hand-made poses. No game loop, no policy,
+  no referee: this page exists only to prove the renderer.
+
+  Query string:
+    ?scene=sym|asym     which scene to load            (default sym)
+    &shot=<name>        which pose+camera preset       (default chase)
+    &w=1600&h=1000      canvas CSS size
+    &frames=90          frames to run before signalling ready
+    &gate=1             hold the window load event until rendering is done, by
+                        keeping an <img> request open (tests/render_shots.mjs
+                        answers it) — this is what makes `firefox --screenshot`
+                        deterministic instead of a race.
+    &bench=1            run 300 extra frames and report frame time
+
+  Everything it prints lands in #log, which is also mirrored to document.title
+  and to window.__RESULT for the driver to read back.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>render harness</title>
+<style>
+  html,body { margin:0; padding:0; background:#05080c; color:#cfe3ee;
+              font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
+  #wrap { position:relative; }
+  canvas { display:block; }
+  #log { position:absolute; left:10px; top:10px; margin:0; padding:8px 10px;
+         background:rgba(4,10,16,.72); border:1px solid rgba(120,190,220,.28);
+         border-radius:6px; white-space:pre; pointer-events:none;
+         text-shadow:0 1px 2px #000; }
+  #err { position:absolute; left:10px; bottom:10px; color:#ff9a8a; white-space:pre;
+         background:rgba(40,6,6,.8); padding:6px 9px; border-radius:6px; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="c"></canvas><pre id="log">booting…</pre><pre id="err" hidden></pre></div>
+
+<script type="module">
+import { createSim } from '../app/physics.js';
+import { createRenderer } from '../app/render.js';
+
+const Q = new URLSearchParams(location.search);
+const sceneName = Q.get('scene') || 'sym';
+const shot      = Q.get('shot')  || 'chase';
+const W = +(Q.get('w') || 1600), H = +(Q.get('h') || 1000);
+const WARM = +(Q.get('frames') || 90);
+const BENCH = Q.get('bench') === '1';
+
+const logEl = document.getElementById('log');
+const errEl = document.getElementById('err');
+const lines = [];
+const log = (s) => { lines.push(s); logEl.textContent = lines.join('\n'); };
+
+// Hold the window load event open until we say we are done (see header).
+let gateImg = null;
+if (Q.get('gate') === '1') {
+  gateImg = document.createElement('img');
+  gateImg.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;left:0;top:0';
+  gateImg.src = '/__gate?id=' + encodeURIComponent(Q.get('gateid') || shot);
+  document.body.appendChild(gateImg);
+}
+const GID = () => encodeURIComponent(Q.get('gateid') || shot);
+
+/* Firefox's headless --screenshot does NOT composite a WebGL canvas (verified:
+ * a canvas cleared to solid teal still comes back black). So the harness reads
+ * the drawing buffer back itself — with preserveDrawingBuffer:true that is the
+ * exact image WebGL produced — and POSTs it to the driver, which writes the PNG. */
+async function done(result) {
+  window.__RESULT = result;
+  try {
+    if (result.ok) {
+      const url = document.getElementById('c').toDataURL('image/png');
+      await fetch('/__png?id=' + GID(), { method: 'POST', body: url });
+    }
+    await fetch('/__result?id=' + GID(), {
+      method: 'POST', body: JSON.stringify(result, null, 1),
+    });
+  } catch (e) { /* driver will report the missing png */ }
+  document.title = 'READY ' + shot;
+  if (Q.get('gate') === '1') await fetch('/__ready?id=' + GID());
+}
+
+/* ------------------------------------------------------------------ poses --
+ * Hand-made poses. Each entry gives a base pose per robot plus a joint-space
+ * pose; nothing is simulated, we just write the pose and mj_forward.
+ * jointPos is in the entity-native FL,FR,RL,RR x (hip,thigh,calf) order that
+ * sim.setPose() expects (scene.json.joints.order).
+ */
+const D = [-0.1, 0.9, -1.8, 0.1, 0.9, -1.8, -0.1, 0.9, -1.8, 0.1, 0.9, -1.8]; // default stance
+// a mid-trot shape: FL+RR swing forward/up, FR+RL stance
+const TROT = [
+  -0.10, 0.55, -1.35,   // FL  swing
+   0.10, 1.18, -2.05,   // FR  stance, loaded
+  -0.10, 1.18, -2.05,   // RL  stance, loaded
+   0.10, 0.55, -1.35,   // RR  swing
+];
+const LUNGE = [
+  -0.12, 0.35, -1.10,
+   0.12, 0.35, -1.10,
+  -0.12, 1.35, -2.25,
+   0.12, 1.35, -2.25,
+];
+
+const POSES = {
+  // both dogs near the centre line, facing each other, mid-stride
+  duel: {
+    a: { x: -0.55, y: -0.18, yaw: 0.16,  z: 0.30, jointPos: TROT },
+    b: { x:  0.62, y:  0.22, yaw: Math.PI - 0.22, z: 0.30, jointPos: TROT },
+  },
+  // player sprinting at its line, opponent chasing from behind
+  breakaway: {
+    a: { x: 1.15, y: -0.10, yaw: 0.05, z: 0.31, jointPos: LUNGE },
+    b: { x: 0.05, y: 0.28, yaw: 0.30,  z: 0.30, jointPos: TROT },
+  },
+  // kick-off: both on their spawns
+  spawn: null,   // use the scene's own spawn
+};
+
+/* ---------------------------------------------------------------- shots -- */
+const SHOTS = {
+  chase:      { pose: 'duel',      cam: 'chase',     focus: 'a' },
+  chase_far:  { pose: 'breakaway', cam: 'chase',     focus: 'a' },
+  fpv:        { pose: 'duel',      cam: 'fpv',       focus: 'a' },
+  broadcast:  { pose: 'duel',      cam: 'broadcast', focus: 'a' },
+  spawn:      { pose: 'spawn',     cam: 'broadcast', focus: 'a' },
+  collision:  { pose: 'duel',      cam: 'broadcast', focus: 'a', collision: true },
+  swap:       { pose: 'duel',      cam: 'chase',     focus: 'b' },   // player drives seat b
+  // drives the real pointer/wheel handlers: orbit ~120 deg right, tilt up, zoom out
+  orbit:      { pose: 'duel',      cam: 'chase',     focus: 'a', controls: { dx: 380, dy: -95, wheel: 260 } },
+};
+
+(async function main() {
+  try {
+    const canvas = document.getElementById('c');
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    document.getElementById('wrap').style.width = W + 'px';
+
+    const t0 = performance.now();
+    const sim = await createSim({ sceneUrl: `../assets/scene/${sceneName}/scene.xml` });
+    const tSim = performance.now() - t0;
+    log(`sim      ${sceneName}  nbody=${sim.nbody} ngeom=${sim.ngeom} nq=${sim.nq}  (${tSim.toFixed(0)} ms)`);
+    if (sim.warnings.length) log(`sim warn ${sim.warnings.length}: ${sim.warnings[0]}`);
+
+    const spec = SHOTS[shot];
+    if (!spec) throw new Error(`unknown shot "${shot}"`);
+
+    // hand-made poses, no stepping
+    const pose = POSES[spec.pose];
+    if (pose) {
+      sim.resetAll({ a: { x: pose.a.x, y: pose.a.y, yaw: pose.a.yaw },
+                     b: { x: pose.b.x, y: pose.b.y, yaw: pose.b.yaw } });
+      for (const r of ['a', 'b']) sim.setPose(r, pose[r]);
+    } else {
+      const sp = sim.sceneJson && sim.sceneJson.spawn && sim.sceneJson.spawn.config;
+      sim.resetAll(sp || undefined);
+    }
+    sim.forward();
+
+    const t1 = performance.now();
+    const ren = createRenderer(canvas, sim, sceneName, {
+      preserveDrawingBuffer: true,   // so the canvas can be read back (see done())
+      quality: 'high',
+      controls: !!spec.controls,     // only the orbit shot wants the mouse handlers
+    });
+    const tRen = performance.now() - t1;
+    log(`renderer three r${ren.info.three}  build ${tRen.toFixed(0)} ms`);
+    log(`geoms    ${ren.info.geoms} total -> ${ren.info.meshGeoms} mesh + ${ren.info.primitiveGeoms} prim`
+        + `, ${ren.info.dynamicGeoms} dynamic, ${ren.info.uniqueGeometries} unique buffers`);
+    log(`field    ${ren.info.field.size.map(v=>v.toFixed(2)).join(' x ')} @ (`
+        + `${ren.info.field.cx.toFixed(2)}, ${ren.info.field.cy.toFixed(2)})`
+        + `  lineX=${ren.info.field.lineX}  src=${ren.info.field.source}`);
+    if (ren.warnings.length) log(`ren warn ${ren.warnings.length}: ${ren.warnings[0]}`);
+
+    ren.setPlayerRobot(spec.focus);
+    ren.setCamera(spec.cam, true);
+    if (spec.collision) ren.setShowCollision(true);
+    ren.resize();
+
+    // Drive it like a real loop: renderState() changes only when we step, so
+    // this also exercises the "no new physics frame" path.
+    const rs = () => sim.renderState();
+    for (let i = 0; i < 3; i++) ren.update(rs(), spec.focus);   // settle the camera
+    ren.snapCamera();
+    ren.update(rs(), spec.focus);
+
+    // synthetic mouse input, through the very listeners app/render.js installs
+    if (spec.controls) {
+      const { dx, dy, wheel } = spec.controls;
+      const pd = (t, x, y, extra) => canvas.dispatchEvent(new PointerEvent(t, {
+        pointerId: 1, button: 0, buttons: 1, clientX: x, clientY: y,
+        bubbles: true, cancelable: true, ...extra,
+      }));
+      pd('pointerdown', 800, 500);
+      for (let i = 1; i <= 12; i++) pd('pointermove', 800 + dx * i / 12, 500 + dy * i / 12);
+      pd('pointerup', 800 + dx, 500 + dy, { buttons: 0 });
+      canvas.dispatchEvent(new WheelEvent('wheel', { deltaY: wheel, bubbles: true, cancelable: true }));
+      log(`controls drag (${dx}, ${dy}) + wheel ${wheel} dispatched`);
+    }
+
+    // a few frames of real animation so the smoothing/interp path runs
+    await new Promise((res) => {
+      let n = 0;
+      const tick = () => {
+        // nudge the dogs a little each frame so interpolation has work to do
+        if (pose && n % 3 === 0) {
+          const k = n / WARM;
+          sim.setPose('a', { ...pose.a, x: pose.a.x + 0.02 * k });
+          sim.forward();
+        }
+        ren.update(rs(), spec.focus);
+        if (++n >= WARM) res(); else requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
+    const info = renderStats(ren);
+    log(`draw     ${info.calls} calls, ${info.tris.toLocaleString()} tris`);
+    const cam = ren.camera;
+    log(`camera   ${spec.cam}  pos (${cam.position.x.toFixed(2)}, ${cam.position.y.toFixed(2)},`
+        + ` ${cam.position.z.toFixed(2)})  fov ${cam.fov.toFixed(1)}  near ${cam.near}`);
+    const ba = sim.getBase('a'), bb = sim.getBase('b');
+    log(`dogs     a (${ba.pos.map(v=>v.toFixed(2)).join(', ')})   b (${bb.pos.map(v=>v.toFixed(2)).join(', ')})`);
+    log(`player   robot=${ren.playerRobot} teal=${ren.teamColors.player}  ai=${ren.teamColors.ai}`);
+
+    let bench = null;
+    if (BENCH) {
+      const gl = ren.renderer.getContext();
+      // CPU side only: WebGL queues, so update() returns before anything is drawn.
+      ren.stats();
+      const N = 300;
+      let t = performance.now();
+      for (let i = 0; i < N; i++) ren.update(rs(), spec.focus);
+      const cpuWall = performance.now() - t;
+      const s = ren.stats();
+      // End to end: gl.finish() blocks until the frame is actually rasterised.
+      t = performance.now();
+      for (let i = 0; i < N; i++) { ren.update(rs(), spec.focus); gl.finish(); }
+      const fullWall = performance.now() - t;
+      bench = {
+        frames: N, cpuMs: s.meanMs, cpuFps: 1000 / (cpuWall / N),
+        fullMs: fullWall / N, fullFps: 1000 / (fullWall / N),
+        renderer: gl.getParameter(gl.RENDERER),
+      };
+      log(`bench    cpu ${bench.cpuMs.toFixed(2)} ms/frame (${bench.cpuFps.toFixed(0)} fps)`
+          + `   end-to-end ${bench.fullMs.toFixed(2)} ms (${bench.fullFps.toFixed(0)} fps)`);
+      log(`gl       ${bench.renderer}`);
+    }
+
+    // one last frame so the front buffer holds the finished image
+    ren.update(rs(), spec.focus);
+    await done({ ok: true, shot, scene: sceneName, lines, info, bench,
+           camera: { mode: spec.cam, pos: cam.position.toArray(), fov: cam.fov },
+           renInfo: { three: ren.info.three, geoms: ren.info.geoms,
+                      mesh: ren.info.meshGeoms, prim: ren.info.primitiveGeoms,
+                      dynamic: ren.info.dynamicGeoms, unique: ren.info.uniqueGeometries },
+           warnings: { sim: sim.warnings, ren: ren.warnings } });
+  } catch (e) {
+    errEl.hidden = false;
+    errEl.textContent = 'FAILED: ' + (e && (e.stack || e.message || e));
+    log('FAILED — see below');
+    await done({ ok: false, shot, error: String((e && e.stack) || e), lines });
+  }
+})();
+
+function renderStats(ren) {
+  const r = ren.renderer.info.render;
+  return { calls: r.calls, tris: r.triangles };
+}
+</script>
+</body>
+</html>

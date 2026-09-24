@@ -1,0 +1,19 @@
+{
+  "name": "s2c-web-play",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "S2C Web Play — browser Go2 touchdown game. The repo root IS the site: plain ES modules, no bundler, no runtime dependencies, all paths relative.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node tests/node_physics_smoke.mjs --http",
+    "test:physics": "node tests/node_physics_smoke.mjs",
+    "test:physics:http": "node tests/node_physics_smoke.mjs --http",
+    "test:physics:fallback": "node tests/node_physics_smoke.mjs --fallback",
+    "serve": "python3 -m http.server 8000"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "//": "There are no dependencies and there must not be any: MuJoCo is vendored under vendor/mujoco (see vendor/mujoco/VERSION.md). `npm install` is never needed to run or to deploy this site."
+}
