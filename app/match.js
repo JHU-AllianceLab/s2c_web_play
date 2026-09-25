@@ -80,6 +80,16 @@ export const PHASE = Object.freeze({
  * ⚠ The gain blend is OFF in the env at `num_envs == 1`
  * (game_qcbf_action.py:238) — which is exactly our case — so a faithful browser
  * shield leaves the gains at walk-soft 20/20/40 unless it deliberately opts in.
+ *
+ * ── THE SHIELD IS NOW IN THE BOX ───────────────────────────────────────────
+ * `app/filter.js` implements it: `makeShieldPath({filter, sim, robot,
+ * opponentRobot})`. It serves BOTH seats — the human's walker and the AI's game
+ * policy propose through the identical affine, so one implementation covers
+ * them both (DESIGN.md section 11 rule 4). `app/main.js` builds the paths from
+ * the two setup checkboxes; nothing in THIS file knows the filter exists.
+ * `info()` returns `{alpha, active, decision, decisionName, value, qTask, thr,
+ * iters, qEvals, gainAlpha, stepMs}`, and `app/ui.js adaptHud` turns
+ * `alpha > 0` into the per-side SHIELD chip.
  */
 // ---------------------------------------------------------------------------
 // createMatch

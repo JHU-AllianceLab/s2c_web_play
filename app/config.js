@@ -693,19 +693,99 @@ export const MATCH = deepFreeze({
   maxStepsPerFrame: 4,
 });
 
+/**
+ * The camera.
+ *
+ * ⚠ app/render.js is the IMPLEMENTATION. It deliberately imports nothing but
+ * three.js (tests/render_harness.html boots it with no app/config.js at all), so
+ * the numbers below are a MIRROR of `MODE_CFG`, `CHASE`, `BROADCAST`, `FPV_EYE`
+ * and the two orbit constants in app/render.js — not their source. Only
+ * `default` and `modes` are read at runtime (app/ui.js:273, :339); everything
+ * else is here so the camera can be read about, and changed, in one place.
+ * Change a number here and you must change it in app/render.js too.
+ *
+ * `chase` geometry, in words: a boom `distance` long, `elevationDeg` above the
+ * horizontal, pivoting `pivotZ` over the dog's base body. At the defaults that
+ * is 3.13 m behind and 1.46 m above the pivot — the lens ~1.94 m off the floor,
+ * looking down 26 deg. It replaced a 2.35 m / 20 deg boom (2.21 m back, 1.24 m
+ * up) that sat low enough for the other robot to fill the frame.
+ *
+ * `omegaPos` / `omegaAim` are the natural frequencies of a critically damped
+ * spring (settling ~5.8/w: 0.53 s and 0.36 s), not lerp factors: the eye and the
+ * look-at each solve x'' = -2w x' - w^2 x exactly for the frame's dt, so the
+ * shot is identical at 30 and 144 fps and can never overshoot.
+ */
 export const CAMERA = deepFreeze({
   default: 'chase',
   modes: ['chase', 'broadcast', 'fpv'],
   chase: {
-    distance: 2.6, height: 1.05, lookAhead: 0.6, pitchDeg: -10, fov: 55,
-    minDistance: 1.2, maxDistance: 8.0, zoomStep: 0.35,
-    posLerp: 0.16, aimLerp: 0.25,
+    /** boom at zoom 1x; the wheel moves it inside [minDistance, maxDistance]. */
+    distance: 3.45, minDistance: 1.6, maxDistance: 9.0,
+    elevationDeg: 25, minElevationDeg: 7, maxElevationDeg: 78,
+    pivotZ: 0.20, aimZ: 0.16, fov: 52, near: 0.05,
+    /** critically damped follow, rad/s — eye and look-at. */
+    omegaPos: 11.0, omegaAim: 16.0,
+    /** velocity lead on the look-at: seconds ahead, capped in metres. */
+    lead: 0.28, leadMax: 1.1,
+    /** boom grows this fraction per m/s of dog speed, capped. */
+    speedStretch: 0.10, speedStretchMax: 0.34,
+    /** the look-at leans this fraction of the gap toward the other robot, */
+    duelBias: 0.52,
+    /** ... in full below duelNear m of separation, not at all above duelFar, */
+    duelNear: 1.0, duelFar: 3.8,
+    /** ... and never further than this many metres off the player. */
+    duelAimMax: 0.95,
+    /** an opponent this close to the camera->player line is eclipsing it, */
+    guardRadius: 0.78,
+    /** ... so the boom lifts this much and backs off this far, at full bite. */
+    guardLiftDeg: 26, guardPush: 0.95,
+    /** ground clearance: of the boom TARGET, and the camera's own backstop. */
+    floorZ: 0.45, hardFloorZ: 0.32,
   },
-  broadcast: { pos: [0, -6.4, 3.6], lookAt: [0, 0, 0.3], fov: 42 },
-  fpv: { offset: [0.28, 0, 0.12], fov: 78 },
-  mouse: { sensitivity: 0.0028, invertY: false, minPitchDeg: -35, maxPitchDeg: 55 },
+  /**
+   * az 90 / el -45 is the angle the 11th-meeting demo clips are rendered at
+   * (Meeting/Video/material_sim/demo_sim_source/README.txt:19, via recon/06
+   * B.3); lookatZ 0.25 from the same line and scripts/render_game_checkpoint.py
+   * :206-212. The distance is SOLVED per frame so the whole pitch fits the lens
+   * (render.js fitDistance), which is why refDistance is only a reference.
+   */
+  broadcast: {
+    azimuthDeg: 90, elevationDeg: -45, refDistance: 5.1, lookatZ: 0.25,
+    fov: 38, near: 0.08, omega: 9.0,
+  },
+  /**
+   * Nose cam: 0.11 m ahead of the Go2's `base3_collision` primitive
+   * (pos x = 0.293, assets/scene/asym/scene.xml:97) and a little above it.
+   * First-order follow, NOT a spring — a spring lets the eye trail the skull.
+   */
+  fpv: { eye: [0.404, 0, 0.092], fov: 78, near: 0.015, kPos: 26.0, kQuat: 18.0 },
+  /**
+   * Mouse. `orbitRadPerPx` is the drag rate at sensitivity 1x and
+   * `zoomPerWheelPx` the wheel's exponential rate; `sensitivityRange` /
+   * `distanceRange` are the sliders app/ui.js ships, which reach
+   * renderer.setMouseSensitivity() and renderer.setCameraDistance().
+   */
+  mouse: {
+    orbitRadPerPx: 0.0055, zoomPerWheelPx: 0.0012,
+    sensitivityRange: [0.2, 4.0], distanceRange: [0.4, 2.5],
+  },
 });
 
+/**
+ * Input. The key->axis tables here ARE the source of truth — app/input.js parses
+ * them (`INPUT.schemes` -> `SCHEMES`) and invents nothing. The polarity is the
+ * repo's own teleop mapping, not a choice: A is +vy, Q is +wz
+ * (Project/unitree_rl_mjlab/scripts/teleop_fastwalk_record.py, recon/04:275).
+ *
+ * The RAMP is not here. Rise/fall seconds, the deadzone, the cruise/sprint split
+ * and the pad deadzone live in app/input.js `FEEL`, in one block with the table
+ * of what each of them measures out to. Two reasons they stay there: they are
+ * per-instance (`createInput(target, { feel })` overrides them), and they are
+ * meaningless without the ceiling they are tuned against — `MATCH.cmdSlewPerSec`
+ * above, which app/match.js applies a second time on the control clock and which
+ * is what actually caps the forward ramp (vx 6.0 m/s^2 = 0.5 s to the top of the
+ * box). Raise that if W should reach cruise quicker than 0.3 s.
+ */
 export const INPUT = deepFreeze({
   schemes: {
     /** DESIGN.md §4: W/S -> vx, A/D -> vy, Q/E -> wz. */
@@ -717,6 +797,12 @@ export const INPUT = deepFreeze({
   sprintKey: 'ShiftLeft',
   pauseKey: 'KeyP',
   restartKey: 'KeyR',
+  /**
+   * The "Steering sensitivity" slider (app/ui.js), reaching
+   * input.setSensitivity(). It scales the vy/wz target AND the vy/wz ramp rate;
+   * it never widens CMD_BOX.
+   */
+  sensitivityRange: [0.4, 1.6],
 });
 
 // ---------------------------------------------------------------------------

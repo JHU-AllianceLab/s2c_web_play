@@ -21,6 +21,7 @@ import { createSim } from './physics.js';
 import { createRenderer } from './render.js';
 import { createMatch, PHASE } from './match.js';
 import { loadManifest } from './policy.js';
+import { loadFilter, makeShieldPath } from './filter.js';
 import * as CONFIG from './config.js';
 
 /** Never simulate more than this many control steps in one animation frame. */
@@ -55,10 +56,15 @@ async function startSession(setup) {
   await teardown();
 
   const game = setup.game;
+  // Which seats run behind the certificate. Both sides load the SAME weights
+  // and the SAME law (app/filter.js); only the proposal differs.
+  const want = { ai: Boolean(setup.filter?.ai), you: Boolean(setup.filter?.you) };
+  const wantFilter = want.ai || want.you;
   const steps = [
     { id: 'scene', label: 'Arena and physics' },
     { id: 'walk', label: 'Your locomotion policy' },
     { id: 'ai', label: `Opponent policy — ${setup.opponent.display || setup.opponent.method}` },
+    ...(wantFilter ? [{ id: 'filter', label: 'S2C safety certificate' }] : []),
     { id: 'render', label: 'Renderer' },
   ];
   ui.loading.begin(steps);
@@ -82,7 +88,39 @@ async function startSession(setup) {
     ui.loading.update('ai', { state: 'done', detail: `${ai.obsDim}→${ai.actDim}` });
     ui.loading.progress(0.8, 'Opponent ready');
 
-    // ---- 3. match -----------------------------------------------------------
+    // ---- 3. the safety filter ------------------------------------------------
+    // The Q-CBF certificate replaces a seat's whole action path (it needs the
+    // increment, keeps its own prev_ctrl, and may rewrite the PD gains), which
+    // is the `actionPaths` seam app/match.js documents.
+    let actionPaths = null;
+    if (wantFilter) {
+      ui.loading.update('filter', { state: 'active' });
+      const filter = await loadFilter({ manifest: man.manifest });
+      const g = CONFIG.gameCfg(game);
+      const playerSeat = setup.playerSeat;
+      const aiSeat = CONFIG.otherSeat(g, playerSeat);
+      const pRobot = CONFIG.seatRobot(g, playerSeat);
+      const aRobot = CONFIG.seatRobot(g, aiSeat);
+      actionPaths = {};
+      if (want.ai) {
+        actionPaths[aiSeat] = makeShieldPath({
+          filter, sim, robot: aRobot, opponentRobot: pRobot,
+        });
+      }
+      if (want.you) {
+        actionPaths[playerSeat] = makeShieldPath({
+          filter, sim, robot: pRobot, opponentRobot: aRobot,
+        });
+      }
+      const on = [want.ai && 'AI', want.you && 'you'].filter(Boolean).join(' + ');
+      ui.loading.update('filter', {
+        state: 'done',
+        detail: `${on} · kappa ${filter.params.kappa} · ${(filter.entry.bin_bytes / 1e6).toFixed(2)} MB`,
+      });
+    }
+    ui.loading.progress(0.9, wantFilter ? 'Certificate ready' : 'Opponent ready');
+
+    // ---- 4. match -----------------------------------------------------------
     const match = createMatch({
       sim,
       game,
@@ -90,10 +128,11 @@ async function startSession(setup) {
       opponent: setup.opponent,
       policies: { walk, ai },
       input: ui.input,
+      actionPaths,
     });
     const playerRobot = match.info?.playerRobot ?? match.state().playerRobot;
 
-    // ---- 4. renderer --------------------------------------------------------
+    // ---- 5. renderer --------------------------------------------------------
     ui.loading.update('render', { state: 'active' });
     const renderer = createRenderer(ui.canvas, sim, game, {
       playerRobot,
@@ -104,7 +143,7 @@ async function startSession(setup) {
     ui.loading.update('render', { state: 'done' });
     ui.loading.progress(1, 'Ready');
 
-    // ---- 5. go --------------------------------------------------------------
+    // ---- 6. go --------------------------------------------------------------
     match.reset();
     ui.startMatch({ game, playerSeat: setup.playerSeat, opponent: setup.opponent });
     const camera = ui.settings?.camera || 'chase';
@@ -178,7 +217,9 @@ function frame() {
 export async function boot() {
   ui = await createUI({
     config: CONFIG,
-    capabilities: { filter: false },   // the QCBF seam exists in match.js; no weights wired yet
+    // The Q-CBF certificate is wired (app/filter.js). app/ui.js clears this
+    // again if assets/policies/manifest.json ships no `filter` block.
+    capabilities: { filter: true },
     cameraModes: CAMERA_MODES,
     // What this build ships. The engine runs both games (tests/node_match.mjs
     // covers sym too); only the asymmetric one is published for now.

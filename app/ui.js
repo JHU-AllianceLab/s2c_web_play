@@ -307,6 +307,15 @@ export async function createUI(options = {}) {
     for (const p of manifest.policies) policyByName.set(p.name, p);
   }
 
+  // The certificate is a capability of the BUILD (app/filter.js implements the
+  // law) *and* of the ASSETS (tools/export_filter.py has to have written the
+  // weights). The shell claims the first; only the manifest can confirm the
+  // second, so a build whose assets/policies/ has no `filter` block falls back
+  // to the greyed-out checkboxes rather than failing on Start.
+  if (capabilities.filter && manifest?.filter?.available !== true) {
+    capabilities.filter = false;
+  }
+
   /** The roster for one game + seat, ordered by METHOD_ORDER, as manifest rows. */
   function roster(game, aiSeat) {
     if (!manifest || !manifest.games || !manifest.games[game]) return [];

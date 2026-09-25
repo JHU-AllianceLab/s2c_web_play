@@ -1,0 +1,52 @@
+{
+  "name": "filter_q1",
+  "role": "twin_q_head_1",
+  "kind": "safety_certificate",
+  "game": "filter",
+  "seat": null,
+  "method": "s2c",
+  "display": "S2C certificate \u2014 twin_q_head_1",
+  "source_checkpoint": "logs/rsl_rl/go2_safety_collision/2026-07-18_14-19-59_collision_ws16_n2048_v5prox/checkpoints/agent_15000.pt",
+  "source_bundle": "deploy/robots/go2_go2/config/policy/safety_game/collision_v5prox_15k_62d_game",
+  "filter_nets_md5": "96fcae4443cc1e51f421a608ea1780b5",
+  "obs_dim": 80,
+  "act_dim": 1,
+  "input_concat": [
+    "obs62",
+    "ctrl12",
+    "dstb6"
+  ],
+  "output": "Q1(obs, u, d)",
+  "cert_obs_dim": 62,
+  "ctrl_dim": 12,
+  "dstb_dim": 6,
+  "layers": [
+    {
+      "in": 80,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 1
+    }
+  ],
+  "activation": "sin",
+  "activation_alpha": 1.0,
+  "head_activation": null,
+  "norm": null,
+  "rotation_baked": false,
+  "action_path": null,
+  "bin": "filter_q1.bin",
+  "bin_bytes": 610308,
+  "bin_layout": "little-endian float32; for each Linear in order: weight (row-major, out x in) then bias (out)",
+  "forward": "x = concat(obs62, ctrl12, dstb6); h = sin(L0 x); h = sin(L1 h); h = sin(L2 h); y = L3 h",
+  "notes": "TwinnedQNetwork head is a bare Linear; app/filter.js takes max(Q1, Q2) because pessimistic == 'max' (filtered_action.py:334)."
+}

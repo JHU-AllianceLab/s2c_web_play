@@ -1,0 +1,51 @@
+{
+  "name": "filter_dstb",
+  "role": "adversary",
+  "kind": "safety_certificate",
+  "game": "filter",
+  "seat": null,
+  "method": "s2c",
+  "display": "S2C certificate \u2014 adversary",
+  "source_checkpoint": "logs/rsl_rl/go2_safety_collision/2026-07-18_14-19-59_collision_ws16_n2048_v5prox/checkpoints/agent_15000.pt",
+  "source_bundle": "deploy/robots/go2_go2/config/policy/safety_game/collision_v5prox_15k_62d_game",
+  "filter_nets_md5": "96fcae4443cc1e51f421a608ea1780b5",
+  "obs_dim": 74,
+  "act_dim": 6,
+  "input_concat": [
+    "obs62",
+    "ctrl12"
+  ],
+  "output": "d (worst-case disturbance, [-1,1]^6)",
+  "cert_obs_dim": 62,
+  "ctrl_dim": 12,
+  "dstb_dim": 6,
+  "layers": [
+    {
+      "in": 74,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 256
+    },
+    {
+      "in": 256,
+      "out": 6
+    }
+  ],
+  "activation": "sin",
+  "activation_alpha": 1.0,
+  "head_activation": "tanh",
+  "norm": null,
+  "rotation_baked": false,
+  "action_path": null,
+  "bin": "filter_dstb.bin",
+  "bin_bytes": 609304,
+  "bin_layout": "little-endian float32; for each Linear in order: weight (row-major, out x in) then bias (out)",
+  "forward": "x = concat(obs62, ctrl12); h = sin(L0 x); h = sin(L1 h); h = sin(L2 h); y = L3 h; y = tanh(y)",
+  "notes": "TanhGaussianActor.forward is tanh(mean_net(x)) * action_scale + action_bias with action_scale == 1 and action_bias == 0 (asserted at export), so the affine is a no-op (networks.py:138-144). log_std_net is never evaluated at deploy and is not exported."
+}

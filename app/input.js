@@ -49,11 +49,35 @@ const CMD_BOX_DEFAULT = CONFIG_MODULE ? CONFIG_MODULE.CMD_BOX : null;
 
 /* ------------------------------------------------------------------ FEEL constants (ours) */
 
+/**
+ * ⚠ THERE IS A SECOND SLEW LIMITER DOWNSTREAM. app/match.js runs every command
+ * through `slewCommand()` with `config.MATCH.cmdSlewPerSec`
+ * (vx 6.0 m/s^2, vy 6.0 m/s^2, wz 10.0 rad/s^2, config.js:687) on the CONTROL
+ * clock, in both directions. The rate a player actually feels is therefore
+ * `min(span/seconds, cmdSlewPerSec)` per axis, and nothing tuned here can go
+ * above that ceiling. The numbers below are set just under it so this file is
+ * the one that decides — with one exception, vx, which is pinned to the ceiling.
+ *
+ * Measured against the trained box (CMD_BOX: vx 3.0, vy 1.0, wz 2.0):
+ *
+ *   axis   rate         hold to cruise        hold to the box       release
+ *   vx     6.00 m/s^2   1.8 m/s in 0.300 s    3.0 m/s in 0.500 s    0.300 s
+ *   vy     5.56 m/s^2   -                     1.0 m/s in 0.180 s    0.170 s
+ *   wz     9.52 rad/s^2 -                     2.0 rad/s in 0.210 s  0.200 s
+ *
+ * vy was 3.33 m/s^2 (1.0 m/s in 0.300 s), which made A/D feel like the dog was
+ * thinking about it; it is the one axis with real headroom under the ceiling.
+ * vx cannot be made quicker from here — raising it needs MATCH.cmdSlewPerSec.vx.
+ */
 export const FEEL = {
   /** Seconds to ramp an axis across its full range when a key is held. */
-  riseSeconds: { vx: 0.35, vy: 0.30, wz: 0.22 },
-  /** Seconds to decay an axis back to zero when the key is released (always faster than rise). */
-  fallSeconds: { vx: 0.18, vy: 0.15, wz: 0.12 },
+  riseSeconds: { vx: 0.50, vy: 0.18, wz: 0.21 },
+  /**
+   * Seconds to decay an axis back to zero when the key is released. Faster than
+   * the rise wherever the downstream ceiling leaves room — on vx it does not,
+   * so the two are equal there and a release takes as long as a press.
+   */
+  fallSeconds: { vx: 0.50, vy: 0.17, wz: 0.20 },
   /** |v| below this is snapped to 0 (DESIGN.md section 4 asks for 0.05). */
   deadzone: 0.05,
   /** Without Shift the forward/backward target is this fraction of the box; Shift = the full box. */
@@ -265,6 +289,11 @@ export function createInput(target = globalThis, opts = {}) {
     sprint = false;
     zeroLatch = false;
     external = null;
+    // Drop the wall clock too. read() is not called while the match is paused or
+    // counting down (app/match.js returns before it), so without this the first
+    // read afterwards would bill the whole gap — clamped to feel.maxDt, but that
+    // is still a fifth of a second of ramp in one control step.
+    lastTime = null;
   }
 
   on(target, 'keydown', onKeyDown);
@@ -381,7 +410,13 @@ export function createInput(target = globalThis, opts = {}) {
       const tgt = clamp(targets[a], box[a][0], box[a][1]);
       const decaying = Math.abs(tgt) < Math.abs(value[a]) || tgt * value[a] < 0;
       const seconds = decaying ? feel.fallSeconds[a] : feel.riseSeconds[a];
-      const rate = span[a] / Math.max(seconds, 1e-3);
+      // Sensitivity scales the RAMP as well as the target. Scaling only the
+      // target made the top half of the slider a no-op on a keyboard: a held key
+      // asks for the full box either way, and the box clamp above throws the
+      // rest away. Scaling the rate too is what makes 1.6x feel different from
+      // 1.0x (turn onset 0.21 s -> 0.13 s, and the same key reaches the same
+      // trained maximum — the box is never widened, only approached sooner).
+      const rate = (span[a] / Math.max(seconds, 1e-3)) * (a === 'vx' ? 1 : sensitivity);
       value[a] = approach(value[a], tgt, rate, dt);
       let v = value[a];
       if (Math.abs(v) < feel.deadzone) v = 0;
@@ -454,8 +489,10 @@ export function createInput(target = globalThis, opts = {}) {
     },
     /** Pause input without tearing the listeners down (menus, countdown, result overlay). */
     setEnabled(v) {
+      const was = enabled;
       enabled = Boolean(v);
       if (!enabled) releaseAll();
+      else if (!was) lastTime = null;   // resume: do not bill the paused seconds
     },
     isEnabled: () => enabled,
     /** Touch stick / scripted driving: normalised axes in [-1,1], or null to hand control back. */

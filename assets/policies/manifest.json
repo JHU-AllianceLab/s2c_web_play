@@ -445,5 +445,282 @@
       "action_path": "increment_integrator",
       "bin_bytes": 788016
     }
-  ]
+  ],
+  "filter": {
+    "available": true,
+    "exporter": "tools/export_filter.py",
+    "display": "S2C safety certificate (Q-CBF)",
+    "source_checkpoint": "logs/rsl_rl/go2_safety_collision/2026-07-18_14-19-59_collision_ws16_n2048_v5prox/checkpoints/agent_15000.pt",
+    "source_bundle": "deploy/robots/go2_go2/config/policy/safety_game/collision_v5prox_15k_62d_game",
+    "filter_nets_md5": "96fcae4443cc1e51f421a608ea1780b5",
+    "authority": "recon/03_safety_filter.md; src/tasks/game/mdp/game_qcbf_action.py, src/tasks/game/mdp/filtered_action.py",
+    "nets": {
+      "ctrl": {
+        "json": "filter_ctrl.json",
+        "bin": "filter_ctrl.bin",
+        "in": 62,
+        "out": 12,
+        "head": "tanh"
+      },
+      "dstb": {
+        "json": "filter_dstb.json",
+        "bin": "filter_dstb.bin",
+        "in": 74,
+        "out": 6,
+        "head": "tanh"
+      },
+      "q1": {
+        "json": "filter_q1.json",
+        "bin": "filter_q1.bin",
+        "in": 80,
+        "out": 1,
+        "head": null
+      },
+      "q2": {
+        "json": "filter_q2.json",
+        "bin": "filter_q2.bin",
+        "in": 80,
+        "out": 1,
+        "head": null
+      }
+    },
+    "bin_bytes": 4084816,
+    "activation": "sin",
+    "normalizer": null,
+    "params": {
+      "kappa": 0.9,
+      "cbf_max_iters": 20,
+      "cbf_tol": 0.01,
+      "pessimistic": "max",
+      "value_eps": -1000000000.0,
+      "value_guard": -1000000000.0,
+      "value_release": -999999999.999999,
+      "intervention": "line_search",
+      "full_takeover": false,
+      "fallback_line_search": false,
+      "kin_enabled": false,
+      "sup_enabled": false,
+      "guard_enabled": false,
+      "reseed_track_err": 0.15
+    },
+    "increment": {
+      "scale": 0.5,
+      "smoothing": 0.3,
+      "inverse_denom": 0.15,
+      "q_lo": [
+        -0.94248,
+        -1.317725,
+        -2.628453,
+        -0.94248,
+        -1.317725,
+        -2.628453,
+        -0.94248,
+        -0.270525,
+        -2.628453,
+        -0.94248,
+        -0.270525,
+        -2.628453
+      ],
+      "q_hi": [
+        0.94248,
+        3.237625,
+        -0.932007,
+        0.94248,
+        3.237625,
+        -0.932007,
+        0.94248,
+        4.284825,
+        -0.932007,
+        0.94248,
+        4.284825,
+        -0.932007
+      ],
+      "q_limits_source": "entity soft_joint_pos_limits (game_qcbf_action.py:147), numerically equal to deploy.yaml increment.joint_pos_*"
+    },
+    "obs": {
+      "dim": 62,
+      "layout": [
+        {
+          "term": "root_link_lin_vel_b",
+          "at": 0,
+          "dim": 3
+        },
+        {
+          "term": "roll",
+          "at": 3,
+          "dim": 1
+        },
+        {
+          "term": "pitch",
+          "at": 4,
+          "dim": 1
+        },
+        {
+          "term": "root_link_ang_vel_b",
+          "at": 5,
+          "dim": 3
+        },
+        {
+          "term": "joint_pos",
+          "at": 8,
+          "dim": 12
+        },
+        {
+          "term": "joint_vel",
+          "at": 20,
+          "dim": 12
+        },
+        {
+          "term": "foot_contact",
+          "at": 32,
+          "dim": 4
+        },
+        {
+          "term": "prev_ctrl",
+          "at": 36,
+          "dim": 12
+        },
+        {
+          "term": "wall_margins",
+          "at": 48,
+          "dim": 4
+        },
+        {
+          "term": "heading",
+          "at": 52,
+          "dim": 2
+        },
+        {
+          "term": "opponent_tail",
+          "at": 54,
+          "dim": 8
+        }
+      ],
+      "slices": {
+        "proprio": [
+          0,
+          48
+        ],
+        "wall_margins": [
+          48,
+          52
+        ],
+        "heading": [
+          52,
+          54
+        ],
+        "opponent_tail": [
+          54,
+          62
+        ]
+      },
+      "joint_order": "FL, FR, RL, RR x (hip, thigh, calf) -- sim order; joint_ids_map / foot_ids_map in the yaml are the hardware permutation and are NOT used here",
+      "joint_pos_is_absolute": true,
+      "prev_ctrl_is_filter_output": true
+    },
+    "field": {
+      "length": 4.8,
+      "width": 3.0,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "d_vis": 1.5,
+      "note": "the asym preset leaves field_size None, so the certificate reads the BUNDLE rectangle (4.8 x 3.0 at the env origin), not the scenario's 5.2 x 3.0 at (0.2, 0) -- recon/03:534-541"
+    },
+    "collision": {
+      "half_extents": [
+        0.29,
+        0.193
+      ],
+      "fwd_offset": 0.05,
+      "d_vis": 1.5,
+      "d_max": 3.0,
+      "no_opponent_tail": [
+        3.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "gains": {
+      "walk": {
+        "kp": [
+          20,
+          20,
+          40,
+          20,
+          20,
+          40,
+          20,
+          20,
+          40,
+          20,
+          20,
+          40
+        ],
+        "kd": [
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2
+        ]
+      },
+      "safety": {
+        "kp": [
+          100,
+          100,
+          200,
+          100,
+          100,
+          200,
+          100,
+          100,
+          200,
+          100,
+          100,
+          200
+        ],
+        "kd": [
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2
+        ]
+      },
+      "rise_steps_env": 8,
+      "rise_steps_cpp": 15,
+      "contact_gated": true
+    },
+    "gain_blend_default": false,
+    "gain_blend_note": "game_qcbf_action.py:238 disables the blend at num_envs == 1, which is the browser's case and the case every single-env demo render ran on; app/filter.js keeps it off by default and exposes it as a flag",
+    "cost_per_filtered_robot_per_step": {
+      "mlp_forwards_floor": 7,
+      "mlp_forwards_typical": "13-19",
+      "mlp_forwards_ceiling": 67,
+      "mac_floor": 1472512,
+      "mac_per_line_search_iter": 455168,
+      "note": "1 ctrl + 2 robust_q at the floor; +1 robust_q per line-search iteration (recon/03:452-482)"
+    }
+  }
 }

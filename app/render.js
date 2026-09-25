@@ -50,6 +50,24 @@
  * player teal #1F6F8B is the paper's S2C colour, opponent is a warm grey.
  * ---------------------------------------------------------------------------
  *
+ * THE VENUE (DESIGN.md section 12)
+ *
+ * The scene above is the plant. Everything that makes it read as a *place* —
+ * the matte hall floor, the walls, the spectator bowl and its crowd, the barrier
+ * boards, the ceiling rig, the contact shadows and the bloom — lives in
+ * app/venue.js and is added to this same scene graph. It is visual-only: no geom,
+ * no constant and no file MuJoCo reads is touched by it, and scene.xml's md5 is
+ * unchanged. `createRenderer(..., {venue: false})` skips it and restores the
+ * previous look (the mjlab checker disc and the gradient sky dome), which is what
+ * the venue/no-venue A/B comparison in tests/shots is shot with.
+ *
+ * With the venue on, the two constants above that described the *old* backdrop —
+ * GROUND_TEX (the mjlab checker) and the sky dome's haze — are unused: an indoor
+ * hall has neither an infinite checkerboard nor a sky. They are kept because the
+ * {venue:false} path still draws them.
+ *
+ * ---------------------------------------------------------------------------
+ *
  * PERFORMANCE CONTRACT
  *  - Scene is built ONCE. describeGeoms()/getMesh() are never called per frame.
  *  - update() allocates nothing: every Vector3/Quaternion/Matrix4/Color it needs
@@ -61,6 +79,7 @@
  */
 
 import * as THREE from '../vendor/three/three.module.js';
+import { buildVenue, createContactShadows, createBloom } from './venue.js';
 
 // ---------------------------------------------------------------------------
 // MuJoCo enums / scene constants
@@ -106,14 +125,69 @@ const TEAM = {
 
 export const CAMERA_MODES = ['chase', 'fpv', 'broadcast'];
 
-/** Per-mode lens + smoothing. k is the exponential-follow rate, 1/s. */
+const DEG = Math.PI / 180;
+
+/**
+ * Per-mode lens + smoothing.
+ *   w*   natural frequency of a CRITICALLY DAMPED spring, rad/s (chase, broadcast)
+ *   k*   rate of a first-order exponential follow, 1/s          (fpv, lens easing)
+ * Both are frame-rate independent; the difference is the shape. A first-order
+ * follow jumps to its maximum speed on frame 1 and then trails an exponential
+ * tail, which is exactly the "icy" feel. The critically damped spring starts at
+ * zero velocity, accelerates, and arrives without overshoot — the boom has
+ * weight but always catches up. FPV stays first-order on purpose: the eye is
+ * bolted to the skull and must not be allowed to lag it (see stepCamera).
+ * Settling time for critical damping is ~5.8/w: chase 0.53 s, broadcast 0.64 s.
+ */
 const MODE_CFG = {
-  chase: { fov: 52, near: 0.05, kPos: 9.0, kTgt: 11.0 },
-  fpv: { fov: 78, near: 0.015, kPos: 26.0, kTgt: 26.0 },
-  broadcast: { fov: 38, near: 0.08, kPos: 4.5, kTgt: 4.5 },
+  chase: { fov: 52, near: 0.05, wPos: 11.0, wTgt: 16.0 },
+  fpv: { fov: 78, near: 0.015, kPos: 26.0, kQuat: 18.0 },
+  broadcast: { fov: 38, near: 0.08, wPos: 9.0, wTgt: 9.0 },
 };
 
-const DEG = Math.PI / 180;
+/**
+ * The chase boom. Everything here is FEEL — no training constant is involved —
+ * but the numbers are chosen against the pitch this game is played on
+ * (5.2 x 3.0 m, app/config.js GAMES.asym.field) and against the 52 deg vertical
+ * lens above, which at 16:9 is 81 deg horizontal.
+ *
+ *  dist/elev   3.45 m at 25 deg = 3.13 m behind and 1.46 m above the boom pivot,
+ *              so the lens sits ~1.94 m off the floor: high enough to look over
+ *              the far dog instead of through it, close enough that the player's
+ *              own dog still reads. (It was 2.35 m at 20 deg = 2.21 m back and
+ *              1.24 m up, which is what let the opponent fill the foreground.)
+ *  the duel    the aim point leans off the player toward the opponent when the
+ *              two are close, so the shot frames the contest and not a backside.
+ *              At the 3.13 m boom the frame is +-2.66 m wide at the dog's range;
+ *              an opponent within ~2.5 m of the player is in shot without help.
+ *  the guard   when the opponent crosses the line of sight the boom lifts and
+ *              backs off instead of letting it eclipse the player.
+ *  floorZ      the boom TARGET never goes under this, so the spring is never
+ *              chasing a point inside the floor (the hard clamp in stepCamera is
+ *              only the backstop).
+ */
+const CHASE = {
+  dist: 3.45, minDist: 1.6, maxDist: 9.0,
+  elev: 25 * DEG, minElev: 7 * DEG, maxElev: 78 * DEG,
+  pivotZ: 0.20,                 // boom pivot, above the dog's base body
+  aimZ: 0.16,                   // look-at, above the dog's base body
+  lead: 0.28, leadMax: 1.1,     // velocity lead on the aim, m and metres cap
+  speedStretch: 0.10,           // boom grows this fraction per m/s of dog speed
+  speedStretchMax: 0.34,        // ... capped here (3.45 -> 4.62 m flat out)
+  duelBias: 0.52,               // aim leans at most this fraction of the gap
+  duelNear: 1.0, duelFar: 3.8,  // full lean at/below near, none at/above far
+  duelAimMax: 0.95,             // ... and never further than this, metres
+  guardRadius: 0.78,            // opponent this close to the sight line is in the way
+  guardLift: 26 * DEG,          // elevation added at full intrusion
+  guardPush: 0.95,              // boom added at full intrusion, metres
+  floorZ: 0.45,                 // minimum ground clearance of the boom target
+  hardFloorZ: 0.32,             // ... and of the camera itself, every mode
+};
+
+/** Mouse orbit, radians per pixel at sensitivity 1, and the wheel's zoom decade. */
+const ORBIT_RAD_PER_PX = 0.0055;
+const ZOOM_PER_WHEEL_PX = 0.0012;
+
 const clamp = (x, lo, hi) => (x < lo ? lo : x > hi ? hi : x);
 /** Shortest signed difference a-b, wrapped to (-pi, pi]. */
 function angDelta(a, b) {
@@ -124,6 +198,32 @@ function angDelta(a, b) {
 }
 /** Frame-rate independent exponential follow weight. */
 const follow = (k, dt) => 1 - Math.exp(-k * dt);
+/** Hermite smoothstep on an already-clamped [0,1] input. */
+const smoothstep = (t) => t * t * (3 - 2 * t);
+
+/**
+ * One EXACT step of a critically damped spring, applied per axis to a
+ * THREE.Vector3 pair (pos carries the state, vel carries its derivative).
+ *
+ * Solving x'' = -2w x' - w^2 x in closed form rather than integrating it means
+ * the result is identical at 30, 60 and 144 fps, cannot overshoot, and cannot
+ * blow up at a long frame — all three of which a fixed-factor lerp gets wrong.
+ * With e = exp(-w dt), d0 = pos - tgt and c = vel + w d0:
+ *      d(dt) = (d0 + c dt) e          v(dt) = (c (1 - w dt) - w d0) e
+ * Steady-state lag behind a target moving at speed s is 2 s / w.
+ */
+function critDamp3(pos, vel, tgt, w, dt) {
+  const e = Math.exp(-w * dt);
+  let d = pos.x - tgt.x, c = vel.x + w * d;
+  pos.x = tgt.x + (d + c * dt) * e;
+  vel.x = (c * (1 - w * dt) - w * d) * e;
+  d = pos.y - tgt.y; c = vel.y + w * d;
+  pos.y = tgt.y + (d + c * dt) * e;
+  vel.y = (c * (1 - w * dt) - w * d) * e;
+  d = pos.z - tgt.z; c = vel.z + w * d;
+  pos.z = tgt.z + (d + c * dt) * e;
+  vel.z = (c * (1 - w * dt) - w * d) * e;
+}
 
 function canonRobot(r) {
   if (r == null) return null;
@@ -285,6 +385,8 @@ function makeSky(hazeColor) {
  *   playerRobot           'a' | 'b'                   (default 'a'; also settable later)
  *   interpolate           boolean                     (default true)
  *   controls              attach mouse orbit/zoom     (default true)
+ *   cameraDistance        chase boom multiplier       (default 1; = setCameraDistance)
+ *   mouseSensitivity      orbit rate multiplier       (default 1; = setMouseSensitivity)
  *   preserveDrawingBuffer for screenshot harnesses     (default false)
  *   antialias             default true
  *   maxPixelRatio         default 2
@@ -304,6 +406,8 @@ export function createRenderer(canvas, sim, game, options = {}) {
     preserveDrawingBuffer: false,
     antialias: true,
     maxPixelRatio: 2,
+    /** build app/venue.js around the pitch; false restores the pre-venue look. */
+    venue: true,
     ...options,
   };
 
@@ -319,8 +423,14 @@ export function createRenderer(canvas, sim, game, options = {}) {
     preserveDrawingBuffer: opt.preserveDrawingBuffer,
   });
   renderer.setClearColor(0x000000, 1);
-  renderer.toneMapping = THREE.NeutralToneMapping; // preserves hue; ACES would shift the MJCF palette
-  renderer.toneMappingExposure = 1.0;
+  // ACES, per DESIGN.md section 12. It rolls the ceiling rig's highlights off
+  // instead of clipping them (which is what makes the bloom read as light rather
+  // than as a white patch) at the cost of a little saturation in the endzone
+  // green and the touchdown red; the exposure below is set to put the pitch back
+  // where Neutral had it. The bloom composite in app/venue.js goes through the
+  // renderer's own tone-mapping include, so both paths share this one curve.
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = opt.venue ? 1.32 : 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -328,7 +438,9 @@ export function createRenderer(canvas, sim, game, options = {}) {
   const scene = new THREE.Scene();
   // Exponential, not linear: from a 1.2 m chase camera most of the visible floor
   // sits well inside any sensible linear `far`, so only exp fog actually grades it.
-  scene.fog = new THREE.FogExp2(hazeColor.clone(), 0.019);
+  // Indoors the density is much higher — the far wall is 11 m away, not 80 — and
+  // it is what hides the seam where the bowl meets the hall wall.
+  scene.fog = new THREE.FogExp2(hazeColor.clone(), opt.venue ? 0.055 : 0.019);
 
   const camera = new THREE.PerspectiveCamera(MODE_CFG.chase.fov, 1.6, MODE_CFG.chase.near, 420);
   camera.up.set(0, 0, 1); // MuJoCo is z-up
@@ -336,13 +448,23 @@ export function createRenderer(canvas, sim, game, options = {}) {
   camera.lookAt(field.cx, field.cy, 0.3);
 
   // ---- lighting -----------------------------------------------------------
-  // MJCF headlight ambient 0.3 / diffuse 0.6 (scene.xml:8) is the reference
-  // level; it is split here into a hemisphere term plus a key/fill pair so the
-  // dogs actually get form and cast a shadow.
-  const ambient = new THREE.AmbientLight(0xffffff, HEADLIGHT.ambient * 0.62);
-  const hemi = new THREE.HemisphereLight(0xbcd8ee, 0x2a3440, 0.70);
-  const key = new THREE.DirectionalLight(0xfff4e2, HEADLIGHT.diffuse * 3.1);
-  key.position.set(-3.4, -4.6, 6.6);
+  // MJCF headlight ambient 0.3 / diffuse 0.6 (scene.xml:8) is the reference level
+  // for the OUTDOOR ({venue:false}) look: a hemisphere term plus a key/fill pair,
+  // so the dogs get form and cast a shadow.
+  //
+  // Indoors it becomes proper three-point lighting, and the reference level goes
+  // down with it: a hall is lit by its rig, not by a sky, so the ambient and
+  // hemisphere terms drop to a bounce and the three directionals do the work.
+  //   key   warm, high and behind the near touchline — the only shadow caster
+  //   fill  cool, opposite and low, opening up the shadow side of both dogs
+  //   rim   cool-white from behind the far touchline, drawing an edge on the dogs
+  //         so they separate from the dark bowl instead of sinking into it
+  const V = opt.venue;
+  const ambient = new THREE.AmbientLight(0xffffff, V ? 0.14 : HEADLIGHT.ambient * 0.62);
+  const hemi = new THREE.HemisphereLight(
+    V ? 0x4a6d92 : 0xbcd8ee, V ? 0x10161f : 0x2a3440, V ? 0.62 : 0.70);
+  const key = new THREE.DirectionalLight(V ? 0xfff1d8 : 0xfff4e2, V ? 2.55 : HEADLIGHT.diffuse * 3.1);
+  key.position.set(-3.4, -4.6, V ? 7.4 : 6.6);
   key.target.position.set(field.cx, field.cy, 0);
   key.castShadow = true;
   const shadowHalf = Math.max(field.halfX, field.halfY) + 1.6;
@@ -350,22 +472,35 @@ export function createRenderer(canvas, sim, game, options = {}) {
   key.shadow.camera.right = shadowHalf;
   key.shadow.camera.top = shadowHalf;
   key.shadow.camera.bottom = -shadowHalf;
-  key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 24;
-  key.shadow.bias = -0.0008;
-  key.shadow.normalBias = 0.012;
-  const fill = new THREE.DirectionalLight(0xc8dcf0, 0.55);
-  fill.position.set(4.2, 3.6, 3.0);
+  // Snug near/far, not 0.5..24. The only casters are the two dogs, and the
+  // receivers that matter are 1.5 mm decor slabs stacked 1.5 mm apart; over a
+  // 23.5 m depth range the map could not tell them apart and the endzone striped
+  // with acne (visible in tests/shots/render_asym_chase_far.png before this).
+  // Halving the range and raising the bias clears it without detaching the
+  // dogs' shadows from their feet.
+  key.shadow.camera.near = V ? 4.0 : 0.5;
+  key.shadow.camera.far = V ? 16 : 24;
+  key.shadow.bias = V ? -0.005 : -0.0008;
+  key.shadow.normalBias = V ? 0.02 : 0.012;
+  const fill = new THREE.DirectionalLight(V ? 0xa8c8f0 : 0xc8dcf0, V ? 0.62 : 0.55);
+  fill.position.set(4.2, 3.6, V ? 2.6 : 3.0);
   fill.target.position.set(field.cx, field.cy, 0);
   scene.add(ambient, hemi, key, key.target, fill, fill.target);
 
+  const rim = V ? new THREE.DirectionalLight(0xdbe9ff, 1.05) : null;
+  if (rim) {
+    rim.position.set(field.cx + 1.6, field.cy + 6.4, 2.3);
+    rim.target.position.set(field.cx, field.cy, 0.22);
+    scene.add(rim, rim.target);
+  }
+
+  // ---- backdrop -----------------------------------------------------------
+  // Outdoors: a gradient sky dome over a finite checker disc (the MJCF terrain
+  // plane is infinite; the disc stands in for it and fades into the haze).
+  // Indoors: neither exists — app/venue.js puts a hall there instead, and the
+  // scene background is the fog colour so every unfilled pixel is hall air.
   const sky = makeSky(hazeColor);
   sky.material.uniforms.uSun.value.copy(key.position).normalize();
-  scene.add(sky);
-
-  // ---- ground -------------------------------------------------------------
-  // The MJCF terrain plane is infinite; here it is a finite disc carrying the
-  // scene's own checker, fading into the haze via the fog.
   const groundTex = groundTexture();
   groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
   const ground = new THREE.Mesh(
@@ -377,7 +512,19 @@ export function createRenderer(canvas, sim, game, options = {}) {
   );
   ground.receiveShadow = true;
   ground.matrixAutoUpdate = false;
-  scene.add(ground);
+
+  let venue = null;
+  if (V) {
+    try {
+      venue = buildVenue(scene, renderer, field, { quality: opt.quality });
+      scene.fog.color.copy(venue.fogColor);
+      scene.background = venue.fogColor.clone();
+    } catch (e) {
+      warnings.push(`venue build failed (${e && e.message}); falling back to the open-air scene`);
+      venue = null;
+    }
+  }
+  if (!venue) { scene.add(sky); scene.add(ground); }
 
   // ---- build the model scene ---------------------------------------------
   const geoms = sim.describeGeoms();
@@ -409,7 +556,22 @@ export function createRenderer(canvas, sim, game, options = {}) {
 
     let geo;
     try {
-      if (g.type === MJ_MESH) {
+      if (venue && g.name === 'decor_centre_circle') {
+        // The MJCF draws the centre circle as a FILLED 0.45 m disc at 30 % alpha
+        // (scene.xml decor_centre_circle, tools/export_scene.py:407); on a real
+        // pitch it is a painted line, and as a filled patch it reads as a grey
+        // smudge under whichever dog is standing on it. The geom is
+        // contype=0 conaffinity=0 density=0 and is never read by physics.js,
+        // obs.js or referee.js, so the renderer draws the line the disc was
+        // standing in for. Same centre, same radius, same slab height.
+        const ck = `ring|${g.size[0]}`;
+        geo = geomCache.get(ck);
+        if (!geo) {
+          geo = new THREE.RingGeometry(g.size[0] - 0.045, g.size[0], 72);
+          geomCache.set(ck, geo);
+        }
+        nPrimGeoms++;
+      } else if (g.type === MJ_MESH) {
         const ck = `m${g.meshId}`;
         geo = geomCache.get(ck);
         if (!geo) { geo = meshGeometry(sim.getMesh(g.meshId)); geomCache.set(ck, geo); }
@@ -430,7 +592,11 @@ export function createRenderer(canvas, sim, game, options = {}) {
     }
 
     const rob = canonRobot(g.robot);
-    const mat = rob ? robotMaterial(rob, g) : worldMaterial(g);
+    let mat = rob ? robotMaterial(rob, g) : worldMaterial(g);
+    // the ring above is a line, not a wash: it carries the slab's colour at the
+    // alpha the other painted markings use (decor_touchline_*, 0.95), not the
+    // 0.30 the filled disc needed to stay subtle.
+    if (venue && g.name === 'decor_centre_circle') mat = markingMaterial(g);
 
     const mesh = new THREE.Mesh(geo, mat);
     mesh.name = g.name || `${g.typeName}_${g.geomId}`;
@@ -489,6 +655,27 @@ export function createRenderer(canvas, sim, game, options = {}) {
       transparent,
       opacity: a,
       depthWrite: !transparent,
+      side: THREE.DoubleSide,
+    });
+    matCache.set(ck, m);
+    return m;
+  }
+
+  /**
+   * A painted pitch marking: the geom's own rgb, at the alpha the touch lines
+   * use (scene.json field.decor.palette.marking = 0.92 0.92 0.88 0.95). Only the
+   * centre circle needs it, and only because the renderer draws that one as a
+   * ring rather than as the disc the MJCF ships.
+   */
+  function markingMaterial(g) {
+    const [r, gr, b] = g.rgba;
+    const ck = `mark|${r}|${gr}|${b}`;
+    let m = matCache.get(ck);
+    if (m) return m;
+    m = new THREE.MeshStandardMaterial({
+      color: mjColor(new THREE.Color(), r, gr, b),
+      roughness: 0.82, metalness: 0.03,
+      transparent: true, opacity: 0.95, depthWrite: false,
       side: THREE.DoubleSide,
     });
     matCache.set(ck, m);
@@ -585,6 +772,12 @@ export function createRenderer(canvas, sim, game, options = {}) {
   }
   scene.add(ringGroup);
 
+  // ---- contact shadows ----------------------------------------------------
+  // One soft blob under each dog, so they are planted on the floor even at
+  // quality 'low' (no shadow map at all) and under the belly, where a single
+  // directional shadow never reaches. See app/venue.js:createContactShadows.
+  const contact = venue ? createContactShadows(scene) : null;
+
   // ---- pose buffers / interpolation --------------------------------------
   const prevBuf = new Float32Array(nbody * 7);
   const nextBuf = new Float32Array(nbody * 7);
@@ -618,10 +811,34 @@ export function createRenderer(canvas, sim, game, options = {}) {
   let mode = 'chase';
   const camPos = new THREE.Vector3().copy(camera.position);
   const camTgt = new THREE.Vector3(field.cx, field.cy, 0.3);
+  /** Spring state for camPos / camTgt. Zeroed whenever the camera snaps. */
+  const camVel = new THREE.Vector3();
+  const camTgtVel = new THREE.Vector3();
   const camQuat = new THREE.Quaternion();
   let camInit = false;
 
-  const chase = { yaw: 0, elev: 20 * DEG, dist: 2.35, minDist: 1.15, maxDist: 6.0 };
+  /**
+   * `chase.yaw/elev/dist` is the PLAYER's boom: the mouse writes it, the
+   * auto-align nudges its yaw, and nothing else may touch it. Every automatic
+   * framing term (speed stretch, the sight-line guard) is computed on top of it
+   * per frame and thrown away, so an orbit is never silently overwritten.
+   * `yawSynced` is false until the boom has been dropped behind the dog's own
+   * heading — without it the camera opens every match pointing down world +x,
+   * which on the asym pitch parks it right on top of the far robot.
+   */
+  const chase = {
+    yaw: 0, elev: CHASE.elev, dist: CHASE.dist,
+    minDist: CHASE.minDist, maxDist: CHASE.maxDist,
+  };
+  let yawSynced = false;
+  /**
+   * Settings-panel multipliers, also accepted up front so a session can open
+   * with the player's saved sliders instead of snapping to them on first drag.
+   */
+  let distScale = 1;
+  let orbitSens = 1;
+  if (Number.isFinite(opt.cameraDistance)) distScale = clamp(opt.cameraDistance, 0.4, 2.5);
+  if (Number.isFinite(opt.mouseSensitivity)) orbitSens = clamp(opt.mouseSensitivity, 0.2, 4.0);
   const fpv = { yawOff: 0, pitchOff: 0 };
   const bcast = {
     az: BROADCAST.azimuthDeg * DEG, el: BROADCAST.elevationDeg * DEG, distScale: 1,
@@ -632,6 +849,7 @@ export function createRenderer(canvas, sim, game, options = {}) {
   const _v3a = new THREE.Vector3(), _v3b = new THREE.Vector3();
   const _fwd = new THREE.Vector3(), _bx = new THREE.Vector3();
   const _by = new THREE.Vector3(), _bz = new THREE.Vector3();
+  const _foe = new THREE.Vector3();
   const _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion();
   const _up = new THREE.Vector3(0, 0, 1);
 
@@ -660,10 +878,13 @@ export function createRenderer(canvas, sim, game, options = {}) {
     const dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
     lastDragT = performance.now() / 1000;
-    const s = 0.0055;
+    const s = ORBIT_RAD_PER_PX * orbitSens;
     if (mode === 'chase') {
+      // Orbiting counts as taking the wheel: the boom stops auto-aligning for a
+      // moment (lastDragT) but keeps the yaw the player just chose.
+      yawSynced = true;
       chase.yaw -= dx * s;
-      chase.elev = clamp(chase.elev + dy * s, 3 * DEG, 78 * DEG);
+      chase.elev = clamp(chase.elev + dy * s, CHASE.minElev, CHASE.maxElev);
     } else if (mode === 'fpv') {
       fpv.yawOff = clamp(fpv.yawOff - dx * s, -100 * DEG, 100 * DEG);
       fpv.pitchOff = clamp(fpv.pitchOff + dy * s, -55 * DEG, 45 * DEG);
@@ -679,7 +900,7 @@ export function createRenderer(canvas, sim, game, options = {}) {
     try { canvas.releasePointerCapture(e.pointerId); } catch { /* fine */ }
   }
   function onWheel(e) {
-    const f = Math.exp(e.deltaY * (e.deltaMode === 1 ? 0.03 : 0.0012));
+    const f = Math.exp(e.deltaY * (e.deltaMode === 1 ? 25 * ZOOM_PER_WHEEL_PX : ZOOM_PER_WHEEL_PX));
     if (mode === 'broadcast') bcast.distScale = clamp(bcast.distScale * f, 0.45, 2.2);
     else chase.dist = clamp(chase.dist * f, chase.minDist, chase.maxDist);
     e.preventDefault();
@@ -710,6 +931,7 @@ export function createRenderer(canvas, sim, game, options = {}) {
 
   // ---- sizing -------------------------------------------------------------
   let vw = 0, vh = 0;
+  const _dbSize = new THREE.Vector2();
   function resize() {
     const w = Math.max(1, Math.round(canvas.clientWidth || canvas.width || 1));
     const h = Math.max(1, Math.round(canvas.clientHeight || canvas.height || 1));
@@ -723,7 +945,33 @@ export function createRenderer(canvas, sim, game, options = {}) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    // the bloom chain works in DRAWING-BUFFER pixels, not CSS pixels
+    if (bloom) { renderer.getDrawingBufferSize(_dbSize); bloom.setSize(_dbSize.x, _dbSize.y); }
   }
+
+  // ---- bloom --------------------------------------------------------------
+  // High only: the chain costs one full-resolution half-float target plus five
+  // fullscreen passes, which is nothing on a GPU and everything on a software
+  // rasteriser. Medium and low render straight to the canvas, through the same
+  // ACES curve (app/venue.js:createBloom explains why the two paths agree).
+  let bloom = null;
+  function setBloom(on) {
+    if (on && !bloom) {
+      try {
+        bloom = createBloom(renderer, scene, camera, { samples: opt.antialias ? 4 : 0 });
+        renderer.getDrawingBufferSize(_dbSize);
+        bloom.setSize(_dbSize.x, _dbSize.y);
+      } catch (e) {
+        warnings.push(`bloom unavailable (${e && e.message}); rendering direct`);
+        bloom = null;
+      }
+    } else if (!on && bloom) {
+      bloom.dispose();
+      bloom = null;
+      renderer.setRenderTarget(null);
+    }
+  }
+
   resize();
 
   function setQuality(q) {
@@ -733,6 +981,8 @@ export function createRenderer(canvas, sim, game, options = {}) {
     key.castShadow = q !== 'low';
     key.shadow.mapSize.setScalar(q === 'high' ? 2048 : 1024);
     if (key.shadow.map) { key.shadow.map.dispose(); key.shadow.map = null; }
+    if (venue) venue.setQuality(q);
+    setBloom(!!venue && q === 'high');
     vw = 0; // force resize() to re-apply the pixel ratio
     resize();
   }
@@ -773,29 +1023,87 @@ export function createRenderer(canvas, sim, game, options = {}) {
     return Math.max(d, 1.0);
   }
 
+  /**
+   * Where the chase boom WANTS to be this frame. The spring in stepCamera is
+   * what actually gets there; nothing below is smoothed, so every term can be
+   * read as a static rule.
+   *
+   * Order matters: yaw first (it defines the sight line), then the aim, then the
+   * sight-line guard (which needs the aim), then the boom itself.
+   */
   function solveChase(dt, desiredPos, desiredTgt) {
     const speed = Math.hypot(focusVel.x, focusVel.y);
-    // GTA-style auto-align: the boom drifts behind the dog when it is moving and
-    // the player has not touched the mouse recently.
+
+    // -- 1. yaw. On the first frame the boom is dropped straight behind the dog;
+    //    after that it is the player's, nudged back in line when they are moving
+    //    and have left the mouse alone (GTA-style auto-align).
+    if (!yawSynced && haveState) { chase.yaw = focusYaw; yawSynced = true; }
     const sinceDrag = performance.now() / 1000 - lastDragT;
     if (!dragging && sinceDrag > 1.1 && speed > 0.25) {
       const w = follow(clamp(2.4 * (speed - 0.2), 0, 3.4), dt);
       chase.yaw += angDelta(focusYaw, chase.yaw) * w;
     }
-    const d = chase.dist * (1 + 0.055 * clamp(speed, 0, 3.5));
-    const ce = Math.cos(chase.elev), se = Math.sin(chase.elev);
-    desiredPos.set(
-      focusPos.x - d * ce * Math.cos(chase.yaw),
-      focusPos.y - d * ce * Math.sin(chase.yaw),
-      focusPos.z + d * se + 0.16,
-    );
-    // velocity lead, clamped so a sprint does not throw the look-at off the pitch
-    const lead = 0.28;
+    const cy = Math.cos(chase.yaw), sy = Math.sin(chase.yaw);
+
+    // -- 2. the other dog, in the same interpolated frame as the one we follow.
+    const oo = 7 * (playerFocus() === 'a' ? baseBodyOf.b : baseBodyOf.a);
+    _foe.set(drawBuf[oo], drawBuf[oo + 1], drawBuf[oo + 2]);
+    const gx = _foe.x - focusPos.x, gy = _foe.y - focusPos.y;
+    const sep = Math.hypot(gx, gy);
+
+    // -- 3. aim. Lean off the player toward the opponent as the gap closes, so a
+    //    close-quarters duel is centred instead of happening over the dog's
+    //    shoulder. The lean is killed when the opponent is behind the lens
+    //    (`face`): leaning at something behind the camera would flip the shot.
+    let lean = CHASE.duelBias
+      * smoothstep(clamp((CHASE.duelFar - sep) / (CHASE.duelFar - CHASE.duelNear), 0, 1));
+    if (sep > 1e-3) {
+      const face = clamp(((gx * cy + gy * sy) / sep) * 1.6 + 0.5, 0, 1);
+      lean *= face;
+      if (sep * lean > CHASE.duelAimMax) lean = CHASE.duelAimMax / sep;
+    } else {
+      lean = 0;
+    }
     desiredTgt.set(
-      focusPos.x + clamp(focusVel.x * lead, -1.1, 1.1),
-      focusPos.y + clamp(focusVel.y * lead, -1.1, 1.1),
-      focusPos.z + 0.10,
+      focusPos.x + gx * lean + clamp(focusVel.x * CHASE.lead, -CHASE.leadMax, CHASE.leadMax),
+      focusPos.y + gy * lean + clamp(focusVel.y * CHASE.lead, -CHASE.leadMax, CHASE.leadMax),
+      focusPos.z + CHASE.aimZ,
     );
+
+    // -- 4. boom length: the player's zoom, times the settings slider, eased out
+    //    with speed so a sprint opens the shot instead of tailgating.
+    let d = clamp(chase.dist * distScale, CHASE.minDist, CHASE.maxDist * 1.25);
+    d *= 1 + Math.min(CHASE.speedStretch * speed, CHASE.speedStretchMax);
+
+    // -- 5. sight-line guard. Project the opponent onto the camera->player line
+    //    in plan view; if it is inside guardRadius of that line AND genuinely
+    //    between the two (t away from both ends), lift the boom over it and back
+    //    off, in proportion to how badly it is in the way.
+    let elev = chase.elev;
+    const reach = d * Math.cos(elev);
+    if (reach > 0.2) {
+      // opponent relative to the nominal lens, in plan view
+      const wx = gx + reach * cy, wy = gy + reach * sy;
+      const t = (wx * cy + wy * sy) / reach;
+      const perp = Math.abs(wy * cy - wx * sy);
+      if (t > 0 && t < 1 && perp < CHASE.guardRadius) {
+        const taper = smoothstep(clamp(Math.min(t / 0.10, (1 - t) / 0.25), 0, 1));
+        const bite = smoothstep(clamp(1 - perp / CHASE.guardRadius, 0, 1)) * taper;
+        elev = clamp(elev + CHASE.guardLift * bite, CHASE.minElev, CHASE.maxElev);
+        d += CHASE.guardPush * bite;
+      }
+    }
+
+    // -- 6. the boom, pivoted above the dog's base so a low orbit still clears
+    //    the floor; the target is floored outright so the spring never chases a
+    //    point underground.
+    const ce = Math.cos(elev), se = Math.sin(elev);
+    desiredPos.set(
+      focusPos.x - d * ce * cy,
+      focusPos.y - d * ce * sy,
+      focusPos.z + CHASE.pivotZ + d * se,
+    );
+    if (desiredPos.z < CHASE.floorZ) desiredPos.z = CHASE.floorZ;
   }
 
   function solveBroadcast(desiredPos, desiredTgt) {
@@ -852,15 +1160,19 @@ export function createRenderer(canvas, sim, game, options = {}) {
       poseBodies();
       updateFocus(focus, dt);
       updateRing(focus);
+      if (contact) updateContact();
     }
 
     stepCamera(dt);
 
-    sky.position.copy(camera.position);
-    sky.matrix.makeTranslation(camera.position.x, camera.position.y, camera.position.z);
-    sky.matrixWorldNeedsUpdate = true;
+    if (!venue) {
+      sky.position.copy(camera.position);
+      sky.matrix.makeTranslation(camera.position.x, camera.position.y, camera.position.z);
+      sky.matrixWorldNeedsUpdate = true;
+    }
 
-    renderer.render(scene, camera);
+    if (bloom) bloom.render();
+    else renderer.render(scene, camera);
     frames++;
     frameMs += (performance.now() / 1000 - now) * 1000;
   }
@@ -909,7 +1221,7 @@ export function createRenderer(canvas, sim, game, options = {}) {
     }
     if (moved) {
       for (const st of statics) { bodyUsed[st.bodyId] = 1; dynamic.push(st); }
-      warnings.push(`${statics.length} world-welded geoms moved; promoted to the per-frame path`);
+      warnings.push(`${statics.length} world-welded geoms moved; promoted to the per-frame path`); // alloc-ok: fires at most once, on the frame a world-welded prop is first seen to move
       statics.length = 0; staticBodies.clear();
       staticCheck = -1;
       return;
@@ -978,6 +1290,23 @@ export function createRenderer(canvas, sim, game, options = {}) {
     ringGroup.matrixWorldNeedsUpdate = true;
   }
 
+  /** Slide both contact blobs under their dogs. Two matrix writes, no alloc. */
+  function updateContact() {
+    const a = 7 * baseBodyOf.a, b = 7 * baseBodyOf.b;
+    contact.place('a', drawBuf[a], drawBuf[a + 1], drawBuf[a + 2]);
+    contact.place('b', drawBuf[b], drawBuf[b + 1], drawBuf[b + 2]);
+  }
+
+  /**
+   * Move the real camera one frame toward whatever the mode's solver asked for.
+   *
+   * chase/broadcast run a critically damped spring (critDamp3) on the eye and
+   * on the look-at separately — the look-at is the stiffer of the two, so the
+   * shot keeps pointing at the action while the boom still has some weight.
+   * FPV keeps its first-order follow: a spring would make the eye trail the
+   * skull by 2 v / w metres at speed, which on a head cam reads as the camera
+   * sinking into the dog.
+   */
   function stepCamera(dt) {
     const cfg = MODE_CFG[mode];
     if (mode === 'fpv') {
@@ -988,25 +1317,35 @@ export function createRenderer(canvas, sim, game, options = {}) {
       _qb.slerp(_qa, 0.5);                       // half the body's pitch/roll
       _v3a.set(FPV_EYE.x, FPV_EYE.y, FPV_EYE.z).applyQuaternion(_qa);
       _v3a.set(drawBuf[o] + _v3a.x, drawBuf[o + 1] + _v3a.y, drawBuf[o + 2] + _v3a.z);
-      if (!camInit) camPos.copy(_v3a); else camPos.lerp(_v3a, follow(cfg.kPos, dt));
+      if (!camInit) { camPos.copy(_v3a); camVel.set(0, 0, 0); } else {
+        camPos.lerp(_v3a, follow(cfg.kPos, dt));
+      }
       camPos.z = Math.max(camPos.z, 0.06);
       _qb.multiply(FPV_BASIS);
       _qa.setFromAxisAngle(_up, fpv.yawOff);     // mouse look, applied in world yaw
       _qb.premultiply(_qa);
       _qa.setFromAxisAngle(_v3b.set(1, 0, 0), fpv.pitchOff);
       _qb.multiply(_qa);
-      if (!camInit) camQuat.copy(_qb); else camQuat.slerp(_qb, follow(18, dt));
+      if (!camInit) camQuat.copy(_qb); else camQuat.slerp(_qb, follow(cfg.kQuat, dt));
       camera.position.copy(camPos);
       camera.quaternion.copy(camQuat);
     } else {
       if (mode === 'chase') solveChase(dt, _v3a, _v3b);
       else solveBroadcast(_v3a, _v3b);
-      if (!camInit) { camPos.copy(_v3a); camTgt.copy(_v3b); } else {
-        camPos.lerp(_v3a, follow(cfg.kPos, dt));
-        camTgt.lerp(_v3b, follow(cfg.kTgt, dt));
+      if (!camInit) {
+        camPos.copy(_v3a); camTgt.copy(_v3b);
+        camVel.set(0, 0, 0); camTgtVel.set(0, 0, 0);
+      } else {
+        critDamp3(camPos, camVel, _v3a, cfg.wPos, dt);
+        critDamp3(camTgt, camTgtVel, _v3b, cfg.wTgt, dt);
       }
-      // never dip into the floor
-      camPos.z = Math.max(camPos.z, 0.30);
+      // Backstop: the solver already floors its target, so this only ever fires
+      // on a snap from a stale position. Kill the downward velocity with it, or
+      // the spring keeps pushing into the clamp and the shot sticks.
+      if (camPos.z < CHASE.hardFloorZ) {
+        camPos.z = CHASE.hardFloorZ;
+        if (camVel.z < 0) camVel.z = 0;
+      }
       camera.position.copy(camPos);
       camera.up.copy(_up);
       camera.lookAt(camTgt);
@@ -1018,7 +1357,10 @@ export function createRenderer(canvas, sim, game, options = {}) {
       camera.near = cfg.near;
       camera.updateProjectionMatrix();
     }
-    camInit = true;
+    // Only arm the easing once there is a pose to ease FROM. Before the first
+    // physics frame the focus is still the origin, and letting the spring start
+    // there would fly the shot in from the middle of the pitch.
+    if (haveState) camInit = true;
   }
 
   function playerFocus() { return lastFocus || playerRobot; }
@@ -1034,13 +1376,16 @@ export function createRenderer(canvas, sim, game, options = {}) {
     /** 'chase' | 'fpv' | 'broadcast'. snap=true skips the fly-over. */
     setCamera(m, snap = false) {
       if (!CAMERA_MODES.includes(m)) throw new Error(`setCamera: unknown mode "${m}"`);
-      if (m === mode) { if (snap) camInit = false; return; }
+      if (m === mode) { if (snap) { camInit = false; if (m === 'chase') yawSynced = false; } return; }
       mode = m;
       if (m === 'broadcast') {
         bcast.az = BROADCAST.azimuthDeg * DEG;
         bcast.el = BROADCAST.elevationDeg * DEG;
         bcast.distScale = 1;
       } else if (m === 'fpv') { fpv.yawOff = 0; fpv.pitchOff = 0; }
+      // Coming back to chase, drop the boom behind the dog again rather than
+      // resuming whatever yaw it held three camera modes ago.
+      if (m === 'chase') yawSynced = false;
       if (snap) camInit = false;
     },
     resize,
@@ -1069,14 +1414,37 @@ export function createRenderer(canvas, sim, game, options = {}) {
     setPlayerRing(on) { ringVisible = !!on; ringGroup.visible = !!on; },
     attachControls,
     detachControls,
+    /**
+     * Settings panel, "Camera distance" (ui.js ships it at 0.6..1.8x). Multiplies
+     * the chase boom on top of whatever the wheel has zoomed to; the product is
+     * still clamped to the boom's own range, so the slider can never put the lens
+     * inside the dog or out past the arena.
+     */
+    setCameraDistance(v) {
+      const n = Number(v);
+      distScale = clamp(Number.isFinite(n) && n > 0 ? n : 1, 0.4, 2.5);
+    },
+    getCameraDistance: () => distScale,
+    /**
+     * Settings panel hook for the mouse. Separate from input.setSensitivity(),
+     * which scales the velocity command, not the orbit — a player who wants a
+     * twitchy camera does not necessarily want a twitchy robot.
+     */
+    setMouseSensitivity(v) {
+      const n = Number(v);
+      orbitSens = clamp(Number.isFinite(n) && n > 0 ? n : 1, 0.2, 4.0);
+    },
+    getMouseSensitivity: () => orbitSens,
     /** Drop the camera on its target immediately (no easing) on the next frame. */
-    snapCamera() { camInit = false; },
+    snapCamera() { camInit = false; yawSynced = false; },
     /** Mean ms spent inside update() since the last call, and the frame count. */
     stats() {
       const s = { frames, meanMs: frames ? frameMs / frames : 0 };
       frames = 0; frameMs = 0;
       return s;
     },
+    /** Hide the whole venue without rebuilding it — for an A/B screenshot. */
+    setVenueVisible(on) { if (venue) venue.group.visible = !!on; },
     info: {
       three: THREE.REVISION,
       field,
@@ -1088,11 +1456,17 @@ export function createRenderer(canvas, sim, game, options = {}) {
       get staticGeoms() { return statics.length; },
       worldGeoms: geoms.length - nSkipped,
       uniqueGeometries: geomCache.size,
+      venue: venue ? venue.info : null,
+      get bloom() { return !!bloom; },
+      toneMapping: 'ACESFilmic',
       drawCalls: () => renderer.info.render.calls,
       triangles: () => renderer.info.render.triangles,
     },
     dispose() {
       detachControls();
+      if (bloom) { bloom.dispose(); bloom = null; }
+      if (contact) contact.dispose();
+      if (venue) venue.dispose();
       for (const g of geomCache.values()) g.dispose();
       for (const m of matCache.values()) m.dispose();
       for (const t of [robotMats.a, robotMats.b]) for (const m of t.values()) m.dispose();
