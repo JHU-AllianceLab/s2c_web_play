@@ -13,8 +13,12 @@
  *   2  GEOMETRY      rect_rect_distance / the 8-D opponent tail
  *   3  OBSERVATION   the 62-D vector, block by block, against python
  *   4  FILTER LAW    u_task / u_safe / V / q_task / u_sel / alpha / decision / target
- *   5  CLOSED LOOP   a real MuJoCo match with the filter on BOTH seats
- *   6  COST          measured us per filtered robot per control step
+ *   5  GRADIENT      grad_u Qhat, against central differences on an independent
+ *                    float64 reimplementation of robust_q
+ *   6  PROJECTED GRADIENT  the shipped solver, against a python trace of
+ *                    BatchedQcbfFilter under intervention="projected_gradient"
+ *   7  CLOSED LOOP   a real MuJoCo match with the filter on BOTH seats
+ *   8  COST          measured us per filtered robot per control step
  */
 
 import { readFile } from 'node:fs/promises';
@@ -25,6 +29,7 @@ import { createMatch } from '../app/match.js';
 import {
   loadFilter, makeShieldPath, createCertificate, createShield, filterObs,
   rectRectDistance, opponentTail, hullCentre, FILTER_OBS_LAYOUT, DECISION_NAME,
+  DECISION, INTERVENTION, PG,
 } from '../app/filter.js';
 import { IncrementIntegrator, DEFAULT_JOINT_POS } from '../app/action.js';
 
@@ -76,6 +81,23 @@ section('1. NETS — the exported certificate');
   ok(filter.field.halfX === 2.4 && filter.field.halfY === 1.5,
     'the certificate sees the BUNDLE rectangle 4.8 x 3.0, not the 5.2 x 3.0 scenario',
     `hx ${filter.field.halfX}  hy ${filter.field.halfY}`);
+  // The solver comes from the RUN CONFIG of the shipped checkpoints, not from
+  // the bundle yaml (game_qcbf_action.py:117-118 lets the action cfg win).
+  ok(p.bundleIntervention === INTERVENTION.LINE_SEARCH,
+    'the bundle yaml names no solver, so it reads "line_search"', p.bundleIntervention);
+  ok(p.intervention === INTERVENTION.PROJECTED_GRADIENT,
+    'but the shipped seats trained under projected_gradient (v133fdrw / v135fdrw ' +
+    'run_config.yaml filter.{attacker,defender}_ctrl)', p.intervention);
+  ok(p.pgStep === 0.2 && p.pgMaxIters === 25 && p.pgBacktrackIters === 12,
+    'with eta 0.2 x 25 steps (travel budget 5.0) and 12 backtracks',
+    `${p.pgStep} x ${p.pgMaxIters}, bt ${p.pgBacktrackIters}`);
+  ok(PG.step * PG.maxIters === 5, 'travel budget = pg_step * pg_max_iters = 5.0 (runcfg.py:338)');
+  const g = filter.entry.params;
+  ok(g.value_eps < -1e8 && g.value_guard < -1e8,
+    'the value channel is parked at -1e9, so no GUARD/HANDBACK branch exists',
+    `value_eps ${g.value_eps}`);
+  ok(g.kin_enabled === false,
+    'and the kinematic tilt guard is off (no tilt_guard key in the bundle yaml)');
 }
 
 // ===========================================================================
@@ -179,11 +201,17 @@ function fakeSim(s) {
 }
 
 // ===========================================================================
-section('4. FILTER LAW — the decision, against BatchedQcbfFilter');
+section('4. FILTER LAW — the decision, against BatchedQcbfFilter (line search)');
 // ===========================================================================
+//
+// tests/filter_fixture.json is a python trace of the SECANT (export_filter.py
+// asserts `p.intervention == "line_search"` before it records), so this section
+// drives the secant. It is still the reference for everything the two solvers
+// share: the obs, u_safe, V, q_task, the task-pass and out-of-set branches and
+// the integrator. The shipped solver is checked in section 6.
 {
   const cert = createCertificate(filter.nets);
-  const shield = createShield(cert, filter.params);
+  const shield = createShield(cert, { ...filter.params, intervention: INTERVENTION.LINE_SEARCH });
   const integ = new IncrementIntegrator(
     DEFAULT_JOINT_POS, filter.params.qLo, filter.params.qHi,
     { incrementScale: filter.params.incScale, smoothing: filter.params.incSmoothing },
@@ -242,7 +270,203 @@ section('4. FILTER LAW — the decision, against BatchedQcbfFilter');
 }
 
 // ===========================================================================
-section('5. CLOSED LOOP — a real match with the filter on BOTH seats');
+section('5. GRADIENT — grad_u Qhat, against central differences');
+// ===========================================================================
+//
+// `cert.gradU` is a hand-written reverse pass through the twin head that won
+// the pessimistic max and then through the adversary — the TOTAL derivative
+// dQ/du + (dQ/dd)(d pi_d/du), which is what python's autograd returns because
+// `robust_q` does not detach d (filtered_action.py:696-698).
+//
+// The reference below is deliberately an INDEPENDENT reimplementation: a plain
+// float64 forward built straight out of the loaded weights, with none of
+// filter.js's tape, blocking or float32 stores. Central differences of THAT
+// catch a wrong backward AND a wrong forward wiring (e.g. feeding the twin
+// heads the wrong d, or differentiating the losing head).
+//
+// Float64 matters: the shipped forward rounds to float32 at every layer, so its
+// own central differences bottom out around 1e-3 relative no matter how h is
+// chosen (the noise floor is ~5e-8 in Q and the quotient divides by 2h).
+{
+  const cert = createCertificate(filter.nets);
+
+  /** Plain float64 MLP forward, straight from `policy.layers`. */
+  const f64 = (net, x) => {
+    const head = net.meta.head_activation;
+    let v = Array.from(x);
+    net.layers.forEach((L, li) => {
+      const y = new Array(L.out);
+      for (let r = 0; r < L.out; r++) {
+        let s = 0;
+        for (let c = 0; c < L.in; c++) s += L.w[r * L.in + c] * v[c];
+        y[r] = s + L.b[r];
+      }
+      const isLast = li === net.layers.length - 1;
+      for (let r = 0; r < L.out; r++) {
+        if (!isLast) y[r] = Math.sin(y[r]);
+        else if (head === 'tanh') y[r] = Math.tanh(y[r]);
+      }
+      v = y;
+    });
+    return v;
+  };
+  const robustQ64 = (obs, u) => {
+    const d = f64(filter.nets.dstb, [...obs, ...u]);
+    const x = [...obs, ...u, ...d];
+    return Math.max(f64(filter.nets.q1, x)[0], f64(filter.nets.q2, x)[0]);
+  };
+
+  // A spread of operating points: the certificate's own action on a few fixture
+  // states, and a few pushed out towards the corners of the [-1,1]^12 box the
+  // ascent actually explores.
+  let rng = 0x5afe;
+  const rand = () => ((rng = (rng * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff) * 2 - 1;
+  const points = [];
+  for (let k = 0; k < 6; k++) {
+    const i = (k * 5 + 2) % fx.obs.length;
+    const obs = Float32Array.from(fx.obs[i]);
+    const u = k % 2 === 0
+      ? Float64Array.from(cert.fallback(obs))
+      : Float64Array.from({ length: 12 }, rand);
+    points.push({ label: fx.states[i].label, obs, u });
+  }
+
+  const H = 1e-3;             // f64 forward: truncation-limited, not noise-limited
+  let worstFwd = 0, worstRel = 0, worstAbs = 0, gScale = 0;
+  for (const pt of points) {
+    const q = cert.robustQ(pt.obs, pt.u);
+    const g = cert.gradU(new Float64Array(12), pt.u);
+    worstFwd = Math.max(worstFwd, Math.abs(q - robustQ64(pt.obs, pt.u)));
+    let gn = 0;
+    for (let k = 0; k < 12; k++) gn = Math.max(gn, Math.abs(g[k]));
+    gScale = Math.max(gScale, gn);
+    for (let k = 0; k < 12; k++) {
+      const up = Float64Array.from(pt.u); up[k] += H;
+      const dn = Float64Array.from(pt.u); dn[k] -= H;
+      const fd = (robustQ64(pt.obs, up) - robustQ64(pt.obs, dn)) / (2 * H);
+      worstAbs = Math.max(worstAbs, Math.abs(fd - g[k]));
+      worstRel = Math.max(worstRel, Math.abs(fd - g[k]) / gn);
+    }
+  }
+  ok(worstFwd < TOL,
+    'the taped float32 forward and an independent float64 one agree on Qhat',
+    `max|d| ${worstFwd.toExponential(3)}`);
+  ok(worstRel < 1e-4,
+    `grad_u Qhat matches central differences (h ${H}) over ${points.length} states x 12 dims`,
+    `worst relative ${worstRel.toExponential(3)} (abs ${worstAbs.toExponential(3)}, ` +
+    `|g|_inf up to ${gScale.toExponential(2)})`);
+
+  // The adversary term is not optional: dropping it would leave the direct
+  // dQ/du, which is a different vector. Show that the two terms are comparable,
+  // so a port that detached d would fail the check above rather than squeak by.
+  const pt = points[0];
+  cert.robustQ(pt.obs, pt.u);
+  const total = Float64Array.from(cert.gradU(new Float64Array(12), pt.u));
+  let dot = 0, nt = 0;
+  for (let k = 0; k < 12; k++) { dot += total[k] * total[k]; nt += 1; }
+  ok(Math.sqrt(dot) > 0, 'the gradient is non-degenerate on a real state',
+    `||g|| ${Math.sqrt(dot).toExponential(3)} over ${nt} dims`);
+}
+
+// ===========================================================================
+section('6. PROJECTED GRADIENT — the shipped solver, against python');
+// ===========================================================================
+//
+// Reference produced by calling the training code, exactly as export_filter.py
+// does for the secant: BatchedQcbfFilter over this bundle's filter_nets.pt with
+//
+//   make_inmemory_shield(..., kappa 0.9, kin/sup/guard OFF,
+//                        intervention="projected_gradient",
+//                        pg_step=0.2, pg_max_iters=25, pg_backtrack_iters=12)
+//
+// stepped on the SAME (obs, target_in, prev_ctrl, q_des) rows the fixture
+// records. Only the rows the fixture resolves with the secant (decision 2) move
+// under the new solver; task-pass and out-of-set rows are unchanged, and are
+// checked against the fixture itself below.
+const PG_REF = [
+  { state: 'headon_d0.6_closing1.5', proposal: 'hold', alpha: 0.457957506,
+    u_sel: [-0.170107514, -0.239844084, 0.147889718, 0.160281375, -0.36276108, 0.504526675, -0.105105378, -0.332645655, 0.26221782, 0.0740086734, -0.279875517, 0.102409601] },
+  { state: 'headon_d0.6_closing1.5', proposal: 'ram', alpha: 0.497485936,
+    u_sel: [0.517779052, -0.0492375791, 0.962690771, 1, -0.146961093, 1, 0.712647021, -0.125724241, 1, 0.443365037, 0.271884739, 0.883647442] },
+  { state: 'tilted_falling', proposal: 'hold', alpha: 0.0403686687,
+    u_sel: [0.0135618709, -0.0219887812, 0.00829649903, -0.0405193418, -0.00764376763, -0.00599386822, 0.0201171637, 0.00797492545, 0.00292498805, -0.0311541632, 0.000791655271, -0.0403016657] },
+  { state: 'tilted_falling', proposal: 'ram', alpha: 0.131967768,
+    u_sel: [1, 0.721025229, 1, 0.404084265, 1, 1, 1, 1, 1, 0.260299146, 1, 1] },
+  { state: 'random_1', proposal: 'ram', alpha: 0.0336863734,
+    u_sel: [1, 1, 0.879404545, 0.961466491, 0.904434681, 1, 1, 1, 1, 0.957861304, 0.984986544, 0.910339057] },
+  { state: 'random_5', proposal: 'hold', alpha: 0.220631763,
+    u_sel: [-0.122534603, 0.0183789171, 0.0757806301, 0.0885770023, -0.0170022566, 0.110660382, 0.0637218654, -0.122220822, 0.113694504, 0.0239187703, 0.0224462561, 0.0333038419] },
+];
+{
+  const cert = createCertificate(filter.nets);
+  const shield = createShield(cert, filter.params);   // the SHIPPED params
+  const integ = new IncrementIntegrator(
+    DEFAULT_JOINT_POS, filter.params.qLo, filter.params.qHi,
+    { incrementScale: filter.params.incScale, smoothing: filter.params.incSmoothing },
+  );
+
+  let wSel = 0, wA = 0, wShared = 0, decOk = 0, matched = 0;
+  let maxEvals = 0, maxAscent = 0, worstFeas = Infinity, worstTravel = -Infinity;
+  const counts = {};
+  for (const c of fx.cases) {
+    const obs = Float32Array.from(c.obs);
+    integ.reset(c.target_in);
+    const a12 = c.q_des.map((v, i) => (v - DEFAULT_JOINT_POS[i]) / 0.25);
+    const uTask = integ.taskIncrement(a12);
+    const r = shield.step(obs, uTask);
+    counts[DECISION_NAME[r.decision]] = (counts[DECISION_NAME[r.decision]] || 0) + 1;
+    maxEvals = Math.max(maxEvals, r.qEvals);
+
+    const ref = PG_REF.find((x) => x.state === c.state && x.proposal === c.proposal);
+    if (c.decision === DECISION.LINE_SEARCH) {
+      // The rows the solver owns: python must have solved them the same way.
+      if (r.decision === DECISION.QP) decOk += 1;
+      if (ref) {
+        matched += 1;
+        wSel = Math.max(wSel, maxAbs(r.u, ref.u_sel));
+        wA = Math.max(wA, Math.abs(r.alpha - ref.alpha));
+      }
+      maxAscent = Math.max(maxAscent, r.iters);
+      // The whole point of the solve: the answer is feasible, and it travels
+      // LESS than the secant's answer did.
+      worstFeas = Math.min(worstFeas, cert.robustQ(obs, r.u) - r.thr);
+      const dPg = Math.hypot(...Array.from(r.u, (v, i) => v - uTask[i]));
+      const dLs = Math.hypot(...c.u_sel.map((v, i) => v - uTask[i]));
+      worstTravel = Math.max(worstTravel, dPg / dLs);
+    } else {
+      // Every other row is solver-independent: still exactly the fixture.
+      if (r.decision === c.decision) decOk += 1;
+      wShared = Math.max(wShared, maxAbs(r.u, c.u_sel));
+    }
+  }
+  const nLs = fx.cases.filter((c) => c.decision === DECISION.LINE_SEARCH).length;
+  ok(decOk === fx.cases.length,
+    `every decision is as expected (${Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(', ')})`,
+    `${decOk}/${fx.cases.length}`);
+  ok(wShared < TOL_U,
+    'task-pass and out-of-set rows are untouched by the solver swap',
+    `max|d| ${wShared.toExponential(3)}`);
+  ok(matched === nLs && matched === PG_REF.length,
+    'the reference covers every row the solver owns', `${matched}/${nLs}`);
+  ok(wSel < TOL_U, 'u_sel matches the python projected gradient',
+    `max|d| ${wSel.toExponential(3)}`);
+  ok(wA < TOL_U, 'alpha matches the python projected gradient',
+    `max|d| ${wA.toExponential(3)}`);
+  ok(worstFeas >= -1e-6,
+    'every solved row satisfies the constraint Qhat(u_sel) >= kappa V',
+    `worst slack ${worstFeas.toExponential(3)}`);
+  ok(worstTravel < 1.0,
+    'and gets there by moving the action LESS than the secant did ' +
+    '(rcbf_gradient_method: ||u*_grad - u_task|| <= ||u*_1D - u_task||)',
+    `worst ratio ${worstTravel.toFixed(3)}`);
+  ok(shield.stats().pgInfeasible === 0,
+    'the travel budget 5.0 was enough on every row (pg_infeasible 0)',
+    JSON.stringify(shield.stats()));
+  console.log(`  worst ascent ${maxAscent} steps, worst ${maxEvals} robust_q evaluations in one step`);
+}
+
+// ===========================================================================
+section('7. CLOSED LOOP — a real match with the filter on BOTH seats');
 // ===========================================================================
 let costRows = [];
 {
@@ -306,21 +530,31 @@ let costRows = [];
   ok(Math.abs(st.seats.attacker.x - (-1.4)) > 0.3,
     'the shielded player still locomotes (the filter is not a freeze)',
     `moved ${Math.abs(st.seats.attacker.x - (-1.4)).toFixed(2)} m`);
+  ok(paths.attacker.solver().intervention === INTERVENTION.PROJECTED_GRADIENT,
+    'both shielded seats ran the projected gradient');
+  // gain_alpha lives in [0,1] and the plant follows it: kp = (1-ag)*walk +
+  // ag*safety, so kp_hip in [20,100] with calf always 2x hip
+  // (gain_blend.py:63-64 over the touchdown_driver.py:42-44 tables).
   const after = sim.getGains('a');
-  ok(maxAbs(before.kp, after.kp) === 0 && after.kp[0] === 20 && after.kp[2] === 40,
-    'gainBlend defaults OFF, so the plant stays at walk-soft 20/20/40 ' +
-    '(game_qcbf_action.py:238)');
+  ok(maxAbs(before.kp, after.kp) > 0,
+    'gainBlend defaults ON, so the plant really does stiffen while the filter works ' +
+    '(game_qcbf_action.py:378, game_dr/__init__.py:392-400)',
+    `kp ${before.kp[0].toFixed(0)} -> ${after.kp[0].toFixed(1)}`);
+  ok(after.kp[0] >= 20 - 1e-9 && after.kp[0] <= 100 + 1e-9 && Math.abs(after.kp[2] - 2 * after.kp[0]) < 1e-9,
+    'and stays inside [20, 100] with calf = 2x hip',
+    `kp ${after.kp[0].toFixed(1)} / ${after.kp[2].toFixed(1)}`);
+  ok(after.kd[0] === 1 && after.kd[2] === 2,
+    'kd never moves: walk_kd == safety_kd == 1/1/2 (touchdown_driver.py:44)');
 
-  // ...and the blend, when it is asked for.
-  const p = makeShieldPath({ filter, sim, robot: 'a', opponentRobot: 'b', gainBlend: true });
+  // ...and the opt-out, for an A/B against the walk-soft plant.
+  sim.setGains('a', [20, 20, 40, 20, 20, 40, 20, 20, 40, 20, 20, 40], [1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2]);
+  const p = makeShieldPath({ filter, sim, robot: 'a', opponentRobot: 'b', gainBlend: false });
   p.reset(sim.getJointPos('a'));
-  const g0 = sim.getGains('a');
-  ok(g0.kp[0] === 20, 'with gainBlend on, reset() writes walk-soft');
   for (let i = 0; i < 12; i++) p.step(new Float32Array(12));
   const g1 = sim.getGains('a');
-  ok(g1.kp[0] >= 20 && g1.kp[0] <= 100 && g1.kp[2] === 2 * g1.kp[0],
-    'and a stint of stepping leaves kp inside [20, 100] with calf = 2x hip',
-    `kp ${g1.kp[0].toFixed(1)} / ${g1.kp[2].toFixed(1)}, alpha ${p.info().gainAlpha.toFixed(3)}`);
+  ok(g1.kp[0] === 20 && g1.kp[2] === 40,
+    'with {gainBlend: false} the plant stays at walk-soft 20/20/40',
+    `kp ${g1.kp[0].toFixed(1)} / ${g1.kp[2].toFixed(1)}`);
   sim.setGains('a', [20, 20, 40, 20, 20, 40, 20, 20, 40, 20, 20, 40], [1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2]);
 
   match.dispose?.();
@@ -328,13 +562,15 @@ let costRows = [];
 }
 
 // ===========================================================================
-section('6. COST — us per filtered robot per control step');
+section('8. COST — us per filtered robot per control step');
 // ===========================================================================
 {
   const cert = createCertificate(filter.nets);
   const shield = createShield(cert, filter.params);
+  const lsShield = createShield(cert, { ...filter.params, intervention: INTERVENTION.LINE_SEARCH });
   const obs = Float32Array.from(fx.obs[0]);
   const u = new Float64Array(12);
+  const gOut = new Float64Array(12);
 
   const time = (fn, n) => {
     for (let i = 0; i < 50; i++) fn();
@@ -345,36 +581,60 @@ section('6. COST — us per filtered robot per control step');
   const N = BENCH ? 4000 : 400;
   const usCtrl = time(() => cert.fallback(obs), N);
   const usQ = time(() => cert.robustQ(obs, u), N);
+  cert.robustQ(obs, u);
+  const usBwd = time(() => cert.gradU(gOut, u), N);   // the tape stays valid
+  const usGrad = usQ + usBwd;
   const floor = usCtrl + 2 * usQ;
 
-  // The two fixture cases that really run the search.
-  const ls = fx.cases.filter((c) => c.decision === 2);
-  let lsUs = 0, lsIters = 0;
-  for (const c of ls) {
+  // The fixture cases that really run a solver.
+  const hard = fx.cases.filter((c) => c.decision === 2);
+  let pgUs = 0, pgIters = 0, pgEvals = 0, lsUs = 0;
+  for (const c of hard) {
     const o = Float32Array.from(c.obs);
     const ut = Float64Array.from(c.u_task);
-    lsUs += time(() => shield.step(o, ut), Math.max(50, N / 8));
-    lsIters += shield.step(o, ut).iters;
+    pgUs += time(() => shield.step(o, ut), Math.max(50, N / 8));
+    lsUs += time(() => lsShield.step(o, ut), Math.max(50, N / 8));
+    const r = shield.step(o, ut);
+    pgIters += r.iters;
+    pgEvals += r.qEvals;
   }
-  lsUs /= Math.max(ls.length, 1);
-  lsIters /= Math.max(ls.length, 1);
+  const n = Math.max(hard.length, 1);
+  pgUs /= n; lsUs /= n; pgIters /= n; pgEvals /= n;
+  // Arithmetic worst case. Two candidate paths, and they are exclusive — a run
+  // that never reaches feasibility never backtracks (filtered_action.py:765):
+  //
+  //   converges on the LAST iterate: the n=0 test rides the tape the cascade
+  //     already left, so N-1 forwards + N-1 reverse passes + M bisections;
+  //   never converges: N-1 forwards, N reverse passes, one post-loop test,
+  //     no bisection.
+  const N_ = PG.maxIters, M_ = PG.backtrackIters;
+  const ceilSolved = floor + (N_ - 1 + M_) * usQ + (N_ - 1) * usBwd;
+  const ceilStuck = floor + N_ * usQ + N_ * usBwd;
+  const ceiling = Math.max(ceilSolved, ceilStuck);
 
-  console.log(`  pi_shield(obs)                 ${usCtrl.toFixed(1)} us`);
-  console.log(`  one robust_q (dstb + twin Q)   ${usQ.toFixed(1)} us`);
-  console.log(`  FLOOR   (task passes)          ${floor.toFixed(1)} us / robot`);
-  console.log(`  TYPICAL (line search, ${lsIters.toFixed(1)} iters) ${lsUs.toFixed(1)} us / robot`);
-  console.log(`  CEILING (20 iters)             ${(floor + 20 * usQ).toFixed(1)} us / robot`);
-  console.log(`  two filtered robots, worst case: ${(2 * (floor + 20 * usQ) / 1000).toFixed(1)} ms ` +
-    `of the 20 ms control step`);
+  console.log(`  pi_shield(obs)                    ${usCtrl.toFixed(1)} us`);
+  console.log(`  one robust_q (dstb + twin Q)      ${usQ.toFixed(1)} us`);
+  console.log(`  one reverse pass (grad_u Qhat)    ${usBwd.toFixed(1)} us ` +
+    `(${(usBwd / usQ).toFixed(2)}x a forward — finite differences would be 24x)`);
+  console.log(`  FLOOR   (task passes)             ${floor.toFixed(1)} us / robot`);
+  console.log(`  TYPICAL projected gradient        ${pgUs.toFixed(1)} us / robot ` +
+    `(${pgIters.toFixed(1)} ascent steps, ${pgEvals.toFixed(1)} robust_q)`);
+  console.log(`  (the secant, for comparison)      ${lsUs.toFixed(1)} us / robot`);
+  console.log(`  CEILING  solve on the last ascent step ${ceilSolved.toFixed(1)} us / robot`);
+  console.log(`           never feasible (no backtrack) ${ceilStuck.toFixed(1)} us / robot`);
   if (costRows.length) {
     costRows.sort((a, b) => a - b);
     const q = (p) => costRows[Math.min(costRows.length - 1, Math.floor(p * costRows.length))];
-    console.log(`  measured in the section-5 match: median ${q(0.5).toFixed(2)} ms, ` +
+    console.log(`  measured in the section-7 match: median ${q(0.5).toFixed(2)} ms, ` +
       `p95 ${q(0.95).toFixed(2)} ms, max ${costRows[costRows.length - 1].toFixed(2)} ms ` +
       `(per filtered robot, ${costRows.length} samples)`);
+    ok(costRows[costRows.length - 1] < 20,
+      'the worst MEASURED shielded control step fits in the 20 ms budget',
+      `${costRows[costRows.length - 1].toFixed(2)} ms`);
   }
-  ok(2 * (floor + 20 * usQ) / 1000 < 20,
-    'even the 20-iteration ceiling for BOTH robots fits in one 20 ms control step');
+  ok(ceiling / 1000 < 20,
+    'so does the arithmetic ceiling: the worst step the solver can construct',
+    `${(ceiling / 1000).toFixed(1)} ms`);
 }
 
 console.log(`\n${failures ? `\x1b[31m${failures} CHECK(S) FAILED\x1b[0m` : '\x1b[32mALL CHECKS PASSED\x1b[0m'}`);
