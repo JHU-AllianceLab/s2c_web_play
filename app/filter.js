@@ -1167,17 +1167,19 @@ export async function loadFilter(opts = {}) {
     throw new Error('filter.js: the manifest carries no `filter` block — run tools/export_filter.py');
   }
   const dir = manifestUrl.slice(0, manifestUrl.lastIndexOf('/') + 1);
-  // The two games share the value function and the adversary and differ ONLY in
-  // the fallback controller: the symmetric members were played behind the
-  // stage-1 ctrl bundle (recon/02:342-348, proved tensor by tensor in
-  // tools/export_filter_s1ctrl.py). Running them behind the asymmetric ctrl
-  // proposes a `u_safe` they were never certified against, and the dog topples.
-  const ctrlKey =
-    opts.ctrlNet && entry.nets[opts.ctrlNet]
-      ? opts.ctrlNet
-      : opts.game === 'sym' && entry.nets.ctrl_s1
-        ? 'ctrl_s1'
-        : 'ctrl';
+  // BOTH games run the same certificate, including the same fallback
+  // controller. sym_game/config/go2_go2/presets.py:60 points the symmetric task
+  // at `collision_v5prox_15k_62d_game`, the bundle the asymmetric arm uses, and
+  // the pool every member was chosen on left `bundle` unset, i.e. that default.
+  //
+  // The stage-1 variant of the SAME certificate exists (recon/02:342-348 —
+  // tools/export_filter_s1ctrl.py proves only `ctrl` differs) and it was tried
+  // here. It DEADLOCKS: its fallback is a stand-still controller, so once the
+  // value goes negative the handover is total, the dog stops, the state never
+  // changes and the value never recovers. Measured with a human parked 0.65 m
+  // in front of it: stage-1 froze for 300 steps, the shipped ctrl worked around
+  // and scored. `ctrlNet` stays as a diagnostic override for that comparison.
+  const ctrlKey = opts.ctrlNet && entry.nets[opts.ctrlNet] ? opts.ctrlNet : 'ctrl';
   const [ctrl, dstb, q1, q2] = await Promise.all(
     [ctrlKey, 'dstb', 'q1', 'q2'].map((k) => loadPolicy(dir + entry.nets[k].json)),
   );
