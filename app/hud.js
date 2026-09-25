@@ -96,6 +96,9 @@ export const FIELD_COLORS = {
   line: '#FF4724',
   zone: 'rgba(26,204,89,0.20)',
   zoneEdge: 'rgba(26,204,89,0.55)',
+  /** Both ends live: each one takes the colour of the dog that scores in it. */
+  zoneYou: 'rgba(79,195,232,0.20)',
+  zoneAi: 'rgba(216,160,90,0.20)',
   midline: 'rgba(235,235,225,0.20)',
 };
 
@@ -298,7 +301,12 @@ export function createHud(options = {}) {
     for (const line of spec.lines) {
       const lx = X(line.x);
       const edge = line.dir > 0 ? right : left;
-      ctx.fillStyle = FIELD_COLORS.zone;
+      ctx.fillStyle =
+        line.mine === undefined
+          ? FIELD_COLORS.zone
+          : line.mine
+            ? FIELD_COLORS.zoneYou
+            : FIELD_COLORS.zoneAi;
       ctx.fillRect(Math.min(lx, edge), topY, Math.abs(edge - lx), botY - topY);
     }
     // halfway line
@@ -425,7 +433,13 @@ export function createHud(options = {}) {
     const aiSeat = g.seats.find((s) => s !== playerSeat);
     const lines = [];
     if (game === 'sym') {
-      lines.push({ x: g.lineX, dir: +1 }, { x: -g.lineX, dir: -1 });
+      // `mine` paints the minimap end zones the same way app/render.js paints
+      // the pitch: the one you run at carries your colour.
+      const youDir = seatDirection(game, playerSeat);
+      lines.push(
+        { x: g.lineX, dir: +1, mine: youDir > 0 },
+        { x: -g.lineX, dir: -1, mine: youDir < 0 },
+      );
     } else {
       lines.push({ x: g.lineX, dir: +1 });
     }

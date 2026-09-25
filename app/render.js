@@ -399,6 +399,12 @@ export function createRenderer(canvas, sim, game, options = {}) {
   }
 
   const warnings = [];
+  /**
+   * Both ends live (the symmetric game) vs one (asymmetric). It decides whether
+   * an end zone is neutral turf or is owned by one of the two dogs.
+   */
+  const bothScore =
+    typeof game === 'string' ? game === 'sym' : Boolean(game && game.rules && game.rules.bothSeatsScore);
   const opt = {
     quality: 'high',
     interpolate: true,
@@ -597,6 +603,14 @@ export function createRenderer(canvas, sim, game, options = {}) {
     // alpha the other painted markings use (decor_touchline_*, 0.95), not the
     // 0.30 the filled disc needed to stay subtle.
     if (venue && g.name === 'decor_centre_circle') mat = markingMaterial(g);
+    // When both ends score, a neutral green on both of them tells the player
+    // nothing. Each end zone wears the colour of the dog that scores in it, so
+    // "run at the cyan end" is readable from the chase camera.
+    if (venue && bothScore && g.name && g.name.startsWith('decor_endzone')) {
+      const mine = Math.sign(g.pos[0]) === (opt.playerRobot === 'b' ? -1 : 1);
+      mat = mat.clone();
+      mat.color.setHex(mine ? TEAM.player.ring : TEAM.ai.ring);
+    }
 
     const mesh = new THREE.Mesh(geo, mat);
     mesh.name = g.name || `${g.typeName}_${g.geomId}`;
