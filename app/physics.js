@@ -714,27 +714,6 @@ export async function createSim({
     }
     queue = next;
   }
-  // ONE request for every mesh. GitHub Pages 502'd intermittently when the page
-  // asked for sixteen .obj files at once (and guessed their type as x-tgif), so
-  // tools/export_scene.py also writes `meshes.json` = { vfsPath: objText }.
-  // Prefer it; the individual files stay in the repo as the source of truth.
-  const packRel = scene && scene.files && scene.files.meshPack;
-  let packed = 0;
-  if (packRel) {
-    try {
-      const pack = JSON.parse(await readText(joinUrl(base, packRel)));
-      for (const [vfsName, text] of Object.entries(pack)) {
-        if (seen.has(vfsName)) continue;
-        seen.add(vfsName);
-        vfs.addBuffer(vfsName, new TextEncoder().encode(text));
-        packed += text.length;
-      }
-    } catch (err) {
-      // fall through to per-file fetching
-      console.warn('[physics] mesh pack unavailable, falling back to individual files:', err.message);
-    }
-  }
-
   // scene.json may list assets the regex cannot see (e.g. a lite mesh dir).
   const declared = (scene && scene.files && scene.files.meshFiles) || (scene && scene.assets);
   const meshDir = (scene && scene.files && scene.files.meshDir) || '';
@@ -744,8 +723,34 @@ export async function createSim({
       if (!seen.has(vfsName)) { seen.add(vfsName); assets.push({ vfsName, fetchRel: vfsName }); }
     }
   }
+
+  // ONE request for every mesh. Sixteen parallel .obj fetches made GitHub Pages
+  // return intermittent 502s (it also guesses their type as x-tgif), so
+  // tools/export_scene.py writes `meshes.json` = { vfsPath: objText }. Mount from
+  // it and DROP those entries from the per-file list below — the .obj files stay
+  // in the repo as the source of truth and as the fallback if the pack is missing.
+  const packRel = scene && scene.files && scene.files.meshPack;
+  let packedBytes = 0;
+  if (packRel) {
+    try {
+      const pack = JSON.parse(await readText(joinUrl(base, packRel)));
+      const provided = new Set();
+      for (const [vfsName, text] of Object.entries(pack)) {
+        const bytes = new TextEncoder().encode(text);
+        vfs.addBuffer(vfsName, bytes);
+        provided.add(vfsName);
+        packedBytes += bytes.byteLength;
+      }
+      for (let i = assets.length - 1; i >= 0; i--) {
+        if (provided.has(assets[i].vfsName)) assets.splice(i, 1);
+      }
+    } catch (err) {
+      console.warn('[physics] mesh pack unusable, falling back to individual files:', err && err.message);
+    }
+  }
+
   const fetched = await Promise.all(assets.map((a) => readBytes(joinUrl(base, a.fetchRel))));
-  let assetBytes = 0;
+  let assetBytes = packedBytes;
   for (let i = 0; i < assets.length; i++) {
     vfs.addBuffer(assets[i].vfsName, fetched[i]);
     assetBytes += fetched[i].byteLength;
