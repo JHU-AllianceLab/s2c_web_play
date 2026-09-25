@@ -33,8 +33,8 @@ const CAMERA_MODES = ['chase', 'fpv', 'broadcast'];
 const SCENE_URL = (game) => `assets/scene/${game}/scene.xml`;
 const WASM_URL = new URL('vendor/mujoco/mujoco.wasm', document.baseURI).href;
 
-/** Games this build offers. Add 'sym' back here (and un-ignore its assets) to ship it. */
-const PUBLISHED_GAMES = ['asym'];
+/** Games this build offers. */
+const PUBLISHED_GAMES = ['asym', 'sym'];
 
 let session = null;   // the live match, or null on the title screen
 let ui = null;

@@ -252,13 +252,6 @@ async function main() {
     await sleep(220);
     await drv.shot('ui_10_settings.png');
 
-    /* 11 — the honest-differences panel, from the title screen */
-    await drv.go(url());
-    await waitReady(drv);
-    await drv.script(`() => document.querySelector('.card-about .btn').click()`);
-    await sleep(220);
-    await drv.shot('ui_11_about.png');
-
     /* 12 — deep link + autostart runs the whole flow unattended */
     await drv.go(url('game=sym&role=A&opponent=lag&autostart=1'));
     await waitReady(drv);

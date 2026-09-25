@@ -111,15 +111,15 @@ async function waitFor(drv, expr, { timeout = 90000, every = 400, label = 'condi
   throw new Error(`timed out waiting for ${label} (${Math.round((Date.now() - t0) / 1000)} s)`);
 }
 
-async function runCase(drv, { role, opponent = 's2c', name }) {
-  const url = `${BASE || `http://127.0.0.1:${PORT}`}/index.html?game=asym&role=${role}&opponent=${opponent}&autostart=1`;
-  console.log(`\n--- asym / you ${role} vs ${opponent} -------------------------------`);
+async function runCase(drv, { game = 'asym', role, opponent = 's2c' }) {
+  const url = `${BASE || `http://127.0.0.1:${PORT}`}/index.html?game=${game}&role=${role}&opponent=${opponent}&autostart=1`;
+  console.log(`\n--- ${game} / you ${role} vs ${opponent} -------------------------------`);
   await drv.go(url);
 
   await waitFor(drv, 'window.__s2c && window.__s2c.session', { label: 'the session to boot' });
   await waitFor(drv, 'window.__s2c.session.match.hud().step > 40', { label: '40 control steps' });
   await sleep(300);
-  const bytes = await drv.shot(`game_asym_${role}.png`);
+  const bytes = await drv.shot(`game_${game}_${role}.png`);
 
   const info = await drv.script(`() => {
     const s = window.__s2c.session;
@@ -166,14 +166,14 @@ async function runCase(drv, { role, opponent = 's2c', name }) {
   await waitFor(drv, 'window.__s2c.session.match.hud().verdict || window.__s2c.session.match.hud().step >= 499',
     { timeout: 120000, label: 'a verdict' });
   await sleep(700);
-  await drv.shot(`game_asym_${role}_result.png`);
+  await drv.shot(`game_${game}_${role}_result.png`);
   const end = await drv.script(`() => { const h = window.__s2c.session.match.hud();
     return { terminal: h.verdict && h.verdict.terminal, winner: h.verdict && h.verdict.winner, step: h.step,
              log: (document.getElementById('log')||{}).textContent || '' }; }`);
   console.log(`  verdict ${end.terminal || '(clock)'} winner ${end.winner || '-'} at step ${end.step}`);
   ok(!!end.terminal, 'the episode ended with a referee terminal', end.terminal || '');
   ok(!end.log.trim(), 'still no console error at the end', end.log.trim().slice(0, 300));
-  return { role, ...end, fps: info.fps, stepMs: info.stepMs };
+  return { game, role, ...end, fps: info.fps, stepMs: info.stepMs };
 }
 
 async function main() {
@@ -195,10 +195,11 @@ async function main() {
     await drv.shot('game_title.png');
     const offered = await drv.script(`() => [...document.querySelectorAll('[data-game]')].map(e => e.dataset.game)`);
     console.log(`  games offered: ${offered.join(', ')}`);
-    ok(offered.length > 0, 'the title screen offers a game');
-    ok(!offered.includes('sym'), 'the symmetric game is not published in this build', offered.join(','));
+    ok(offered.includes('asym'), 'the asymmetric game is offered', offered.join(','));
+    ok(offered.includes('sym'), 'the symmetric game is offered', offered.join(','));
 
     for (const role of ['attacker', 'defender']) out.push(await runCase(drv, { role }));
+    out.push(await runCase(drv, { game: 'sym', role: 'A' }));
   } catch (err) {
     failures += 1;
     console.error('\nHARNESS ERROR:', err.message);
@@ -211,7 +212,7 @@ async function main() {
 
   console.log(`\n${'='.repeat(70)}`);
   for (const r of out) {
-    console.log(`  asym ${r.role.padEnd(9)} -> ${String(r.terminal).padEnd(14)} winner ${String(r.winner).padEnd(9)} ` +
+    console.log(`  ${r.game.padEnd(4)} ${r.role.padEnd(9)} -> ${String(r.terminal).padEnd(14)} winner ${String(r.winner).padEnd(9)} ` +
       `${r.fps?.toFixed(0)} fps, ${r.stepMs?.toFixed(2)} ms/step`);
   }
   console.log(failures ? `${failures} CHECK(S) FAILED` : 'ALL BROWSER CHECKS PASSED');

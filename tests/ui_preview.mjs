@@ -116,6 +116,7 @@ export async function boot() {
   const ui = await createUI({
     config,
     capabilities: { filter: params.get('filtercap') === '1' },
+    games: ['asym', 'sym'],          // the order app/main.js publishes
     onStart: (setup) => runFakeMatch(setup),
     onRestart: () => runFakeMatch(lastSetup),
     onChangeSetup: () => stop(),

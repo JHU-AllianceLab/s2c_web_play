@@ -1,726 +1,637 @@
 {
-  "schema": 2,
-  "exporter": "tools/export_policy.py",
-  "authority": "DESIGN.md section 3 (asset list); recon/01 asym, recon/02 sym",
-  "complete": true,
-  "norm_placement": "json (norm.mean / norm.std / norm.eps), not folded",
-  "activation": "elu (alpha 1.0) between layers; the head is linear",
-  "bin_layout": "little-endian float32; per Linear: weight (row-major, out x in) then bias",
-  "norm_eps": 0.01,
-  "action_scale": 0.25,
-  "default_joint_pos": [
-    -0.1,
-    0.9,
-    -1.8,
-    0.1,
-    0.9,
-    -1.8,
-    -0.1,
-    0.9,
-    -1.8,
-    0.1,
-    0.9,
-    -1.8
-  ],
-  "joint_order": [
-    "FL_hip",
-    "FL_thigh",
-    "FL_calf",
-    "FR_hip",
-    "FR_thigh",
-    "FR_calf",
-    "RL_hip",
-    "RL_thigh",
-    "RL_calf",
-    "RR_hip",
-    "RR_thigh",
-    "RR_calf"
-  ],
-  "control_hz": 50.0,
-  "increment_integrator": {
-    "scale": 0.5,
-    "smoothing": 0.3,
-    "inverse_denom": 0.15,
-    "source": "src/tasks/safety/mdp/ctrl_action.py:179-191",
-    "reset": "target is re-seeded from the MEASURED joint_pos on every reset (ctrl_action.py:107-122)"
+ "schema": 2,
+ "exporter": "tools/export_policy.py",
+ "authority": "tools/export_policy.py; checkpoint provenance stays local (.cache/manifest.provenance.json)",
+ "complete": true,
+ "norm_placement": "json (norm.mean / norm.std / norm.eps), not folded",
+ "activation": "elu (alpha 1.0) between layers; the head is linear",
+ "bin_layout": "little-endian float32; per Linear: weight (row-major, out x in) then bias",
+ "norm_eps": 0.01,
+ "action_scale": 0.25,
+ "default_joint_pos": [
+  -0.1,
+  0.9,
+  -1.8,
+  0.1,
+  0.9,
+  -1.8,
+  -0.1,
+  0.9,
+  -1.8,
+  0.1,
+  0.9,
+  -1.8
+ ],
+ "joint_order": [
+  "FL_hip",
+  "FL_thigh",
+  "FL_calf",
+  "FR_hip",
+  "FR_thigh",
+  "FR_calf",
+  "RL_hip",
+  "RL_thigh",
+  "RL_calf",
+  "RR_hip",
+  "RR_thigh",
+  "RR_calf"
+ ],
+ "control_hz": 50.0,
+ "increment_integrator": {
+  "scale": 0.5,
+  "smoothing": 0.3,
+  "inverse_denom": 0.15,
+  "source": "src/tasks/safety/mdp/ctrl_action.py:179-191",
+  "reset": "target is re-seeded from the MEASURED joint_pos on every reset (ctrl_action.py:107-122)"
+ },
+ "display_names": {
+  "s2c": "S2C",
+  "et": "ET",
+  "nom": "Nominal",
+  "cpo": "CPO",
+  "lag": "Lagrangian"
+ },
+ "_howto": "games.<game>.seats.<seat> lists policy NAMES; look each one up in the flat `policies` array (or load assets/policies/<name>.json). Never hard-code a checkpoint path -- every one is in here.",
+ "seating": {
+  "sym": "the human takes seat A (scores at x = +1.9); the AI takes seat B (scores at x = -1.9). Every sym file below is the seat-B build; A-half members carry the pi-rotation baked in.",
+  "asym": "the human picks attacker or defender; the AI takes the other seat. No rotation on this side -- the roles are fixed."
+ },
+ "player_walk": {
+  "name": "player_walk_fastwalk_v3_9000",
+  "display": "Player walk",
+  "method": null,
+  "role": "player_walk",
+  "game": "walk",
+  "seat": null,
+  "bin": "player_walk_fastwalk_v3_9000.bin",
+  "json": "player_walk_fastwalk_v3_9000.json",
+  "obs_dim": 47,
+  "act_dim": 12,
+  "native_half": null,
+  "rotation_baked": false,
+  "action_path": "walk_affine",
+  "bin_bytes": 761392
+ },
+ "games": {
+  "sym": {
+   "seats": {
+    "B": [
+     "sym_s2c_B",
+     "sym_et_B",
+     "sym_nom_B",
+     "sym_cpo_B",
+     "sym_lag_B"
+    ]
+   }
   },
-  "display_names": {
-    "s2c": "S2C",
-    "et": "ET",
-    "nom": "Nominal",
-    "cpo": "CPO",
-    "lag": "Lagrangian"
-  },
-  "_howto": "games.<game>.seats.<seat> lists policy NAMES; look each one up in the flat `policies` array (or load assets/policies/<name>.json). Never hard-code a checkpoint path -- every one is in here.",
-  "seating": {
-    "sym": "the human takes seat A (scores at x = +1.9); the AI takes seat B (scores at x = -1.9). Every sym file below is the seat-B build; A-half members carry the pi-rotation baked in.",
-    "asym": "the human picks attacker or defender; the AI takes the other seat. No rotation on this side -- the roles are fixed."
-  },
-  "player_walk": {
-    "name": "player_walk_fastwalk_v3_9000",
-    "display": "Player walk",
-    "method": null,
-    "role": "player_walk",
-    "game": "walk",
-    "seat": null,
-    "bin": "player_walk_fastwalk_v3_9000.bin",
-    "json": "player_walk_fastwalk_v3_9000.json",
-    "obs_dim": 47,
-    "act_dim": 12,
-    "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/go2_velocity_fast/2026-08-09_17-32-07_fastwalk_v3/model_9000.pt",
-    "md5": "120c17c78d1dd10b732840b5189a42d6",
-    "upstream_checkpoint_md5": "120c17c78d1dd10b732840b5189a42d6",
-    "upstream_md5_verified": true,
-    "provenance": "local original; md5 matches the 5080 copy (DESIGN.md 3.1)",
-    "native_half": null,
-    "rotation_baked": false,
-    "action_path": "walk_affine",
-    "bin_bytes": 761392
-  },
-  "games": {
-    "sym": {
-      "seats": {
-        "B": [
-          "sym_s2c_B",
-          "sym_et_B",
-          "sym_nom_B",
-          "sym_cpo_B",
-          "sym_lag_B"
-        ]
-      }
-    },
-    "asym": {
-      "seats": {
-        "attacker": [
-          "asym_s2c_attacker",
-          "asym_et_attacker",
-          "asym_nom_attacker",
-          "asym_cpo_attacker",
-          "asym_lag_attacker"
-        ],
-        "defender": [
-          "asym_s2c_defender",
-          "asym_et_defender",
-          "asym_nom_defender",
-          "asym_cpo_defender",
-          "asym_lag_defender"
-        ]
-      }
-    }
-  },
-  "policies": [
-    {
-      "name": "player_walk_fastwalk_v3_9000",
-      "display": "Player walk",
-      "method": null,
-      "role": "player_walk",
-      "game": "walk",
-      "seat": null,
-      "bin": "player_walk_fastwalk_v3_9000.bin",
-      "json": "player_walk_fastwalk_v3_9000.json",
-      "obs_dim": 47,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/go2_velocity_fast/2026-08-09_17-32-07_fastwalk_v3/model_9000.pt",
-      "md5": "120c17c78d1dd10b732840b5189a42d6",
-      "upstream_checkpoint_md5": "120c17c78d1dd10b732840b5189a42d6",
-      "upstream_md5_verified": true,
-      "provenance": "local original; md5 matches the 5080 copy (DESIGN.md 3.1)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "walk_affine",
-      "bin_bytes": 761392
-    },
-    {
-      "name": "sym_s2c_B",
-      "display": "S2C",
-      "method": "s2c",
-      "role": "ai_opponent",
-      "game": "sym",
-      "seat": "B",
-      "bin": "sym_s2c_B.bin",
-      "json": "sym_s2c_B.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc/2026-08-20_13-04-30_sym_v5_s17/game_3200.pt",
-      "md5": "c180c85e41ef29a045da67227a376f62",
-      "upstream_checkpoint_md5": "c180c85e41ef29a045da67227a376f62",
-      "upstream_md5_verified": true,
-      "provenance": "pulled from the 5080 into .cache/; md5 verified byte-identical",
-      "native_half": "B",
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "sym_et_B",
-      "display": "ET",
-      "method": "et",
-      "role": "ai_opponent",
-      "game": "sym",
-      "seat": "B",
-      "bin": "sym_et_B.bin",
-      "json": "sym_et_B.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc/2026-08-21_07-46-57_sym_n_v2_s23/game_1700.pt",
-      "md5": "83eb4e3c7918b312dca834cdbe6f47e9",
-      "upstream_checkpoint_md5": "83eb4e3c7918b312dca834cdbe6f47e9",
-      "upstream_md5_verified": true,
-      "provenance": "local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-      "native_half": "A",
-      "rotation_baked": true,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "sym_nom_B",
-      "display": "Nominal",
-      "method": "nom",
-      "role": "ai_opponent",
-      "game": "sym",
-      "seat": "B",
-      "bin": "sym_nom_B.bin",
-      "json": "sym_nom_B.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc_penalty/2026-08-27_07-17-18_sym_p_v3_s29/game_3300.pt",
-      "md5": "9217118a22a36c3ec3f5c6cf8159c865",
-      "upstream_checkpoint_md5": "9217118a22a36c3ec3f5c6cf8159c865",
-      "upstream_md5_verified": true,
-      "provenance": "pulled from the 5080 into .cache/; md5 verified byte-identical against a remote md5sum of the original",
-      "native_half": "A",
-      "rotation_baked": true,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "sym_cpo_B",
-      "display": "CPO",
-      "method": "cpo",
-      "role": "ai_opponent",
-      "game": "sym",
-      "seat": "B",
-      "bin": "sym_cpo_B.bin",
-      "json": "sym_cpo_B.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc_cpo/2026-08-21_21-42-19_sym_c_v3_s59/game_2700.pt",
-      "md5": "bc6c8cbfe220abe77fe319bc381ff82b",
-      "upstream_checkpoint_md5": "bc6c8cbfe220abe77fe319bc381ff82b",
-      "upstream_md5_verified": true,
-      "provenance": "local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-      "native_half": "B",
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "sym_lag_B",
-      "display": "Lagrangian",
-      "method": "lag",
-      "role": "ai_opponent",
-      "game": "sym",
-      "seat": "B",
-      "bin": "sym_lag_B.bin",
-      "json": "sym_lag_B.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc_lag/2026-08-22_18-35-30_sym_l_v8_s103/game_1000.pt",
-      "md5": "4ce9ec2a1786d9e1d62ad3ed521ddaf1",
-      "upstream_checkpoint_md5": "4ce9ec2a1786d9e1d62ad3ed521ddaf1",
-      "upstream_md5_verified": true,
-      "provenance": "local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-      "native_half": "B",
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_s2c_attacker",
-      "display": "S2C",
-      "method": "s2c",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "attacker",
-      "bin": "asym_s2c_attacker.bin",
-      "json": "asym_s2c_attacker.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc/2026-08-17_22-23-27_v133fdrw/game_6000.pt",
-      "md5": "d8f3672494f744bf316a9d2e0f2a2c30",
-      "upstream_checkpoint_md5": "d8f3672494f744bf316a9d2e0f2a2c30",
-      "upstream_md5_verified": true,
-      "provenance": "pulled from the 5080 into .cache/; md5 verified byte-identical",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_s2c_defender",
-      "display": "S2C",
-      "method": "s2c",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "defender",
-      "bin": "asym_s2c_defender.bin",
-      "json": "asym_s2c_defender.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc/2026-08-18_11-55-46_v135fdrw/game_5000.pt",
-      "md5": "fec34c66bd90487351d05c32fe1284bc",
-      "upstream_checkpoint_md5": "fec34c66bd90487351d05c32fe1284bc",
-      "upstream_md5_verified": true,
-      "provenance": "pulled from the 5080 into .cache/; md5 verified byte-identical",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_et_attacker",
-      "display": "ET",
-      "method": "et",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "attacker",
-      "bin": "asym_et_attacker.bin",
-      "json": "asym_et_attacker.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/a3run/evalck_v90sweep/v90_g3600.pt",
-      "md5": "6a78cbbe6038d5d395941553ef26ddf2",
-      "upstream_checkpoint_md5": "6a78cbbe6038d5d395941553ef26ddf2",
-      "upstream_md5_verified": true,
-      "provenance": "local backup copy; md5 matches the 5080 original (recon/01 section 1)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_et_defender",
-      "display": "ET",
-      "method": "et",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "defender",
-      "bin": "asym_et_defender.bin",
-      "json": "asym_et_defender.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/a3run/evalck_v90sweep/v90_g2000.pt",
-      "md5": "e52999a6309a076521a77e6fea8b64e2",
-      "upstream_checkpoint_md5": "e52999a6309a076521a77e6fea8b64e2",
-      "upstream_md5_verified": true,
-      "provenance": "local backup copy; md5 matches the 5080 original (recon/01 section 1)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_nom_attacker",
-      "display": "Nominal",
-      "method": "nom",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "attacker",
-      "bin": "asym_nom_attacker.bin",
-      "json": "asym_nom_attacker.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1700.pt",
-      "md5": "6d558906de9a74b57e5572222f82b882",
-      "upstream_checkpoint_md5": "cc9d1b9e692b61d83b256e6195f9deba",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.attacker_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_nom_defender",
-      "display": "Nominal",
-      "method": "nom",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "defender",
-      "bin": "asym_nom_defender.bin",
-      "json": "asym_nom_defender.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1400.pt",
-      "md5": "6d558906de9a74b57e5572222f82b882",
-      "upstream_checkpoint_md5": "0e6d9a6771a2aaf158bb319569c76271",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.defender_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_cpo_attacker",
-      "display": "CPO",
-      "method": "cpo",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "attacker",
-      "bin": "asym_cpo_attacker.bin",
-      "json": "asym_cpo_attacker.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_1500.pt",
-      "md5": "e80fa8bf32b8c9eb4a9c311cdef3fd1c",
-      "upstream_checkpoint_md5": "1dd6483dde5bdaebbda6c8bc07b1de46",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.attacker_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_cpo_defender",
-      "display": "CPO",
-      "method": "cpo",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "defender",
-      "bin": "asym_cpo_defender.bin",
-      "json": "asym_cpo_defender.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_4400.pt",
-      "md5": "e80fa8bf32b8c9eb4a9c311cdef3fd1c",
-      "upstream_checkpoint_md5": "da9ba043c5f4139c16cb56b280d842cd",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.defender_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_lag_attacker",
-      "display": "Lagrangian",
-      "method": "lag",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "attacker",
-      "bin": "asym_lag_attacker.bin",
-      "json": "asym_lag_attacker.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_lag/2026-08-15_18-50-22_wbc_l4_d4_s71/game_2700.pt",
-      "md5": "643592eae439d03d06e6e0133ce13b03",
-      "upstream_checkpoint_md5": "1dbf684ebb16e691e10a8489095edf2f",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.attacker_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    },
-    {
-      "name": "asym_lag_defender",
-      "display": "Lagrangian",
-      "method": "lag",
-      "role": "ai_opponent",
-      "game": "asym",
-      "seat": "defender",
-      "bin": "asym_lag_defender.bin",
-      "json": "asym_lag_defender.json",
-      "obs_dim": 60,
-      "act_dim": 12,
-      "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_lag/2026-08-15_18-50-22_wbc_l4_d4_s71/game_1800.pt",
-      "md5": "643592eae439d03d06e6e0133ce13b03",
-      "upstream_checkpoint_md5": "ea9765653f19243a3fa37c852030e014",
-      "upstream_md5_verified": false,
-      "provenance": "spliced eval cell; infos.eval_matchup.defender_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
-      "native_half": null,
-      "rotation_baked": false,
-      "action_path": "increment_integrator",
-      "bin_bytes": 788016
-    }
-  ],
-  "filter": {
-    "available": true,
-    "exporter": "tools/export_filter.py",
-    "display": "S2C safety certificate (Q-CBF)",
-    "source_checkpoint": "logs/rsl_rl/go2_safety_collision/2026-07-18_14-19-59_collision_ws16_n2048_v5prox/checkpoints/agent_15000.pt",
-    "source_bundle": "deploy/robots/go2_go2/config/policy/safety_game/collision_v5prox_15k_62d_game",
-    "filter_nets_md5": "96fcae4443cc1e51f421a608ea1780b5",
-    "authority": "recon/03_safety_filter.md; src/tasks/game/mdp/game_qcbf_action.py, src/tasks/game/mdp/filtered_action.py",
-    "nets": {
-      "ctrl": {
-        "json": "filter_ctrl.json",
-        "bin": "filter_ctrl.bin",
-        "in": 62,
-        "out": 12,
-        "head": "tanh"
-      },
-      "dstb": {
-        "json": "filter_dstb.json",
-        "bin": "filter_dstb.bin",
-        "in": 74,
-        "out": 6,
-        "head": "tanh"
-      },
-      "q1": {
-        "json": "filter_q1.json",
-        "bin": "filter_q1.bin",
-        "in": 80,
-        "out": 1,
-        "head": null
-      },
-      "q2": {
-        "json": "filter_q2.json",
-        "bin": "filter_q2.bin",
-        "in": 80,
-        "out": 1,
-        "head": null
-      }
-    },
-    "bin_bytes": 4084816,
-    "activation": "sin",
-    "normalizer": null,
-    "params": {
-      "kappa": 0.9,
-      "cbf_max_iters": 20,
-      "cbf_tol": 0.01,
-      "pessimistic": "max",
-      "value_eps": -1000000000.0,
-      "value_guard": -1000000000.0,
-      "value_release": -999999999.999999,
-      "intervention": "line_search",
-      "full_takeover": false,
-      "fallback_line_search": false,
-      "kin_enabled": false,
-      "sup_enabled": false,
-      "guard_enabled": false,
-      "reseed_track_err": 0.15
-    },
-    "increment": {
-      "scale": 0.5,
-      "smoothing": 0.3,
-      "inverse_denom": 0.15,
-      "q_lo": [
-        -0.94248,
-        -1.317725,
-        -2.628453,
-        -0.94248,
-        -1.317725,
-        -2.628453,
-        -0.94248,
-        -0.270525,
-        -2.628453,
-        -0.94248,
-        -0.270525,
-        -2.628453
-      ],
-      "q_hi": [
-        0.94248,
-        3.237625,
-        -0.932007,
-        0.94248,
-        3.237625,
-        -0.932007,
-        0.94248,
-        4.284825,
-        -0.932007,
-        0.94248,
-        4.284825,
-        -0.932007
-      ],
-      "q_limits_source": "entity soft_joint_pos_limits (game_qcbf_action.py:147), numerically equal to deploy.yaml increment.joint_pos_*"
-    },
-    "obs": {
-      "dim": 62,
-      "layout": [
-        {
-          "term": "root_link_lin_vel_b",
-          "at": 0,
-          "dim": 3
-        },
-        {
-          "term": "roll",
-          "at": 3,
-          "dim": 1
-        },
-        {
-          "term": "pitch",
-          "at": 4,
-          "dim": 1
-        },
-        {
-          "term": "root_link_ang_vel_b",
-          "at": 5,
-          "dim": 3
-        },
-        {
-          "term": "joint_pos",
-          "at": 8,
-          "dim": 12
-        },
-        {
-          "term": "joint_vel",
-          "at": 20,
-          "dim": 12
-        },
-        {
-          "term": "foot_contact",
-          "at": 32,
-          "dim": 4
-        },
-        {
-          "term": "prev_ctrl",
-          "at": 36,
-          "dim": 12
-        },
-        {
-          "term": "wall_margins",
-          "at": 48,
-          "dim": 4
-        },
-        {
-          "term": "heading",
-          "at": 52,
-          "dim": 2
-        },
-        {
-          "term": "opponent_tail",
-          "at": 54,
-          "dim": 8
-        }
-      ],
-      "slices": {
-        "proprio": [
-          0,
-          48
-        ],
-        "wall_margins": [
-          48,
-          52
-        ],
-        "heading": [
-          52,
-          54
-        ],
-        "opponent_tail": [
-          54,
-          62
-        ]
-      },
-      "joint_order": "FL, FR, RL, RR x (hip, thigh, calf) -- sim order; joint_ids_map / foot_ids_map in the yaml are the hardware permutation and are NOT used here",
-      "joint_pos_is_absolute": true,
-      "prev_ctrl_is_filter_output": true
-    },
-    "field": {
-      "length": 4.8,
-      "width": 3.0,
-      "center": [
-        0.0,
-        0.0
-      ],
-      "d_vis": 1.5,
-      "note": "the asym preset leaves field_size None, so the certificate reads the BUNDLE rectangle (4.8 x 3.0 at the env origin), not the scenario's 5.2 x 3.0 at (0.2, 0) -- recon/03:534-541"
-    },
-    "collision": {
-      "half_extents": [
-        0.29,
-        0.193
-      ],
-      "fwd_offset": 0.05,
-      "d_vis": 1.5,
-      "d_max": 3.0,
-      "no_opponent_tail": [
-        3.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.0,
-        0.0
-      ]
-    },
-    "gains": {
-      "walk": {
-        "kp": [
-          20,
-          20,
-          40,
-          20,
-          20,
-          40,
-          20,
-          20,
-          40,
-          20,
-          20,
-          40
-        ],
-        "kd": [
-          1,
-          1,
-          2,
-          1,
-          1,
-          2,
-          1,
-          1,
-          2,
-          1,
-          1,
-          2
-        ]
-      },
-      "safety": {
-        "kp": [
-          100,
-          100,
-          200,
-          100,
-          100,
-          200,
-          100,
-          100,
-          200,
-          100,
-          100,
-          200
-        ],
-        "kd": [
-          1,
-          1,
-          2,
-          1,
-          1,
-          2,
-          1,
-          1,
-          2,
-          1,
-          1,
-          2
-        ]
-      },
-      "rise_steps_env": 8,
-      "rise_steps_cpp": 15,
-      "contact_gated": true
-    },
-    "gain_blend_default": false,
-    "gain_blend_note": "game_qcbf_action.py:238 disables the blend at num_envs == 1, which is the browser's case and the case every single-env demo render ran on; app/filter.js keeps it off by default and exposes it as a flag",
-    "cost_per_filtered_robot_per_step": {
-      "mlp_forwards_floor": 7,
-      "mlp_forwards_typical": "13-19",
-      "mlp_forwards_ceiling": 67,
-      "mac_floor": 1472512,
-      "mac_per_line_search_iter": 455168,
-      "note": "1 ctrl + 2 robust_q at the floor; +1 robust_q per line-search iteration (recon/03:452-482)"
-    }
+  "asym": {
+   "seats": {
+    "attacker": [
+     "asym_s2c_attacker",
+     "asym_et_attacker",
+     "asym_nom_attacker",
+     "asym_cpo_attacker",
+     "asym_lag_attacker"
+    ],
+    "defender": [
+     "asym_s2c_defender",
+     "asym_et_defender",
+     "asym_nom_defender",
+     "asym_cpo_defender",
+     "asym_lag_defender"
+    ]
+   }
   }
+ },
+ "policies": [
+  {
+   "name": "player_walk_fastwalk_v3_9000",
+   "display": "Player walk",
+   "method": null,
+   "role": "player_walk",
+   "game": "walk",
+   "seat": null,
+   "bin": "player_walk_fastwalk_v3_9000.bin",
+   "json": "player_walk_fastwalk_v3_9000.json",
+   "obs_dim": 47,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "walk_affine",
+   "bin_bytes": 761392
+  },
+  {
+   "name": "sym_s2c_B",
+   "display": "S2C",
+   "method": "s2c",
+   "role": "ai_opponent",
+   "game": "sym",
+   "seat": "B",
+   "bin": "sym_s2c_B.bin",
+   "json": "sym_s2c_B.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": "B",
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "sym_et_B",
+   "display": "ET",
+   "method": "et",
+   "role": "ai_opponent",
+   "game": "sym",
+   "seat": "B",
+   "bin": "sym_et_B.bin",
+   "json": "sym_et_B.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": "A",
+   "rotation_baked": true,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "sym_nom_B",
+   "display": "Nominal",
+   "method": "nom",
+   "role": "ai_opponent",
+   "game": "sym",
+   "seat": "B",
+   "bin": "sym_nom_B.bin",
+   "json": "sym_nom_B.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": "A",
+   "rotation_baked": true,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "sym_cpo_B",
+   "display": "CPO",
+   "method": "cpo",
+   "role": "ai_opponent",
+   "game": "sym",
+   "seat": "B",
+   "bin": "sym_cpo_B.bin",
+   "json": "sym_cpo_B.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": "B",
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "sym_lag_B",
+   "display": "Lagrangian",
+   "method": "lag",
+   "role": "ai_opponent",
+   "game": "sym",
+   "seat": "B",
+   "bin": "sym_lag_B.bin",
+   "json": "sym_lag_B.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": "B",
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_s2c_attacker",
+   "display": "S2C",
+   "method": "s2c",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "attacker",
+   "bin": "asym_s2c_attacker.bin",
+   "json": "asym_s2c_attacker.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_s2c_defender",
+   "display": "S2C",
+   "method": "s2c",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "defender",
+   "bin": "asym_s2c_defender.bin",
+   "json": "asym_s2c_defender.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_et_attacker",
+   "display": "ET",
+   "method": "et",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "attacker",
+   "bin": "asym_et_attacker.bin",
+   "json": "asym_et_attacker.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_et_defender",
+   "display": "ET",
+   "method": "et",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "defender",
+   "bin": "asym_et_defender.bin",
+   "json": "asym_et_defender.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_nom_attacker",
+   "display": "Nominal",
+   "method": "nom",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "attacker",
+   "bin": "asym_nom_attacker.bin",
+   "json": "asym_nom_attacker.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_nom_defender",
+   "display": "Nominal",
+   "method": "nom",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "defender",
+   "bin": "asym_nom_defender.bin",
+   "json": "asym_nom_defender.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_cpo_attacker",
+   "display": "CPO",
+   "method": "cpo",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "attacker",
+   "bin": "asym_cpo_attacker.bin",
+   "json": "asym_cpo_attacker.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_cpo_defender",
+   "display": "CPO",
+   "method": "cpo",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "defender",
+   "bin": "asym_cpo_defender.bin",
+   "json": "asym_cpo_defender.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_lag_attacker",
+   "display": "Lagrangian",
+   "method": "lag",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "attacker",
+   "bin": "asym_lag_attacker.bin",
+   "json": "asym_lag_attacker.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  },
+  {
+   "name": "asym_lag_defender",
+   "display": "Lagrangian",
+   "method": "lag",
+   "role": "ai_opponent",
+   "game": "asym",
+   "seat": "defender",
+   "bin": "asym_lag_defender.bin",
+   "json": "asym_lag_defender.json",
+   "obs_dim": 60,
+   "act_dim": 12,
+   "native_half": null,
+   "rotation_baked": false,
+   "action_path": "increment_integrator",
+   "bin_bytes": 788016
+  }
+ ],
+ "filter": {
+  "available": true,
+  "exporter": "tools/export_filter.py",
+  "display": "S2C safety certificate (Q-CBF)",
+  "nets": {
+   "ctrl": {
+    "json": "filter_ctrl.json",
+    "bin": "filter_ctrl.bin",
+    "in": 62,
+    "out": 12,
+    "head": "tanh"
+   },
+   "dstb": {
+    "json": "filter_dstb.json",
+    "bin": "filter_dstb.bin",
+    "in": 74,
+    "out": 6,
+    "head": "tanh"
+   },
+   "q1": {
+    "json": "filter_q1.json",
+    "bin": "filter_q1.bin",
+    "in": 80,
+    "out": 1,
+    "head": null
+   },
+   "q2": {
+    "json": "filter_q2.json",
+    "bin": "filter_q2.bin",
+    "in": 80,
+    "out": 1,
+    "head": null
+   }
+  },
+  "bin_bytes": 4084816,
+  "activation": "sin",
+  "normalizer": null,
+  "params": {
+   "kappa": 0.9,
+   "cbf_max_iters": 20,
+   "cbf_tol": 0.01,
+   "pessimistic": "max",
+   "value_eps": -1000000000.0,
+   "value_guard": -1000000000.0,
+   "value_release": -999999999.999999,
+   "intervention": "line_search",
+   "full_takeover": false,
+   "fallback_line_search": false,
+   "kin_enabled": false,
+   "sup_enabled": false,
+   "guard_enabled": false,
+   "reseed_track_err": 0.15
+  },
+  "increment": {
+   "scale": 0.5,
+   "smoothing": 0.3,
+   "inverse_denom": 0.15,
+   "q_lo": [
+    -0.94248,
+    -1.317725,
+    -2.628453,
+    -0.94248,
+    -1.317725,
+    -2.628453,
+    -0.94248,
+    -0.270525,
+    -2.628453,
+    -0.94248,
+    -0.270525,
+    -2.628453
+   ],
+   "q_hi": [
+    0.94248,
+    3.237625,
+    -0.932007,
+    0.94248,
+    3.237625,
+    -0.932007,
+    0.94248,
+    4.284825,
+    -0.932007,
+    0.94248,
+    4.284825,
+    -0.932007
+   ],
+   "q_limits_source": "entity soft_joint_pos_limits (game_qcbf_action.py:147), numerically equal to deploy.yaml increment.joint_pos_*"
+  },
+  "obs": {
+   "dim": 62,
+   "layout": [
+    {
+     "term": "root_link_lin_vel_b",
+     "at": 0,
+     "dim": 3
+    },
+    {
+     "term": "roll",
+     "at": 3,
+     "dim": 1
+    },
+    {
+     "term": "pitch",
+     "at": 4,
+     "dim": 1
+    },
+    {
+     "term": "root_link_ang_vel_b",
+     "at": 5,
+     "dim": 3
+    },
+    {
+     "term": "joint_pos",
+     "at": 8,
+     "dim": 12
+    },
+    {
+     "term": "joint_vel",
+     "at": 20,
+     "dim": 12
+    },
+    {
+     "term": "foot_contact",
+     "at": 32,
+     "dim": 4
+    },
+    {
+     "term": "prev_ctrl",
+     "at": 36,
+     "dim": 12
+    },
+    {
+     "term": "wall_margins",
+     "at": 48,
+     "dim": 4
+    },
+    {
+     "term": "heading",
+     "at": 52,
+     "dim": 2
+    },
+    {
+     "term": "opponent_tail",
+     "at": 54,
+     "dim": 8
+    }
+   ],
+   "slices": {
+    "proprio": [
+     0,
+     48
+    ],
+    "wall_margins": [
+     48,
+     52
+    ],
+    "heading": [
+     52,
+     54
+    ],
+    "opponent_tail": [
+     54,
+     62
+    ]
+   },
+   "joint_order": "FL, FR, RL, RR x (hip, thigh, calf) -- sim order; joint_ids_map / foot_ids_map in the yaml are the hardware permutation and are NOT used here",
+   "joint_pos_is_absolute": true,
+   "prev_ctrl_is_filter_output": true
+  },
+  "field": {
+   "length": 4.8,
+   "width": 3.0,
+   "center": [
+    0.0,
+    0.0
+   ],
+   "d_vis": 1.5,
+   "note": "the asym preset leaves field_size None, so the certificate reads the BUNDLE rectangle (4.8 x 3.0 at the env origin), not the scenario's 5.2 x 3.0 at (0.2, 0) -- recon/03:534-541"
+  },
+  "collision": {
+   "half_extents": [
+    0.29,
+    0.193
+   ],
+   "fwd_offset": 0.05,
+   "d_vis": 1.5,
+   "d_max": 3.0,
+   "no_opponent_tail": [
+    3.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "gains": {
+   "walk": {
+    "kp": [
+     20,
+     20,
+     40,
+     20,
+     20,
+     40,
+     20,
+     20,
+     40,
+     20,
+     20,
+     40
+    ],
+    "kd": [
+     1,
+     1,
+     2,
+     1,
+     1,
+     2,
+     1,
+     1,
+     2,
+     1,
+     1,
+     2
+    ]
+   },
+   "safety": {
+    "kp": [
+     100,
+     100,
+     200,
+     100,
+     100,
+     200,
+     100,
+     100,
+     200,
+     100,
+     100,
+     200
+    ],
+    "kd": [
+     1,
+     1,
+     2,
+     1,
+     1,
+     2,
+     1,
+     1,
+     2,
+     1,
+     1,
+     2
+    ]
+   },
+   "rise_steps_env": 8,
+   "rise_steps_cpp": 15,
+   "contact_gated": true
+  },
+  "gain_blend_default": false,
+  "gain_blend_note": "game_qcbf_action.py:238 disables the blend at num_envs == 1, which is the browser's case and the case every single-env demo render ran on; app/filter.js keeps it off by default and exposes it as a flag",
+  "cost_per_filtered_robot_per_step": {
+   "mlp_forwards_floor": 7,
+   "mlp_forwards_typical": "13-19",
+   "mlp_forwards_ceiling": 67,
+   "mac_floor": 1472512,
+   "mac_per_line_search_iter": 455168,
+   "note": "1 ctrl + 2 robust_q at the floor; +1 robust_q per line-search iteration (recon/03:452-482)"
+  }
+ }
 }

@@ -349,8 +349,11 @@ kbd.key-inline {
   gap: 14px;
   flex-wrap: wrap;
 }
+.choice-row-games {
+  flex-direction: column;
+}
 .choice-row-games > .choice {
-  flex: 1 1 320px;
+  flex: 1 1 auto;
 }
 .opp-grid {
   display: grid;

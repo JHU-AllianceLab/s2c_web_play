@@ -102,18 +102,14 @@ const GAME_COPY = {
   sym: {
     name: 'Symmetric',
     tag: 'race',
-    line: 'Both dogs attack. First reference point past its own line wins.',
-    detail:
-      'You take seat A and score at x = +1.9 m; the AI takes seat B and scores at x = −1.9 m. ' +
-      'Time out is a draw.',
+    line: 'Both dogs attack at once. First one across the far line wins.',
+    detail: 'You run right, the AI runs left. Ten seconds. Nobody across is a draw.',
   },
   asym: {
     name: 'Asymmetric',
     tag: 'attack / defend',
     line: 'One attacker, one defender, ten seconds on the clock.',
-    detail:
-      'The attacker must put its trunk centre past x = +1.9 m before the clock runs out. ' +
-      'The defender wins on time out.',
+    detail: 'The attacker has ten seconds to get past the line. The defender wins the clock.',
   },
 };
 
@@ -217,8 +213,8 @@ export function verdictText(config, game, playerSeat, aiSeat, result) {
       headline = scorerIsYou ? 'Touchdown. You scored.' : `Touchdown. ${they} scored.`;
       detail =
         game === 'sym'
-          ? 'Trunk centre past its own scoring line first.'
-          : 'The attacker put its trunk centre past x = +1.9 m before the clock ran out.';
+          ? 'Across the far line first.'
+          : 'The attacker got past the line before the clock ran out.';
       break;
     }
     case 'trunk_contact':
@@ -380,6 +376,7 @@ export async function createUI(options = {}) {
     h('h2.step-title', null, [h('span.step-n', { text: '2' }), 'Pick your side']),
     roleRow,
   ]);
+  const oppStepN = h('span.step-n', { text: '3' });
   const oppGrid = h('div.opp-grid');
   const oppNote = h('p.step-note', { text: '' });
 
@@ -518,7 +515,7 @@ export async function createUI(options = {}) {
         ]),
         roleSection,
         h('section.setup-step', null, [
-          h('h2.step-title', null, [h('span.step-n', { text: '3' }), 'Pick the opponent']),
+          h('h2.step-title', null, [oppStepN, 'Pick the opponent']),
           oppGrid,
           oppNote,
         ]),
@@ -918,11 +915,13 @@ export async function createUI(options = {}) {
       card.setAttribute('aria-pressed', id === state.game ? 'true' : 'false');
     }
 
-    // roles
+    // roles — asym only. In the symmetric game both dogs do the same thing, so
+    // there is nothing to pick and the opponent step moves up to 2.
     const seats = GAMES[state.game].seats;
     roleRow.textContent = '';
     if (state.game === 'asym') {
       roleSection.hidden = false;
+      oppStepN.textContent = '3';
       for (const seat of seats) roleRow.appendChild(roleCard(seat));
       for (const card of roleRow.children) {
         const on = card.dataset.role === state.playerSeat;
@@ -930,18 +929,9 @@ export async function createUI(options = {}) {
         card.setAttribute('aria-pressed', on ? 'true' : 'false');
       }
     } else {
-      roleSection.hidden = false;
-      state.playerSeat = 'A';
-      roleRow.appendChild(
-        h('div.fixed-seat', null, [
-          h('span.fixed-seat-name', { text: 'You are seat A' }),
-          h('p.choice-line', {
-            text:
-              'Both dogs attack, so the seats are interchangeable: you score at x = +1.9 m, the ' +
-              'AI at x = −1.9 m. The shipped pool members are all built for seat B.',
-          }),
-        ])
-      );
+      roleSection.hidden = true;
+      oppStepN.textContent = '2';
+      state.playerSeat = seats[0];
     }
 
     // opponents
@@ -966,7 +956,11 @@ export async function createUI(options = {}) {
         if (card.setAttribute) card.setAttribute('aria-pressed', on ? 'true' : 'false');
       }
       const sel = rows.find((r) => r.method === state.method);
-      oppNote.textContent = sel ? `${sel.display} plays ${seatLabel(state.game, aiSeat)}.` : '';
+      oppNote.textContent = sel
+        ? state.game === 'sym'
+          ? `${sel.display} runs the other dog.`
+          : `${sel.display} plays ${seatLabel(state.game, aiSeat)}.`
+        : '';
     }
 
     // filter — S2C IS its certificate: it always runs behind the Q-CBF stack, and no
