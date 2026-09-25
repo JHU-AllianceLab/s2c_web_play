@@ -38,8 +38,35 @@ import { loadFilter, makeShieldPath, DECISION_NAME } from '../app/filter.js';
 import { seatRobot, otherSeat, gameCfg } from '../app/config.js';
 
 const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
-const EPISODES = Number(process.argv[2] || 10);
-const stillInput = { read: () => ({ vx: 0, vy: 0, wz: 0 }), bindings: {}, setScheme() {} };
+const argv = process.argv.slice(2);
+const flag = (n, d) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] : d; };
+const EPISODES = Number(argv.find((a) => /^\d+$/.test(a)) || 10);
+/** Which game, which AI seat, which certificate fallback net, what the human does. */
+const GAME = flag('--game', 'asym');
+const OPPONENT = flag('--opponent', GAME === 'sym' ? 'sym_s2c_B' : 'asym_s2c_attacker');
+const PLAYER_SEAT = flag('--seat', GAME === 'sym' ? 'A' : 'defender');
+const CTRL = flag('--ctrl', '');                       // '', 'ctrl' or 'ctrl_s1'
+const VX = Number(flag('--vx', GAME === 'sym' ? '2.0' : '0'));
+/**
+ * `--player erratic` drives the human seat the way a person actually does —
+ * speed changes, turns, the odd sidestep — because a straight-line charge only
+ * ever produces one contact geometry and the certificate's regime depends on
+ * the geometry. Deterministic: episode index seeds the phase.
+ */
+let PLAYER_T = 0, PLAYER_EP = 0;
+const ERRATIC = flag('--player', 'hold') === 'erratic';
+const stillInput = {
+  read: () => {
+    if (!ERRATIC) return { vx: VX, vy: 0, wz: 0 };
+    const t = PLAYER_T * 0.02, k = 1 + PLAYER_EP;
+    return {
+      vx: 1.6 + 1.2 * Math.sin(0.9 * k * t + k),
+      vy: 0.6 * Math.sin(1.7 * t + 2 * k),
+      wz: 1.1 * Math.sin(0.6 * k * t + 0.5 * k),
+    };
+  },
+  bindings: {}, setScheme() {},
+};
 
 /** v133fdrw attacker, the run behind `asym_s2c_attacker`. See the header. */
 const TRAINING = {
@@ -57,19 +84,22 @@ const pct = (a, p) => {
 };
 
 async function run({ withFilter, episodes }) {
-  const sim = await createSim({ sceneUrl: `${ROOT}/assets/scene/asym/scene.xml` });
+  const sim = await createSim({ sceneUrl: `${ROOT}/assets/scene/${GAME}/scene.xml` });
   const man = await loadManifest(`${ROOT}/assets/policies/manifest.json`);
   const walk = await man.load(man.playerWalk().name);
-  const ai = await man.load('asym_s2c_attacker');
+  const ai = await man.load(OPPONENT);
 
-  const game = 'asym';
+  const game = GAME;
   const g = gameCfg(game);
-  const playerSeat = 'defender';
+  const playerSeat = PLAYER_SEAT;
   const aiSeat = otherSeat(g, playerSeat);
   let actionPaths = null;
   let shield = null;
   if (withFilter) {
-    const filter = await loadFilter({ manifest: man.manifest, baseUrl: `${ROOT}/assets/policies/` });
+    const filter = await loadFilter({
+      manifest: man.manifest, baseUrl: `${ROOT}/assets/policies/`, game,
+      ...(CTRL ? { ctrlNet: CTRL } : {}),
+    });
     shield = makeShieldPath({
       filter, sim, robot: seatRobot(g, aiSeat), opponentRobot: seatRobot(g, playerSeat),
     });
@@ -77,23 +107,27 @@ async function run({ withFilter, episodes }) {
   }
 
   const match = createMatch({
-    sim, game, playerSeat, opponent: man.entry('asym_s2c_attacker'),
+    sim, game, playerSeat, opponent: man.entry(OPPONENT),
     policies: { walk, ai }, input: stillInput, actionPaths,
     config: { countdownMs: 0 },
   });
 
   const tally = {};
   const decisions = {};
+  const tilts = [], heights = [];
   const alpha = [], gainAlpha = [], value = [], stepMs = [], qEvals = [];
   let maxTilt = 0, steps = 0, pgInfeasible = 0;
   for (let ep = 0; ep < episodes; ep++) {
     match.reset();
+    PLAYER_EP = ep; PLAYER_T = 0;
     let hud = match.hud();
     while (!hud.verdict && hud.step < g.episodeSteps) {
       hud = match.tick(20);
-      steps += 1;
+      steps += 1; PLAYER_T += 1;
       const t = sim.tiltAngle(seatRobot(g, aiSeat));
       if (t > maxTilt) maxTilt = t;
+      tilts.push(t);
+      heights.push(sim.getBase(seatRobot(g, aiSeat)).pos[2]);
       const info = hud.filter && hud.filter[aiSeat];
       if (!info) continue;
       const name = DECISION_NAME[info.decision];
@@ -113,6 +147,11 @@ async function run({ withFilter, episodes }) {
   sim.dispose?.();
   return {
     tally,
+    meanTiltDeg: (mean(tilts) * 180) / Math.PI,
+    p95TiltDeg: (pct(tilts, 0.95) * 180) / Math.PI,
+    meanHeight: mean(heights),
+    sdHeight: Math.sqrt(mean(heights.map((h) => (h - mean(heights)) ** 2))),
+    loHeight: pct(heights, 0.05),
     maxTiltDeg: (maxTilt * 180) / Math.PI,
     steps,
     solver,
@@ -136,7 +175,8 @@ for (const withFilter of [false, true]) {
   try {
     const r = await run({ withFilter, episodes: EPISODES });
     console.log(`  verdicts: ${JSON.stringify(r.tally)}`);
-    console.log(`  AI max tilt ${r.maxTiltDeg.toFixed(1)} deg (fall threshold 70)`);
+    console.log(`  AI tilt  mean ${r.meanTiltDeg.toFixed(1)}  p95 ${r.p95TiltDeg.toFixed(1)}  max ${r.maxTiltDeg.toFixed(1)} deg` +
+      `   trunk height ${r.meanHeight.toFixed(3)} m  sd ${r.sdHeight.toFixed(3)}  p05 ${r.loHeight.toFixed(3)}`);
     if (!withFilter) continue;
     console.log(`  solver ${r.solver.intervention}  eta ${r.solver.pgStep} x ` +
       `${r.solver.pgMaxIters} steps, ${r.solver.pgBacktrackIters} backtracks`);

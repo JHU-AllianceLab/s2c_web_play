@@ -1172,7 +1172,12 @@ export async function loadFilter(opts = {}) {
   // stage-1 ctrl bundle (recon/02:342-348, proved tensor by tensor in
   // tools/export_filter_s1ctrl.py). Running them behind the asymmetric ctrl
   // proposes a `u_safe` they were never certified against, and the dog topples.
-  const ctrlKey = opts.game === 'sym' && entry.nets.ctrl_s1 ? 'ctrl_s1' : 'ctrl';
+  const ctrlKey =
+    opts.ctrlNet && entry.nets[opts.ctrlNet]
+      ? opts.ctrlNet
+      : opts.game === 'sym' && entry.nets.ctrl_s1
+        ? 'ctrl_s1'
+        : 'ctrl';
   const [ctrl, dstb, q1, q2] = await Promise.all(
     [ctrlKey, 'dstb', 'q1', 'q2'].map((k) => loadPolicy(dir + entry.nets[k].json)),
   );
