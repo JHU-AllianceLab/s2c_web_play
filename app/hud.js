@@ -480,7 +480,9 @@ export function createHud(options = {}) {
   }
 
   function seatLabel(gameId, seat) {
-    if (gameId === 'sym') return `seat ${seat}`;
+    // In the symmetric game the seat is bookkeeping — both dogs do the same
+    // thing — so the chip carries only "You" and the opponent's name.
+    if (gameId === 'sym') return '';
     return seat === 'attacker' ? 'attacker' : 'defender';
   }
 

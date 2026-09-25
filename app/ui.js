@@ -153,7 +153,7 @@ function saveSettings(s) {
 }
 
 function seatLabel(game, seat) {
-  if (game === 'sym') return `seat ${seat}`;
+  if (game === 'sym') return '';   // both dogs do the same thing; the seat is bookkeeping
   return seat;
 }
 
@@ -631,7 +631,6 @@ export async function createUI(options = {}) {
     resultTone,
     resultHead,
     resultSub,
-    h('div.result-meta', null, [h('span.result-meta-label', { text: 'referee' }), resultTerm]),
     resultStats,
     h('div.overlay-actions', null, [
       h('button.btn.btn-primary', { type: 'button', onclick: () => doRestart() }, ['Restart', h('kbd.key.key-inline', { text: 'R' })]),
@@ -1161,7 +1160,7 @@ export async function createUI(options = {}) {
     const v = verdictText(config, state.game, state.playerSeat, aiSeat, result || {});
     resultHead.textContent = v.headline;
     resultSub.textContent = v.detail;
-    resultTerm.textContent = v.term;
+    resultTerm.textContent = v.term;   // kept for the test harnesses; not shown
     resultTone.className = `result-tone tone-${v.tone}`;
     resultTone.textContent = v.tone === 'win' ? 'WIN' : v.tone === 'lose' ? 'LOSS' : 'DRAW';
     resultStats.textContent = '';
