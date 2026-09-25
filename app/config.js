@@ -388,6 +388,27 @@ export const GAMES = deepFreeze({
     /** Match / robustness jitter envelopes. sym_touchdown.py:77-78, :82-83 */
     jitter: { tight: { x: 0.15, y: 0.15, yaw: 0.10 }, wide: { x: 1.0, y: 1.2, yaw: Math.PI } },
 
+    /**
+     * The human's speed limit IN THIS GAME ONLY (app/input.js setLimits).
+     *
+     * Both dogs run for a line here, so the match is a race and whoever is
+     * faster wins it without playing. The walker the human drives is not the
+     * locomotion the game policies have: measured on this pitch, a held W runs
+     * 1.78 m/s and Shift 2.39 m/s, against S2C 1.12, Nominal 1.03, Lagrangian
+     * 1.52, CPO 1.75 and ET 1.91. So a straight line plus one sidestep beat
+     * three of the five opponents with no skill involved.
+     *
+     * Narrowed to vx 2.2 with a 0.65 cruise fraction: W gives 1.43 m/s and
+     * Shift 2.2 m/s, which sits between the slow opponents and the fast ones —
+     * you out-run Nominal and S2C, ET and CPO out-run you, and none of it is
+     * decided before the first stride. Still strictly inside CMD_BOX, so the
+     * walk policy is never asked for a command it was not trained on.
+     *
+     * The asymmetric game keeps the full box: there the roles are not
+     * symmetric, the attacker has a clock, and speed is the attacker's job.
+     */
+    playerCmd: { vx: [-1.1, 2.2], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.65 },
+
     // --- rules --------------------------------------------------------------
     /** The live TerminationManager vocabulary. scene.json rules.terminationTerms */
     terminationTerms: [

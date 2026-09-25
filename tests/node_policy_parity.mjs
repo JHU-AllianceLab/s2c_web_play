@@ -26,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 import { loadPolicy, loadManifest, buildPolicy } from '../app/policy.js';
+import { GAMES, CMD_BOX } from '../app/config.js';
 import {
   walkObs,
   gameObs,
@@ -599,6 +600,23 @@ async function sectionGroundTruth() {
         JSON.stringify(W.meta.commandRanges.lin_vel_y) === JSON.stringify([-1.0, 1.0]) &&
         JSON.stringify(W.meta.commandRanges.ang_vel_z) === JSON.stringify([-2.0, 2.0]),
       'walk: the live command box is CMD_BOX vx[-1.5,3] vy[-1,1] wz[-2,2]',
+    );
+
+    // The symmetric game narrows what the human may ask for (config GAMES.sym
+    // playerCmd): both dogs race for a line there, and the walker the human
+    // drives is faster than the policies. Narrowing only -- never wider than
+    // the trained box, or the walker is extrapolating.
+    const symCmd = GAMES.sym.playerCmd;
+    ok(
+      symCmd
+        && symCmd.vx[1] <= CMD_BOX.vx[1] && symCmd.vx[0] >= CMD_BOX.vx[0]
+        && symCmd.vy[1] <= CMD_BOX.vy[1] && symCmd.wz[1] <= CMD_BOX.wz[1],
+      'sym: the player command limit is inside the trained box',
+      `vx ${symCmd.vx.join('..')} cruise ${symCmd.cruiseFrac}`,
+    );
+    ok(
+      Math.abs(symCmd.vx[1] * symCmd.cruiseFrac - 1.43) < 0.02,
+      'sym: a held W asks for 1.43 m/s (measured against the opponents: 1.0-1.9)',
     );
 
     let worst = 0;

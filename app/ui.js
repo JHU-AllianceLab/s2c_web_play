@@ -909,6 +909,11 @@ export async function createUI(options = {}) {
   }
 
   function syncSetup() {
+    // Per-game speed limit. The symmetric game is a race, so the human's walker
+    // is held to the pace the game policies actually run at (GAMES.sym.playerCmd);
+    // the asymmetric game keeps the trained box. input.setLimits can only narrow.
+    input.setLimits(GAMES[state.game].playerCmd || null);
+    renderControlsList();
     for (const [id, card] of Object.entries(gameCards)) {
       card.classList.toggle('on', id === state.game);
       card.setAttribute('aria-pressed', id === state.game ? 'true' : 'false');

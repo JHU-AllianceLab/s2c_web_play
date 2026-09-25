@@ -183,7 +183,9 @@ function applyPadDeadzone(v, dz) {
  *   onChange   (state) => void, fired when the scheme/sensitivity/source changes
  */
 export function createInput(target = globalThis, opts = {}) {
-  const box = opts.cmdBox || CMD_BOX_DEFAULT;
+  const boxDefault = opts.cmdBox || CMD_BOX_DEFAULT;
+  /** The live limits. setLimits() narrows them per game; it can never widen them. */
+  let box = boxDefault;
   if (!box || !box.vx || !box.vy || !box.wz) {
     throw new Error(
       'app/input.js: no command box. app/config.js must export CMD_BOX, or pass ' +
@@ -198,11 +200,15 @@ export function createInput(target = globalThis, opts = {}) {
     fallSeconds: { ...FEEL.fallSeconds, ...((opts.feel || {}).fallSeconds || {}) },
   };
 
-  const span = {
-    vx: Math.max(Math.abs(box.vx[0]), Math.abs(box.vx[1])),
-    vy: Math.max(Math.abs(box.vy[0]), Math.abs(box.vy[1])),
-    wz: Math.max(Math.abs(box.wz[0]), Math.abs(box.wz[1])),
+  let span;
+  const recomputeSpan = () => {
+    span = {
+      vx: Math.max(Math.abs(box.vx[0]), Math.abs(box.vx[1])),
+      vy: Math.max(Math.abs(box.vy[0]), Math.abs(box.vy[1])),
+      wz: Math.max(Math.abs(box.wz[0]), Math.abs(box.wz[1])),
+    };
   };
+  recomputeSpan();
 
   const resolveScheme = (name) => {
     const id = SCHEME_ALIAS[name] || name;
@@ -425,11 +431,13 @@ export function createInput(target = globalThis, opts = {}) {
     return out;
   }
 
+  const round1 = (v) => Math.round(v * 10) / 10;
+
   function bindingRows() {
     const s = SCHEMES[scheme];
     const axisName = { vx: 'forward / back', vy: 'strafe', wz: 'turn' };
     const rows = [
-      { keys: ['W', 'S'], axis: 'vx', label: axisName.vx },
+      { keys: ['W', 'S'], axis: 'vx', label: axisName.vx, scale: feel.cruiseFrac },
       {
         keys: ['A', 'D'],
         axis: s.map.KeyA[0],
@@ -440,12 +448,15 @@ export function createInput(target = globalThis, opts = {}) {
         axis: s.map.KeyQ[0],
         label: axisName[s.map.KeyQ[0]],
       },
-      { keys: ['Shift'], axis: 'vx', label: 'sprint (full forward box)' },
+      { keys: ['Shift'], axis: 'vx', label: 'sprint' },
       { keys: ['X'], axis: null, label: 'stop' },
     ];
     for (const r of rows) {
       if (!r.axis) continue;
-      r.range = box[r.axis];
+      // What the key actually gives, not the width of the trained box: W is the
+      // cruise fraction of it and only Shift reaches the top.
+      const k = r.scale ?? 1;
+      r.range = [round1(box[r.axis][0] * k), round1(box[r.axis][1] * k)];
       r.unit = r.axis === 'wz' ? 'rad/s' : 'm/s';
     }
     return rows;
@@ -465,6 +476,29 @@ export function createInput(target = globalThis, opts = {}) {
       };
     },
     /** FROZEN. Accepts a scheme id from config.INPUT.schemes, or the alias "steer". */
+    /**
+     * Narrow the command limits for one game. `null` restores the trained box.
+     * A game may only ever ask for LESS than the box the walker was trained on
+     * (app/config.js CMD_BOX) — the clamp below refuses to widen it, because
+     * outside that box the walk policy is extrapolating.
+     */
+    setLimits(limits) {
+      if (!limits) {
+        box = boxDefault;
+        feel.cruiseFrac = FEEL.cruiseFrac;
+      } else {
+        const narrow = (a) => [
+          Math.max(limits[a]?.[0] ?? boxDefault[a][0], boxDefault[a][0]),
+          Math.min(limits[a]?.[1] ?? boxDefault[a][1], boxDefault[a][1]),
+        ];
+        box = { vx: narrow('vx'), vy: narrow('vy'), wz: narrow('wz') };
+        feel.cruiseFrac = limits.cruiseFrac ?? FEEL.cruiseFrac;
+      }
+      recomputeSpan();
+      for (const a of AXES) value[a] = clamp(value[a], box[a][0], box[a][1]);
+      if (opts.onChange) opts.onChange(api.state());
+      return box;
+    },
     setScheme(name) {
       const id = resolveScheme(name);
       if (!id) {
