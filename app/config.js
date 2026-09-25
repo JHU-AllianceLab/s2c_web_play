@@ -394,15 +394,20 @@ export const GAMES = deepFreeze({
      * Both dogs run for a line here, so the match is a race and whoever is
      * faster wins it without playing. The walker the human drives is not the
      * locomotion the game policies have: measured on this pitch, a held W runs
-     * 1.78 m/s and Shift 2.39 m/s, against S2C 1.12, Nominal 1.03, Lagrangian
-     * 1.52, CPO 1.75 and ET 1.91. So a straight line plus one sidestep beat
-     * three of the five opponents with no skill involved.
+     * 1.78 m/s and Shift 2.39 m/s, while the opponents race at S2C 1.76,
+     * CPO 1.74, ET 1.70, Lagrangian 1.51 and Nominal 1.28. A straight line plus
+     * one sidestep beat three of the five with no skill involved.
+     *
+     * (Measure the opponents while they are RACING. An earlier pass timed them
+     * through a head-on charge and read S2C at 1.12 — that is the speed of a
+     * policy working around a dog in its path, not its pace.)
      *
      * Narrowed to vx 2.2 with a 0.65 cruise fraction: W gives 1.43 m/s and
-     * Shift 2.2 m/s, which sits between the slow opponents and the fast ones —
-     * you out-run Nominal and S2C, ET and CPO out-run you, and none of it is
-     * decided before the first stride. Still strictly inside CMD_BOX, so the
-     * walk policy is never asked for a command it was not trained on.
+     * Shift 2.2 m/s. At cruise you are mid-pack — faster than Nominal, slower
+     * than S2C, CPO and ET — and only the sprint out-runs the field, which is
+     * also what makes you the faster closer and puts the collision at your
+     * fault. Still strictly inside CMD_BOX, so the walk policy is never asked
+     * for a command it was not trained on.
      *
      * The asymmetric game keeps the full box: there the roles are not
      * symmetric, the attacker has a clock, and speed is the attacker's job.
