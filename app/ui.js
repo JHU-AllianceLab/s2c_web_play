@@ -554,8 +554,8 @@ export async function createUI(options = {}) {
     controlsList.textContent = '';
     for (const row of input.bindings.rows) {
       const keys = h('span.control-keys', null, row.keys.map(keycap));
-      const range = row.range
-        ? h('span.control-range', { text: `${row.range[0]} … ${row.range[1]} ${row.unit}` })
+      const range = Number.isFinite(row.top)
+        ? h('span.control-range', { text: `${row.top} ${row.unit}` })
         : null;
       controlsList.appendChild(
         h('li.control-row', null, [keys, h('span.control-what', { text: row.label }), range])
@@ -913,7 +913,6 @@ export async function createUI(options = {}) {
     // is held to the pace the game policies actually run at (GAMES.sym.playerCmd);
     // the asymmetric game keeps the trained box. input.setLimits can only narrow.
     input.setLimits(GAMES[state.game].playerCmd || null);
-    renderControlsList();
     for (const [id, card] of Object.entries(gameCards)) {
       card.classList.toggle('on', id === state.game);
       card.setAttribute('aria-pressed', id === state.game ? 'true' : 'false');

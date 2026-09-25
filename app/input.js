@@ -453,10 +453,15 @@ export function createInput(target = globalThis, opts = {}) {
     ];
     for (const r of rows) {
       if (!r.axis) continue;
-      // What the key actually gives, not the width of the trained box: W is the
-      // cruise fraction of it and only Shift reaches the top.
+      // One number per row: the speed the key gives. A signed RANGE
+      // ("-0.9 ... 1.8 m/s") reads as arithmetic, not as a control.
+      //
+      // Always the STANDARD figures (boxDefault), never the per-game narrowing
+      // setLimits() applies. Ray 2026-09-26: the controls card is the same card
+      // in every game; a number that moves when you pick a game is a tuning
+      // detail, and the player did not ask for it.
       const k = r.scale ?? 1;
-      r.range = [round1(box[r.axis][0] * k), round1(box[r.axis][1] * k)];
+      r.top = round1(boxDefault[r.axis][1] * k);
       r.unit = r.axis === 'wz' ? 'rad/s' : 'm/s';
     }
     return rows;
