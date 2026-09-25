@@ -227,27 +227,25 @@ export function verdictText(config, game, playerSeat, aiSeat, result) {
         : draw
           ? 'Collision.'
           : 'You initiated the collision — you lose.';
-      detail =
-        'Any robot-on-robot contact ends the episode; the side closing faster at the moment of ' +
-        'contact is at fault (0.12 s EMA of the closing speed).';
+      detail = 'The side closing faster at the moment of contact is at fault.';
       break;
     case 'fell':
       headline = subjectIsYou ? 'You fell over — you lose.' : `${they} fell over. You win.`;
-      detail = 'Trunk tilted more than 70° from upright.';
+      detail = '';
       break;
     case 'oob':
       headline = subjectIsYou
         ? 'You left the field — you lose.'
         : `${they} left the field. You win.`;
-      detail = 'The trunk centre crossed the field rectangle. There are no walls to stop you.';
+      detail = 'There are no walls — staying in is part of the game.';
       break;
     case 'time_out':
       if (game === 'sym') {
         headline = 'Time out. Draw.';
-        detail = 'Nobody crossed in ten seconds, so the symmetric game scores it a draw.';
+        detail = 'Nobody crossed in ten seconds.';
       } else {
         headline = youWon ? 'Time out. You held the line.' : 'Time out. The defender held.';
-        detail = 'Ten seconds, 500 control steps. In the asymmetric game the defender wins the clock.';
+        detail = 'The defender wins the clock.';
       }
       break;
     default:
