@@ -97,8 +97,8 @@ export const FIELD_COLORS = {
   zone: 'rgba(26,204,89,0.20)',
   zoneEdge: 'rgba(26,204,89,0.55)',
   /** Both ends live: each one takes the colour of the dog that scores in it. */
-  zoneYou: 'rgba(79,195,232,0.20)',
-  zoneAi: 'rgba(216,160,90,0.20)',
+  zoneYou: 'rgba(79,195,232,0.26)',
+  zoneAi: 'rgba(216,160,90,0.30)',
   midline: 'rgba(235,235,225,0.20)',
 };
 
@@ -460,19 +460,18 @@ export function createHud(options = {}) {
     ai.seat.textContent = seatLabel(game, aiSeat);
     ai.method.textContent = opponent && opponent.display ? opponent.display : '';
     you.method.textContent = '';
-    const scores = (dir) => `${dir > 0 ? '+' : '−'}${g.lineX.toFixed(1)} m`;
-    const youGoal = game === 'asym' && playerSeat === 'defender'
-      ? 'hold the line until the clock runs out'
-      : `reach x = ${scores(pDir)}`;
-    const aiGoal = game === 'asym' && aiSeat === 'defender'
-      ? 'hold the line until the clock runs out'
-      : `reach x = ${scores(aDir)}`;
+    // Plain words, not coordinates: the player is looking down the pitch, not
+    // reading the scenario file.
+    const goalOf = (seat, dir, third) =>
+      game === 'asym' && seat === 'defender'
+        ? `hold${third ? 's' : ''} the line`
+        : `run${third ? 's' : ''} ${dir > 0 ? 'right' : 'left'}`;
+    const youGoal = goalOf(playerSeat, pDir, false);
+    const aiGoal = goalOf(aiSeat, aDir, true);
     legend.textContent =
-      `YOU · ${seatLabel(game, playerSeat)} · ${youGoal}    |    ` +
-      `AI · ${opponent && opponent.display ? opponent.display : 'opponent'} · ` +
-      `${seatLabel(game, aiSeat)} · ${aiGoal}`;
-    mapScale.textContent = `${g.field[0].toFixed(1)} × ${g.field[1].toFixed(1)} m` +
-      (g.center[0] ? ` · centre (${g.center[0]}, ${g.center[1]})` : '');
+      `You ${youGoal}    |    ` +
+      `${opponent && opponent.display ? opponent.display : 'the AI'} ${aiGoal}`;
+    mapScale.textContent = `${g.field[0].toFixed(1)} × ${g.field[1].toFixed(1)} m`;
     if (controlDt) {
       clockSub.textContent = `s left of ${(g.episodeSteps * controlDt).toFixed(0)}`;
     }
