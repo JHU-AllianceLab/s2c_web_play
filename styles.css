@@ -921,6 +921,18 @@ kbd.key-inline {
   text-align: center;
 }
 
+/*
+ * 32 places in app/*.js hide an element by setting `hidden`. The UA sheet's
+ * `[hidden] { display: none }` is the weakest possible rule, so ANY author
+ * `display:` on the same element silently beats it and the element stays on
+ * screen. That is how the countdown "1" kept sitting over the pitch for the
+ * whole match: `.hud-center` sets `display: grid`, and `center.hidden = true`
+ * did nothing. One rule, so no future `display:` can reintroduce it.
+ */
+[hidden] {
+  display: none !important;
+}
+
 .hud-center {
   position: absolute;
   inset: 0;

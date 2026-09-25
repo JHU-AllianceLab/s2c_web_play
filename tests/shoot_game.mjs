@@ -147,6 +147,14 @@ async function runCase(drv, { game = 'asym', role, opponent = 's2c' }) {
       you: st.seats[st.playerSeat], ai: st.seats[st.aiSeat],
       canvas: [cv.width, cv.height],
       distinctPixels: uniq.size,
+      // A hidden element that an author display rule keeps on screen is
+      // invisible to a hidden-attribute check, so ask the browser what it paints.
+      countdownVisible: (() => {
+        const c = document.querySelector('.hud-center');
+        if (!c) return '';
+        const vis = getComputedStyle(c).display !== 'none';
+        return vis ? 'showing ' + (c.textContent || '').trim().slice(0, 24) : '';
+      })(),
       log: (document.getElementById('log') || {}).textContent || '',
     };
   }`);
@@ -156,6 +164,7 @@ async function runCase(drv, { game = 'asym', role, opponent = 's2c' }) {
     `you(${info.you.x.toFixed(2)}, ${info.you.y.toFixed(2)})  ai(${info.ai.x.toFixed(2)}, ${info.ai.y.toFixed(2)})`);
 
   ok(info.step > 40, 'the browser advanced control steps', `step ${info.step}`);
+  ok(!info.countdownVisible, 'the countdown overlay is gone once the match runs', info.countdownVisible || '');
   ok(Number.isFinite(info.you.x) && Number.isFinite(info.ai.x), 'positions are finite');
   ok(info.distinctPixels > 1, 'the canvas is drawing a scene, not one flat colour', `${info.distinctPixels}/16 distinct samples`);
   ok(bytes > 40000, 'the screenshot has real content', `${bytes} B`);
