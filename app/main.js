@@ -99,7 +99,7 @@ async function startSession(setup) {
     let actionPaths = null;
     if (wantFilter) {
       ui.loading.update('filter', { state: 'active' });
-      const filter = await loadFilter({ manifest: man.manifest });
+      const filter = await loadFilter({ manifest: man.manifest, game });
       const g = CONFIG.gameCfg(game);
       const playerSeat = setup.playerSeat;
       const aiSeat = CONFIG.otherSeat(g, playerSeat);

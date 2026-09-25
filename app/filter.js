@@ -1132,6 +1132,31 @@ export function createShield(cert, params) {
  * @param {object} [opts.manifest]  pre-parsed manifest (skips the fetch)
  * @returns {Promise<{nets, params, field, collide, gains, entry}>}
  */
+/**
+ * The rectangle the certificate measures its wall margins against.
+ *
+ * The two games do NOT share it, and this is the one filter knob they differ
+ * on (recon/03:109-113). The asymmetric preset leaves `field_size` unset, so
+ * the certificate reads the BUNDLE's 4.8 x 3.0 at the origin even though the
+ * pitch is 5.2 x 3.0 at (0.2, 0) — trained that way, reproduced, not fixed.
+ * `sym_preset.py:114-131` passes `_SYM_FIELD = (5.6, 3.0)` and
+ * `_SYM_CENTER = (0, 0)` explicitly, so on the symmetric pitch the certificate
+ * sees the real walls. Feeding it the bundle rectangle there would put the
+ * boundary 0.4 m inside each end zone and have it fight a dog that is safely
+ * on the pitch.
+ */
+function fieldFor(entry, game) {
+  const base = {
+    halfX: entry.field.length / 2,
+    halfY: entry.field.width / 2,
+    cx: entry.field.center[0],
+    cy: entry.field.center[1],
+    dVis: entry.field.d_vis,
+  };
+  if (game !== 'sym') return base;
+  return { ...base, halfX: 2.8, halfY: 1.5, cx: 0, cy: 0 };
+}
+
 export async function loadFilter(opts = {}) {
   const manifestUrl = opts.manifestUrl || 'assets/policies/manifest.json';
   // Through app/policy.js `loadManifest`, so the node harnesses and the browser
@@ -1142,8 +1167,14 @@ export async function loadFilter(opts = {}) {
     throw new Error('filter.js: the manifest carries no `filter` block — run tools/export_filter.py');
   }
   const dir = manifestUrl.slice(0, manifestUrl.lastIndexOf('/') + 1);
+  // The two games share the value function and the adversary and differ ONLY in
+  // the fallback controller: the symmetric members were played behind the
+  // stage-1 ctrl bundle (recon/02:342-348, proved tensor by tensor in
+  // tools/export_filter_s1ctrl.py). Running them behind the asymmetric ctrl
+  // proposes a `u_safe` they were never certified against, and the dog topples.
+  const ctrlKey = opts.game === 'sym' && entry.nets.ctrl_s1 ? 'ctrl_s1' : 'ctrl';
   const [ctrl, dstb, q1, q2] = await Promise.all(
-    ['ctrl', 'dstb', 'q1', 'q2'].map((k) => loadPolicy(dir + entry.nets[k].json)),
+    [ctrlKey, 'dstb', 'q1', 'q2'].map((k) => loadPolicy(dir + entry.nets[k].json)),
   );
 
   // The manifest is the source of truth for everything the BUNDLE decides;
@@ -1200,13 +1231,7 @@ export async function loadFilter(opts = {}) {
       qLo: entry.increment.q_lo,
       qHi: entry.increment.q_hi,
     },
-    field: {
-      halfX: entry.field.length / 2,
-      halfY: entry.field.width / 2,
-      cx: entry.field.center[0],
-      cy: entry.field.center[1],
-      dVis: entry.field.d_vis,
-    },
+    field: fieldFor(entry, opts.game),
     collide: entry.collision,
     gains: entry.gains,
   };
