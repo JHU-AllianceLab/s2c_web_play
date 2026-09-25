@@ -399,8 +399,7 @@ export async function createUI(options = {}) {
       h('p.choice-line', { text: copy.line }),
       h('div.choice-facts', null, [
         h('span', { text: `${g.field[0]} × ${g.field[1]} m` }),
-        h('span', { text: `line x = ${g.lineX > 0 ? '+' : ''}${g.lineX} m` }),
-        h('span', { text: `${g.episodeSteps} steps · ${(g.episodeSteps * config.PHYS.controlDt).toFixed(0)} s` }),
+        h('span', { text: `${(g.episodeSteps * config.PHYS.controlDt).toFixed(0)} s` }),
       ]),
     ]);
     card.addEventListener('click', () => selectGame(id));
@@ -485,10 +484,6 @@ export async function createUI(options = {}) {
         isOurs ? h('span.choice-tag.tag-ours', { text: 'ours' }) : null,
       ]),
       h('p.choice-line', { text: METHOD_BLURB[row.method] || '' }),
-      h('div.choice-facts', null, [
-        h('span.mono', { text: row.name }),
-        h('span.mono', { text: `${row.obs_dim}→${row.act_dim}` }),
-      ]),
     ]);
     card.addEventListener('click', () => {
       state.method = row.method;
@@ -971,9 +966,7 @@ export async function createUI(options = {}) {
         if (card.setAttribute) card.setAttribute('aria-pressed', on ? 'true' : 'false');
       }
       const sel = rows.find((r) => r.method === state.method);
-      oppNote.textContent = sel
-        ? `${sel.display} plays ${seatLabel(state.game, aiSeat)}. Weights: ${sel.name} (${sel.obs_dim}→${sel.act_dim}).`
-        : '';
+      oppNote.textContent = sel ? `${sel.display} plays ${seatLabel(state.game, aiSeat)}.` : '';
     }
 
     // filter — S2C IS its certificate: it always runs behind the Q-CBF stack, and no

@@ -77,19 +77,19 @@ async function startSession(setup) {
     // `new URL('mujoco.wasm', import.meta.url)` would look in the wrong place.
     // Point at the vendored binary explicitly; it is correct either way.
     const sim = await createSim({ sceneUrl: SCENE_URL(game), wasmUrl: WASM_URL });
-    ui.loading.update('scene', { state: 'done', detail: `${sim.nbody} bodies, ${sim.nu} actuators` });
+    ui.loading.update('scene', { state: 'done' });
     ui.loading.progress(0.35, 'Arena ready');
 
     // ---- 2. policies --------------------------------------------------------
     const man = await loadManifest();
     ui.loading.update('walk', { state: 'active' });
     const walk = await man.load(setup.playerWalk.name);
-    ui.loading.update('walk', { state: 'done', detail: `${walk.obsDim}→${walk.actDim}` });
+    ui.loading.update('walk', { state: 'done' });
     ui.loading.progress(0.6, 'Walk policy ready');
 
     ui.loading.update('ai', { state: 'active' });
     const ai = await man.load(setup.opponent.name);
-    ui.loading.update('ai', { state: 'done', detail: `${ai.obsDim}→${ai.actDim}` });
+    ui.loading.update('ai', { state: 'done' });
     ui.loading.progress(0.8, 'Opponent ready');
 
     // ---- 3. the safety filter ------------------------------------------------
@@ -116,11 +116,7 @@ async function startSession(setup) {
           filter, sim, robot: pRobot, opponentRobot: aRobot,
         });
       }
-      const on = [want.ai && 'AI', want.you && 'you'].filter(Boolean).join(' + ');
-      ui.loading.update('filter', {
-        state: 'done',
-        detail: `${on} · kappa ${filter.params.kappa} · ${(filter.entry.bin_bytes / 1e6).toFixed(2)} MB`,
-      });
+      ui.loading.update('filter', { state: 'done' });
     }
     ui.loading.progress(0.9, wantFilter ? 'Certificate ready' : 'Opponent ready');
 
