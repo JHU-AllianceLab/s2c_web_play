@@ -81,9 +81,24 @@ async function getNodeFs() {
 }
 
 /** Read bytes in either environment (same rule as app/physics.js:143-152). */
+/** Retry 5xx: the lab's custom domain 502s under parallel load (see app/physics.js). */
+async function fetchRetry(url, tries = 4) {
+  let last;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+      last = new Error(`fetch ${url} -> HTTP ${res.status}`);
+      if (res.status < 500 && res.status !== 429) throw last;
+    } catch (err) { last = err; }
+    await new Promise((r) => setTimeout(r, [200, 600, 1500][Math.min(i, 2)]));
+  }
+  throw last;
+}
+
 async function readBytes(url) {
   if (!IS_NODE || isNetUrl(url)) {
-    const res = await fetch(url);
+    const res = await fetchRetry(url);
     if (!res.ok) throw new Error(`fetch ${url} -> HTTP ${res.status}`);
     return new Uint8Array(await res.arrayBuffer());
   }

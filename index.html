@@ -51,10 +51,35 @@
        */
       const params = new URLSearchParams(location.search);
       const preview = params.get('uipreview') === '1' || params.get('uipreview') === 'true';
-      const entry = preview ? './tests/ui_preview.mjs' : './app/main.js';
+
+      // One request for all of the code. The lab's custom domain sits behind a
+      // proxy that 502s under parallel load, and a failed ES-module import cannot
+      // be retried by the browser — so the bundle is fetched as text, with
+      // retries, and imported from a blob. dist/app.bundle.js is built by
+      // `npx esbuild app/main.js --bundle --format=esm --minify`.
+      async function fetchTextRetry(url, tries = 5) {
+        let last;
+        for (let i = 0; i < tries; i++) {
+          if (i) await new Promise((r) => setTimeout(r, [200, 500, 1200, 2500][Math.min(i - 1, 3)]));
+          try {
+            const res = await fetch(url);
+            if (res.ok) return await res.text();
+            last = new Error(url + ' -> HTTP ' + res.status);
+            if (res.status === 404) break;
+          } catch (err) { last = err; }
+        }
+        throw last;
+      }
 
       try {
-        const mod = await import(entry);
+        let mod;
+        if (preview) {
+          mod = await import('./tests/ui_preview.mjs');
+        } else {
+          const code = await fetchTextRetry('./dist/app.bundle.js');
+          const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+          try { mod = await import(url); } finally { URL.revokeObjectURL(url); }
+        }
         if (mod && typeof mod.boot === 'function') await mod.boot();
       } catch (err) {
         console.error('[s2c] boot failed', err);
@@ -63,9 +88,9 @@
         const box = document.createElement('div');
         box.className = 'boot-error';
         const h1 = document.createElement('h1');
-        h1.textContent = 'This build did not boot';
+        h1.textContent = 'Could not load';
         const p = document.createElement('p');
-        p.textContent = 'Could not load ' + entry + '.';
+        p.textContent = 'Reload the page — the server dropped a file.';
         const pre = document.createElement('pre');
         pre.textContent = String((err && err.stack) || err);
         box.append(h1, p, pre);

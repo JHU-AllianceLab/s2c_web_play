@@ -31,6 +31,7 @@ const MAX_CATCHUP_STEPS = 6;
 const CAMERA_MODES = ['chase', 'fpv', 'broadcast'];
 
 const SCENE_URL = (game) => `assets/scene/${game}/scene.xml`;
+const WASM_URL = new URL('vendor/mujoco/mujoco.wasm', document.baseURI).href;
 
 /** Games this build offers. Add 'sym' back here (and un-ignore its assets) to ship it. */
 const PUBLISHED_GAMES = ['asym'];
@@ -72,7 +73,10 @@ async function startSession(setup) {
   try {
     // ---- 1. physics ---------------------------------------------------------
     ui.loading.update('scene', { state: 'active' });
-    const sim = await createSim({ sceneUrl: SCENE_URL(game) });
+    // The bundled build lives in dist/, so mujoco.js's own
+    // `new URL('mujoco.wasm', import.meta.url)` would look in the wrong place.
+    // Point at the vendored binary explicitly; it is correct either way.
+    const sim = await createSim({ sceneUrl: SCENE_URL(game), wasmUrl: WASM_URL });
     ui.loading.update('scene', { state: 'done', detail: `${sim.nbody} bodies, ${sim.nu} actuators` });
     ui.loading.progress(0.35, 'Arena ready');
 

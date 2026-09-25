@@ -140,10 +140,35 @@ function isNetUrl(u) {
 }
 
 /** Read a URL or path as bytes. Browser: fetch. Node: fetch for http(s), fs otherwise. */
+/**
+ * Fetch with retry. The lab's custom domain sits behind a proxy that returns a
+ * 502 for roughly one request in three when several land at once (measured
+ * 2026-09-25: 8 of 24 parallel module fetches failed). A retried request
+ * almost always succeeds, so every asset read goes through here.
+ */
+const FETCH_TRIES = 4;
+const FETCH_BACKOFF_MS = [200, 600, 1500];
+
+async function fetchWithRetry(url) {
+  let last;
+  for (let attempt = 0; attempt < FETCH_TRIES; attempt++) {
+    try {
+      const res = await fetch(url, { cache: 'default' });
+      if (res.ok) return res;
+      last = new Error(`fetch ${url} -> HTTP ${res.status}`);
+      if (res.status < 500 && res.status !== 429) throw last;   // 404 will not fix itself
+    } catch (err) {
+      last = err;
+    }
+    const wait = FETCH_BACKOFF_MS[Math.min(attempt, FETCH_BACKOFF_MS.length - 1)];
+    await new Promise((r) => setTimeout(r, wait));
+  }
+  throw last || new Error(`fetch ${url} failed`);
+}
+
 async function readBytes(url) {
   if (!IS_NODE || isNetUrl(url)) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`fetch ${url} -> HTTP ${res.status}`);
+    const res = await fetchWithRetry(url);
     return new Uint8Array(await res.arrayBuffer());
   }
   const fs = await getNodeFs();

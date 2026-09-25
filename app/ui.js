@@ -294,7 +294,13 @@ export async function createUI(options = {}) {
   if (!manifest) {
     const url = options.manifestUrl || 'assets/policies/manifest.json';
     try {
-      const res = await fetch(url, { cache: 'no-cache' });
+      let res = null;
+      for (let i = 0; i < 4 && !(res && res.ok); i++) {
+        if (i) await new Promise((r) => setTimeout(r, [200, 600, 1500][Math.min(i - 1, 2)]));
+        try { res = await fetch(url, { cache: 'no-cache' }); } catch { res = null; }
+        if (res && !res.ok && res.status < 500 && res.status !== 429) break;
+      }
+      if (!res) throw new Error(`fetch ${url} failed`);
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       manifest = await res.json();
     } catch (err) {
