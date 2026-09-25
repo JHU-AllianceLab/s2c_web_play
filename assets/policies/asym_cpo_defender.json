@@ -5,8 +5,6 @@
   "seat": "defender",
   "method": "cpo",
   "display": "CPO",
-  "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_4400.pt",
-  "md5": "e80fa8bf32b8c9eb4a9c311cdef3fd1c",
   "obs_dim": 60,
   "act_dim": 12,
   "layers": [
@@ -159,12 +157,10 @@
   },
   "rotation_baked": false,
   "action_path": "increment_integrator",
-  "local_copy": "/home/ray/Disk_ext/Go2/Meeting/9th_meeting/cells_w40/matchups/m0__CPO_s71__vs__CPO_s71.pt",
   "local_md5": "e80fa8bf32b8c9eb4a9c311cdef3fd1c",
   "local_bytes": 11170907,
   "upstream_checkpoint_md5": "da9ba043c5f4139c16cb56b280d842cd",
   "upstream_md5_verified": false,
-  "provenance": "spliced eval cell; infos.eval_matchup.defender_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
   "seat_in_checkpoint": "defender",
   "native_half": null,
   "norm_placement": "separate -- the runtime computes (obs - norm.mean) / (norm.std + norm.eps) before layer 0; it is NOT folded into the weights",
@@ -202,7 +198,6 @@
   "bin_bytes": 788016,
   "bin_layout": "little-endian float32; for each Linear in order: weight (row-major, out x in) then bias (out)",
   "forward": "z = (obs - norm.mean) / (norm.std + norm.eps); h = ELU(L0 z); h = ELU(L1 h); h = ELU(L2 h); action = L3 h",
-  "notes": "CPO defender, CPO_s71 = wbc_c6_s71 game_4400 (seats['defender']).",
   "increment": {
     "scale": 0.5,
     "smoothing": 0.3,
@@ -212,14 +207,11 @@
   },
   "splice_infos": {
     "attacker_system": "CPO_s71",
-    "attacker_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_1500.pt",
-    "defender_system": "CPO_s71",
-    "defender_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_4400.pt"
+    "defender_system": "CPO_s71"
   },
   "splice_corroboration": {
     "file": "m1__PEN_s23__vs__CPO_s71.pt",
-    "seat_sha256": "42c9a992e2f724d12cfb8c488407fd6f3f8e927f2b430c785d3515be973215f7",
-    "records": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_cpo/2026-08-16_06-30-45_wbc_c6_s71/game_4400.pt"
+    "seat_sha256": "42c9a992e2f724d12cfb8c488407fd6f3f8e927f2b430c785d3515be973215f7"
   },
   "obs_layout_probe": {
     "critic_zero_variance_dims": [

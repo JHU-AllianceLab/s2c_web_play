@@ -42,6 +42,5 @@
   "bin": "filter_ctrl_s1.bin",
   "bin_bytes": 2254896,
   "bin_layout": "little-endian float32; for each Linear in order: weight (row-major, out x in) then bias (out)",
-  "forward": "x = concat(obs62); h = sin(L0 x); h = sin(L1 h); h = sin(L2 h); y = L3 h; y = tanh(y)",
-  "notes": "TanhGaussianActor.forward is tanh(mean_net(x)) * action_scale + action_bias with action_scale == 1 and action_bias == 0 (asserted at export), so the affine is a no-op (networks.py:138-144). log_std_net is never evaluated at deploy and is not exported."
+  "forward": "x = concat(obs62); h = sin(L0 x); h = sin(L1 h); h = sin(L2 h); y = L3 h; y = tanh(y)"
 }

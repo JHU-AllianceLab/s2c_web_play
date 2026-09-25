@@ -214,32 +214,37 @@ POLICIES: list[dict] = [
     dict(
         name="sym_s2c_B",
         corroborate=None,
-        expect_bytes=9560459,
+        expect_bytes=9555531,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="s2c",
         display=DISPLAY["s2c"],
-        # DESIGN.md 3.4, pool member S_v5s17g3200B. 5080-only original, pulled
-        # byte-identical into .cache/ (md5 checked against the 5080).
-        source=CACHE / "sym_v5_s17_game_3200.pt",
+        # Pool member F_v7g2000A -- the STRONGEST S2C member of the symmetric
+        # pool's final table (Meeting/10th_meeting/data_sym_final): 72.5 % macro
+        # over the four baseline arms across 9,780 episodes, both seats, with a
+        # 6.18 % fall rate. It replaces S_v5s17g3200B, which was picked on ten
+        # episodes from one fixed opening against one opponent and is not a pool
+        # member at all. 5080-only original, pulled byte-identical into .cache/.
+        source=CACHE / "F_v7g2000A.pt",
         upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc/2026-08-20_13-04-30_sym_v5_s17/"
-                 "game_3200.pt",
-        upstream_md5="c180c85e41ef29a045da67227a376f62",
+                 "game_sym_touchdown_go2_go2_wbc/2026-08-21_03-35-40_sym_v7_s41/"
+                 "game_2000.pt",
+        upstream_md5="5e8a3ae437556732ce2896aa15bbfaa0",
         provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
-        ckpt_seat="defender",      # the B half
+        ckpt_seat="attacker",      # the A half
         obs_dim=60,
         act_dim=12,
-        native_half="B",
+        native_half="A",
         action_path="increment_integrator",
         notes=(
-            "S2C / Shield, pool member S_v5s17g3200B, the B half of "
-            "sym_v5_s17 game_3200 (checkpoint key seats['defender']). Seated at "
-            "B = its native half, so NO pi-rotation is baked in. Trained behind "
-            "the v5prox agent_15000 62-D QCBF (projected_gradient); running the "
-            "bare 60-D MLP gives the UNSHIELDED policy -- the certificate is a "
-            "separate 62-D network stack between q_des and the plant."
+            "S2C / Shield, pool member F_v7g2000A, the A half of sym_v7_s41 "
+            "game_2000 (checkpoint key seats['attacker']). Seated at B, the "
+            "OPPOSITE half, so the pi-rotation IS baked into the weights. "
+            "Trained behind the v5prox agent_15000 62-D QCBF "
+            "(projected_gradient); running the bare 60-D MLP gives the "
+            "UNSHIELDED policy -- the certificate is a separate 62-D network "
+            "stack between q_des and the plant."
         ),
     ),
     dict(

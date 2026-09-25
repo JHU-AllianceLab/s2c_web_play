@@ -896,11 +896,11 @@ async function sectionPlumbing(loaded) {
   const viaManifest = await man.load(man.opponents('sym', 'B')[0]);
   ok(viaManifest.obsDim === 60 && viaManifest.actDim === 12, 'loadManifest().load() returns a runnable 60->12 policy');
 
-  // Rotation: the two A-half members must be flagged, the three B-half ones not.
+  // Rotation: every A-half member seated at B must be flagged, every B-half one not.
   const rot = man.list().filter((r) => r.rotation_baked).map((r) => r.name).sort();
   ok(
-    JSON.stringify(rot) === JSON.stringify(['sym_et_B', 'sym_nom_B']),
-    'exactly sym_et_B and sym_nom_B carry the baked pi-rotation',
+    JSON.stringify(rot) === JSON.stringify(['sym_et_B', 'sym_nom_B', 'sym_s2c_B']),
+    'exactly the A-half members carry the baked pi-rotation',
     rot.join(','),
   );
 

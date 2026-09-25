@@ -5,8 +5,6 @@
   "seat": "attacker",
   "method": "nom",
   "display": "Nominal",
-  "source_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1700.pt",
-  "md5": "6d558906de9a74b57e5572222f82b882",
   "obs_dim": 60,
   "act_dim": 12,
   "layers": [
@@ -159,12 +157,10 @@
   },
   "rotation_baked": false,
   "action_path": "increment_integrator",
-  "local_copy": "/home/ray/Disk_ext/Go2/Meeting/9th_meeting/cells_w40/matchups/m0__PEN_s23__vs__PEN_s23.pt",
   "local_md5": "6d558906de9a74b57e5572222f82b882",
   "local_bytes": 9547341,
   "upstream_checkpoint_md5": "cc9d1b9e692b61d83b256e6195f9deba",
   "upstream_md5_verified": false,
-  "provenance": "spliced eval cell; infos.eval_matchup.attacker_checkpoint names the upstream file, whose md5 is recorded in recon/01 but NOT recomputed here (the original is 5080-only)",
   "seat_in_checkpoint": "attacker",
   "native_half": null,
   "norm_placement": "separate -- the runtime computes (obs - norm.mean) / (norm.std + norm.eps) before layer 0; it is NOT folded into the weights",
@@ -202,7 +198,6 @@
   "bin_bytes": 788016,
   "bin_layout": "little-endian float32; for each Linear in order: weight (row-major, out x in) then bias (out)",
   "forward": "z = (obs - norm.mean) / (norm.std + norm.eps); h = ELU(L0 z); h = ELU(L1 h); h = ELU(L2 h); action = L3 h",
-  "notes": "Nom / Penalty attacker, PEN_s23 = wbc_p25_s23 game_1700 (seats['attacker']). Never filtered.",
   "increment": {
     "scale": 0.5,
     "smoothing": 0.3,
@@ -212,14 +207,11 @@
   },
   "splice_infos": {
     "attacker_system": "PEN_s23",
-    "attacker_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1700.pt",
-    "defender_system": "PEN_s23",
-    "defender_checkpoint": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1400.pt"
+    "defender_system": "PEN_s23"
   },
   "splice_corroboration": {
     "file": "m1__PEN_s23__vs__CPO_s71.pt",
-    "seat_sha256": "e139262666fced8426713e1a4aa334db63feb0ec43ddcb57d956c4b025b2c576",
-    "records": "/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_touchdown_go2_go2_wbc_penalty/2026-08-16_15-04-49_wbc_p25_s23/game_1700.pt"
+    "seat_sha256": "e139262666fced8426713e1a4aa334db63feb0ec43ddcb57d956c4b025b2c576"
   },
   "obs_layout_probe": {
     "critic_zero_variance_dims": [
