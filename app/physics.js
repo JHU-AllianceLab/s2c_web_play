@@ -714,6 +714,27 @@ export async function createSim({
     }
     queue = next;
   }
+  // ONE request for every mesh. GitHub Pages 502'd intermittently when the page
+  // asked for sixteen .obj files at once (and guessed their type as x-tgif), so
+  // tools/export_scene.py also writes `meshes.json` = { vfsPath: objText }.
+  // Prefer it; the individual files stay in the repo as the source of truth.
+  const packRel = scene && scene.files && scene.files.meshPack;
+  let packed = 0;
+  if (packRel) {
+    try {
+      const pack = JSON.parse(await readText(joinUrl(base, packRel)));
+      for (const [vfsName, text] of Object.entries(pack)) {
+        if (seen.has(vfsName)) continue;
+        seen.add(vfsName);
+        vfs.addBuffer(vfsName, new TextEncoder().encode(text));
+        packed += text.length;
+      }
+    } catch (err) {
+      // fall through to per-file fetching
+      console.warn('[physics] mesh pack unavailable, falling back to individual files:', err.message);
+    }
+  }
+
   // scene.json may list assets the regex cannot see (e.g. a lite mesh dir).
   const declared = (scene && scene.files && scene.files.meshFiles) || (scene && scene.assets);
   const meshDir = (scene && scene.files && scene.files.meshDir) || '';

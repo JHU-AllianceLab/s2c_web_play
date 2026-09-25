@@ -27,6 +27,8 @@ const flag = (n, d) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] 
 const PORT = Number(flag('--port', '8791'));
 const GD_PORT = Number(flag('--driver-port', '4481'));
 const KEEP = argv.includes('--keep');
+/** Point the harness at a deployed site instead of the local server. */
+const BASE = flag('--base', '');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -110,7 +112,7 @@ async function waitFor(drv, expr, { timeout = 90000, every = 400, label = 'condi
 }
 
 async function runCase(drv, { role, opponent = 's2c', name }) {
-  const url = `http://127.0.0.1:${PORT}/index.html?game=asym&role=${role}&opponent=${opponent}&autostart=1`;
+  const url = `${BASE || `http://127.0.0.1:${PORT}`}/index.html?game=asym&role=${role}&opponent=${opponent}&autostart=1`;
   console.log(`\n--- asym / you ${role} vs ${opponent} -------------------------------`);
   await drv.go(url);
 
@@ -187,7 +189,7 @@ async function main() {
     await drv.setRect(1440, 900);
 
     console.log('\n--- title screen ------------------------------------------------');
-    await drv.go(`http://127.0.0.1:${PORT}/index.html`);
+    await drv.go(`${BASE || `http://127.0.0.1:${PORT}`}/index.html`);
     await waitFor(drv, 'document.querySelector(".choice-game")', { label: 'the title screen' });
     await sleep(400);
     await drv.shot('game_title.png');

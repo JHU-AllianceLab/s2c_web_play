@@ -89,11 +89,11 @@ async function resolveConfig(injected) {
 
 /** One line per method. Descriptive only — no numbers claimed that are not in recon/. */
 const METHOD_BLURB = {
-  s2c: 'Ours. Trained behind the Q-CBF safety certificate, which overrides the policy whenever the certificate predicts a violation.',
-  et: 'Early termination. The episode simply ends when a safety event happens, so the return does the teaching.',
-  nom: 'Penalty. A fixed cost for unsafe events is added to the reward and the policy trades it off freely.',
-  cpo: 'CPO. A constrained trust-region update that projects each step back into the feasible set.',
-  lag: 'Lagrangian. A learned multiplier prices the constraint into the reward and adapts during training.',
+  s2c: 'Ours — runs behind the safety certificate.',
+  et: 'Baseline — early termination.',
+  nom: 'Baseline — safety penalty.',
+  cpo: 'Baseline — constrained policy optimisation.',
+  lag: 'Baseline — Lagrangian.',
 };
 
 const METHOD_ORDER = ['s2c', 'et', 'nom', 'cpo', 'lag'];
@@ -379,9 +379,6 @@ export async function createUI(options = {}) {
   const oppGrid = h('div.opp-grid');
   const oppNote = h('p.step-note', { text: '' });
 
-  const filterAiBox = h('input', { type: 'checkbox', id: 'opt-filter-ai' });
-  const filterYouBox = h('input', { type: 'checkbox', id: 'opt-filter-you' });
-  const filterNote = h('p.step-note');
 
   const startBtn = h('button.btn.btn-primary.btn-start', { type: 'button' }, ['Start match']);
   const startHint = h('p.start-hint', { text: '' });
@@ -396,7 +393,6 @@ export async function createUI(options = {}) {
       ]),
       fieldDiagram(id),
       h('p.choice-line', { text: copy.line }),
-      h('p.choice-detail', { text: copy.detail }),
       h('div.choice-facts', null, [
         h('span', { text: `${g.field[0]} × ${g.field[1]} m` }),
         h('span', { text: `line x = ${g.lineX > 0 ? '+' : ''}${g.lineX} m` }),
@@ -527,17 +523,9 @@ export async function createUI(options = {}) {
           oppGrid,
           oppNote,
         ]),
-        h('section.setup-step.setup-step-options', null, [
-          h('h2.step-title', null, [h('span.step-n', { text: '4' }), 'Safety filter']),
-          h('div.opt-row', null, [
-            h('label.opt', { for: 'opt-filter-ai' }, [filterAiBox, h('span', { text: 'The AI runs behind the S2C certificate' })]),
-            h('label.opt', { for: 'opt-filter-you' }, [filterYouBox, h('span', { text: 'I run behind it too' })]),
-          ]),
-          filterNote,
-        ]),
         h('div.start-row', null, [startBtn, startHint]),
       ]),
-      h('aside.setup-side', null, [controlsCard(), aboutCard()]),
+      h('aside.setup-side', null, [controlsCard()]),
     ]),
   ]);
 
@@ -563,11 +551,6 @@ export async function createUI(options = {}) {
           h('span.control-what', { text: 'camera' }),
         ]),
       ]),
-      h('p.card-note', {
-        text:
-          'Keys are ramped, not switched: a held key eases into the command so the walk policy ' +
-          'sees a smooth target. A gamepad left stick works too.',
-      }),
     ]);
   }
 
@@ -989,21 +972,9 @@ export async function createUI(options = {}) {
         : '';
     }
 
-    // filter
-    const canFilter = capabilities.filter === true;
-    filterAiBox.disabled = !canFilter;
-    filterYouBox.disabled = !canFilter;
-    if (!canFilter) {
-      filterAiBox.checked = false;
-      filterYouBox.checked = false;
-      state.filter = { ai: false, you: false };
-    }
-    filterNote.textContent = canFilter
-      ? 'The certificate is the same Q-CBF stack on both sides. With it on, a command that would ' +
-        'cause a collision is overridden before it reaches the plant.'
-      : 'The certificate stack is not wired into this build yet, so every policy here runs ' +
-        'unshielded — including S2C, which was trained behind it.';
-    setupScreen.classList.toggle('no-filter', !canFilter);
+    // filter — S2C IS its certificate: it always runs behind the Q-CBF stack, and no
+    // baseline ever does. There is nothing for the player to toggle (Ray, 2026-09-25).
+    state.filter = { ai: capabilities.filter === true && state.method === 's2c', you: false };
 
     // start button
     const ready = Boolean(state.method);
@@ -1323,18 +1294,10 @@ export async function createUI(options = {}) {
   if (deep.filter && capabilities.filter) {
     state.filter.ai = deep.filter === 'ai' || deep.filter === 'both';
     state.filter.you = deep.filter === 'you' || deep.filter === 'both';
-    filterAiBox.checked = state.filter.ai;
-    filterYouBox.checked = state.filter.you;
   }
   if (deep.camera && cameraModes.includes(deep.camera)) state.camera = deep.camera;
   syncSetup();
 
-  filterAiBox.addEventListener('change', () => {
-    state.filter.ai = filterAiBox.checked;
-  });
-  filterYouBox.addEventListener('change', () => {
-    state.filter.you = filterYouBox.checked;
-  });
 
   if (manifestError) {
     toast('Could not load the policy manifest', 'warn', 6000);

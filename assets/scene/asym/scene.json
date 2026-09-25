@@ -1,6231 +1,6232 @@
 {
-  "schema": "s2c_web_play/scene@2",
-  "game": "asym",
-  "generatedBy": "tools/export_scene.py",
-  "provenance": {
-    "mjlabTask": "Game-Touchdown-Go2-Go2-WBC-Clean",
-    "twinTask": "Game-Touchdown-Go2-Go2-WBC-Clean-Filtered",
-    "twinPlantVerifiedIdentical": true,
-    "play": true,
-    "mjlabRepo": "/home/ray/Disk_ext/Go2/Project/unitree_rl_mjlab",
-    "robotXml": "/home/ray/Disk_ext/Go2/Project/unitree_rl_mjlab/src/assets/robots/unitree_go2/xmls/go2.xml",
-    "robotXmlMd5": "adf31ec76228ca36b1ff8935878ce098",
-    "mujocoVersion": "3.5.0",
-    "scenario": "TouchdownScenarioCfg",
-    "note": "Compiled from mjlab's own MjSpec; every array in tools/export_scene.py:_ARRAYS matches the mjlab compile (P1). The arena decoration and the reduced meshes are then proved physics-neutral by bit-identical rollouts (P2/P3)."
-  },
-  "files": {
-    "xml": "scene.xml",
-    "meshDir": "assets",
-    "meshFiles": [
-      "base_0.obj",
-      "base_1.obj",
-      "base_2.obj",
-      "base_3.obj",
-      "base_4.obj",
-      "calf_0.obj",
-      "calf_1.obj",
-      "calf_mirror_0.obj",
-      "calf_mirror_1.obj",
-      "foot.obj",
-      "hip_0.obj",
-      "hip_1.obj",
-      "thigh_0.obj",
-      "thigh_1.obj",
-      "thigh_mirror_0.obj",
-      "thigh_mirror_1.obj"
-    ],
-    "meshNote": "The two games ship identical copies of the same 16 reduced meshes so each scene directory is self-contained; app code may point both at one copy via createSim's assetsBase if it prefers."
-  },
-  "physics": {
-    "timestep": 0.005,
-    "decimation": 4,
-    "controlDt": 0.02,
-    "episodeLengthS": 10.0,
-    "episodeSteps": 500,
-    "integrator": "implicitfast",
-    "solver": "newton",
-    "iterations": 10,
-    "tolerance": 1e-08,
-    "lsIterations": 20,
-    "lsTolerance": 0.01,
-    "ccdIterations": 100,
-    "cone": "pyramidal",
-    "impratio": 1.0,
-    "jacobian": "auto",
-    "gravity": [
-      0.0,
-      0.0,
-      -9.81
-    ],
-    "disableflags": 0,
-    "enableflags": 0
-  },
-  "model": {
-    "nq": 38,
-    "nv": 36,
-    "nu": 24,
-    "nbody": 30,
-    "njnt": 26,
-    "ngeom": 145,
-    "nsite": 53,
-    "nmesh": 32,
-    "nsensor": 109,
-    "nkey": 1,
-    "na": 0,
-    "nmocap": 0,
-    "bodyNames": [
-      "world",
-      "terrain",
-      "a_base_link",
-      "a_FL_hip",
-      "a_FL_thigh",
-      "a_FL_calf",
-      "a_FR_hip",
-      "a_FR_thigh",
-      "a_FR_calf",
-      "a_RL_hip",
-      "a_RL_thigh",
-      "a_RL_calf",
-      "a_RR_hip",
-      "a_RR_thigh",
-      "a_RR_calf",
-      "b_base_link",
-      "b_FL_hip",
-      "b_FL_thigh",
-      "b_FL_calf",
-      "b_FR_hip",
-      "b_FR_thigh",
-      "b_FR_calf",
-      "b_RL_hip",
-      "b_RL_thigh",
-      "b_RL_calf",
-      "b_RR_hip",
-      "b_RR_thigh",
-      "b_RR_calf",
-      "touchdown_field_markers",
-      "arena_decor"
-    ],
-    "geomNames": [
-      "terrain",
-      null,
-      null,
-      null,
-      null,
-      null,
-      "a_base1_collision",
-      "a_base2_collision",
-      "a_base3_collision",
-      null,
-      null,
-      "a_FL_hip_collision",
-      null,
-      null,
-      "a_FL_thigh_collision",
-      null,
-      null,
-      "a_FL_calf1_collision",
-      "a_FL_calf2_collision",
-      null,
-      "a_FL_foot_collision",
-      null,
-      null,
-      "a_FR_hip_collision",
-      null,
-      null,
-      "a_FR_thigh_collision",
-      null,
-      null,
-      "a_FR_calf1_collision",
-      "a_FR_calf2_collision",
-      null,
-      "a_FR_foot_collision",
-      null,
-      null,
-      "a_RL_hip_collision",
-      null,
-      null,
-      "a_RL_thigh_collision",
-      null,
-      null,
-      "a_RL_calf1_collision",
-      "a_RL_calf2_collision",
-      null,
-      "a_RL_foot_collision",
-      null,
-      null,
-      "a_RR_hip_collision",
-      null,
-      null,
-      "a_RR_thigh_collision",
-      null,
-      null,
-      "a_RR_calf1_collision",
-      "a_RR_calf2_collision",
-      null,
-      "a_RR_foot_collision",
-      null,
-      null,
-      null,
-      null,
-      null,
-      "b_base1_collision",
-      "b_base2_collision",
-      "b_base3_collision",
-      null,
-      null,
-      "b_FL_hip_collision",
-      null,
-      null,
-      "b_FL_thigh_collision",
-      null,
-      null,
-      "b_FL_calf1_collision",
-      "b_FL_calf2_collision",
-      null,
-      "b_FL_foot_collision",
-      null,
-      null,
-      "b_FR_hip_collision",
-      null,
-      null,
-      "b_FR_thigh_collision",
-      null,
-      null,
-      "b_FR_calf1_collision",
-      "b_FR_calf2_collision",
-      null,
-      "b_FR_foot_collision",
-      null,
-      null,
-      "b_RL_hip_collision",
-      null,
-      null,
-      "b_RL_thigh_collision",
-      null,
-      null,
-      "b_RL_calf1_collision",
-      "b_RL_calf2_collision",
-      null,
-      "b_RL_foot_collision",
-      null,
-      null,
-      "b_RR_hip_collision",
-      null,
-      null,
-      "b_RR_thigh_collision",
-      null,
-      null,
-      "b_RR_calf1_collision",
-      "b_RR_calf2_collision",
-      null,
-      "b_RR_foot_collision",
-      "field_x_min",
-      "field_x_max",
-      "field_y_min",
-      "field_y_max",
-      "touchdown_line",
-      "touchdown_region",
-      "decor_apron",
-      "decor_surface",
-      "decor_endzone",
-      "decor_line",
-      "decor_touchline_y_min",
-      "decor_touchline_y_max",
-      "decor_goalline_x_min",
-      "decor_goalline_x_max",
-      "decor_halfway",
-      "decor_centre_circle",
-      "decor_post_0",
-      "decor_post_cap_0",
-      "decor_post_1",
-      "decor_post_cap_1",
-      "decor_post_2",
-      "decor_post_cap_2",
-      "decor_post_3",
-      "decor_post_cap_3",
-      "decor_barrier_y_min",
-      "decor_barrier_y_min_top",
-      "decor_barrier_y_max",
-      "decor_barrier_y_max_top",
-      "decor_barrier_x_min",
-      "decor_barrier_x_min_top",
-      "decor_barrier_x_max",
-      "decor_barrier_x_max_top"
-    ],
-    "jointNames": [
-      "a_floating_base_joint",
-      "a_FL_hip_joint",
-      "a_FL_thigh_joint",
-      "a_FL_calf_joint",
-      "a_FR_hip_joint",
-      "a_FR_thigh_joint",
-      "a_FR_calf_joint",
-      "a_RL_hip_joint",
-      "a_RL_thigh_joint",
-      "a_RL_calf_joint",
-      "a_RR_hip_joint",
-      "a_RR_thigh_joint",
-      "a_RR_calf_joint",
-      "b_floating_base_joint",
-      "b_FL_hip_joint",
-      "b_FL_thigh_joint",
-      "b_FL_calf_joint",
-      "b_FR_hip_joint",
-      "b_FR_thigh_joint",
-      "b_FR_calf_joint",
-      "b_RL_hip_joint",
-      "b_RL_thigh_joint",
-      "b_RL_calf_joint",
-      "b_RR_hip_joint",
-      "b_RR_thigh_joint",
-      "b_RR_calf_joint"
-    ],
-    "actuatorNames": [
-      "a_FL_hip_joint",
-      "a_FR_hip_joint",
-      "a_RL_hip_joint",
-      "a_RR_hip_joint",
-      "a_FL_thigh_joint",
-      "a_FR_thigh_joint",
-      "a_RL_thigh_joint",
-      "a_RR_thigh_joint",
-      "a_FL_calf_joint",
-      "a_FR_calf_joint",
-      "a_RL_calf_joint",
-      "a_RR_calf_joint",
-      "b_FL_hip_joint",
-      "b_FR_hip_joint",
-      "b_RL_hip_joint",
-      "b_RR_hip_joint",
-      "b_FL_thigh_joint",
-      "b_FR_thigh_joint",
-      "b_RL_thigh_joint",
-      "b_RR_thigh_joint",
-      "b_FL_calf_joint",
-      "b_FR_calf_joint",
-      "b_RL_calf_joint",
-      "b_RR_calf_joint"
-    ],
-    "sensorNames": [
-      "a_imu_ang_vel",
-      "a_imu_lin_vel",
-      "a_imu_lin_acc",
-      "a_root_angmom",
-      "b_imu_ang_vel",
-      "b_imu_lin_vel",
-      "b_imu_lin_acc",
-      "b_root_angmom",
-      "a_feet_ground_contact_FL_foot_collision_found",
-      "a_feet_ground_contact_FL_foot_collision_force",
-      "a_feet_ground_contact_FR_foot_collision_found",
-      "a_feet_ground_contact_FR_foot_collision_force",
-      "a_feet_ground_contact_RL_foot_collision_found",
-      "a_feet_ground_contact_RL_foot_collision_force",
-      "a_feet_ground_contact_RR_foot_collision_found",
-      "a_feet_ground_contact_RR_foot_collision_force",
-      "a_limb_ground_contact_FL_thigh_collision_found",
-      "a_limb_ground_contact_FL_calf1_collision_found",
-      "a_limb_ground_contact_FR_thigh_collision_found",
-      "a_limb_ground_contact_FR_calf1_collision_found",
-      "a_limb_ground_contact_RL_thigh_collision_found",
-      "a_limb_ground_contact_RL_calf1_collision_found",
-      "a_limb_ground_contact_RR_thigh_collision_found",
-      "a_limb_ground_contact_RR_calf1_collision_found",
-      "b_feet_ground_contact_FL_foot_collision_found",
-      "b_feet_ground_contact_FL_foot_collision_force",
-      "b_feet_ground_contact_FR_foot_collision_found",
-      "b_feet_ground_contact_FR_foot_collision_force",
-      "b_feet_ground_contact_RL_foot_collision_found",
-      "b_feet_ground_contact_RL_foot_collision_force",
-      "b_feet_ground_contact_RR_foot_collision_found",
-      "b_feet_ground_contact_RR_foot_collision_force",
-      "b_limb_ground_contact_FL_thigh_collision_found",
-      "b_limb_ground_contact_FL_calf1_collision_found",
-      "b_limb_ground_contact_FR_thigh_collision_found",
-      "b_limb_ground_contact_FR_calf1_collision_found",
-      "b_limb_ground_contact_RL_thigh_collision_found",
-      "b_limb_ground_contact_RL_calf1_collision_found",
-      "b_limb_ground_contact_RR_thigh_collision_found",
-      "b_limb_ground_contact_RR_calf1_collision_found",
-      "a_vs_b_trunk_base1_collision_found",
-      "a_vs_b_trunk_base2_collision_found",
-      "a_vs_b_trunk_base3_collision_found",
-      "a_vs_b_trunk_FL_hip_collision_found",
-      "a_vs_b_trunk_FL_thigh_collision_found",
-      "a_vs_b_trunk_FL_calf1_collision_found",
-      "a_vs_b_trunk_FL_calf2_collision_found",
-      "a_vs_b_trunk_FL_foot_collision_found",
-      "a_vs_b_trunk_FR_hip_collision_found",
-      "a_vs_b_trunk_FR_thigh_collision_found",
-      "a_vs_b_trunk_FR_calf1_collision_found",
-      "a_vs_b_trunk_FR_calf2_collision_found",
-      "a_vs_b_trunk_FR_foot_collision_found",
-      "a_vs_b_trunk_RL_hip_collision_found",
-      "a_vs_b_trunk_RL_thigh_collision_found",
-      "a_vs_b_trunk_RL_calf1_collision_found",
-      "a_vs_b_trunk_RL_calf2_collision_found",
-      "a_vs_b_trunk_RL_foot_collision_found",
-      "a_vs_b_trunk_RR_hip_collision_found",
-      "a_vs_b_trunk_RR_thigh_collision_found",
-      "a_vs_b_trunk_RR_calf1_collision_found",
-      "a_vs_b_trunk_RR_calf2_collision_found",
-      "a_vs_b_trunk_RR_foot_collision_found",
-      "b_vs_a_trunk_base1_collision_found",
-      "b_vs_a_trunk_base2_collision_found",
-      "b_vs_a_trunk_base3_collision_found",
-      "b_vs_a_trunk_FL_hip_collision_found",
-      "b_vs_a_trunk_FL_thigh_collision_found",
-      "b_vs_a_trunk_FL_calf1_collision_found",
-      "b_vs_a_trunk_FL_calf2_collision_found",
-      "b_vs_a_trunk_FL_foot_collision_found",
-      "b_vs_a_trunk_FR_hip_collision_found",
-      "b_vs_a_trunk_FR_thigh_collision_found",
-      "b_vs_a_trunk_FR_calf1_collision_found",
-      "b_vs_a_trunk_FR_calf2_collision_found",
-      "b_vs_a_trunk_FR_foot_collision_found",
-      "b_vs_a_trunk_RL_hip_collision_found",
-      "b_vs_a_trunk_RL_thigh_collision_found",
-      "b_vs_a_trunk_RL_calf1_collision_found",
-      "b_vs_a_trunk_RL_calf2_collision_found",
-      "b_vs_a_trunk_RL_foot_collision_found",
-      "b_vs_a_trunk_RR_hip_collision_found",
-      "b_vs_a_trunk_RR_thigh_collision_found",
-      "b_vs_a_trunk_RR_calf1_collision_found",
-      "b_vs_a_trunk_RR_calf2_collision_found",
-      "b_vs_a_trunk_RR_foot_collision_found",
-      "a_vs_b_base1_collision_found",
-      "a_vs_b_base2_collision_found",
-      "a_vs_b_base3_collision_found",
-      "a_vs_b_FL_hip_collision_found",
-      "a_vs_b_FL_thigh_collision_found",
-      "a_vs_b_FL_calf1_collision_found",
-      "a_vs_b_FL_calf2_collision_found",
-      "a_vs_b_FL_foot_collision_found",
-      "a_vs_b_FR_hip_collision_found",
-      "a_vs_b_FR_thigh_collision_found",
-      "a_vs_b_FR_calf1_collision_found",
-      "a_vs_b_FR_calf2_collision_found",
-      "a_vs_b_FR_foot_collision_found",
-      "a_vs_b_RL_hip_collision_found",
-      "a_vs_b_RL_thigh_collision_found",
-      "a_vs_b_RL_calf1_collision_found",
-      "a_vs_b_RL_calf2_collision_found",
-      "a_vs_b_RL_foot_collision_found",
-      "a_vs_b_RR_hip_collision_found",
-      "a_vs_b_RR_thigh_collision_found",
-      "a_vs_b_RR_calf1_collision_found",
-      "a_vs_b_RR_calf2_collision_found",
-      "a_vs_b_RR_foot_collision_found"
-    ],
-    "geomBodyId": [
-      1,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      3,
-      3,
-      3,
-      4,
-      4,
-      4,
-      5,
-      5,
-      5,
-      5,
-      5,
-      5,
-      6,
-      6,
-      6,
-      7,
-      7,
-      7,
-      8,
-      8,
-      8,
-      8,
-      8,
-      8,
-      9,
-      9,
-      9,
-      10,
-      10,
-      10,
-      11,
-      11,
-      11,
-      11,
-      11,
-      11,
-      12,
-      12,
-      12,
-      13,
-      13,
-      13,
-      14,
-      14,
-      14,
-      14,
-      14,
-      14,
-      15,
-      15,
-      15,
-      15,
-      15,
-      15,
-      15,
-      15,
-      16,
-      16,
-      16,
-      17,
-      17,
-      17,
-      18,
-      18,
-      18,
-      18,
-      18,
-      18,
-      19,
-      19,
-      19,
-      20,
-      20,
-      20,
-      21,
-      21,
-      21,
-      21,
-      21,
-      21,
-      22,
-      22,
-      22,
-      23,
-      23,
-      23,
-      24,
-      24,
-      24,
-      24,
-      24,
-      24,
-      25,
-      25,
-      25,
-      26,
-      26,
-      26,
-      27,
-      27,
-      27,
-      27,
-      27,
-      27,
-      28,
-      28,
-      28,
-      28,
-      28,
-      28,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29,
-      29
-    ],
-    "geomRobot": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "a",
-      "a",
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      "a",
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      "a",
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      "a",
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      null,
-      null,
-      "a",
-      "a",
-      null,
-      "a",
-      null,
-      null,
-      null,
-      null,
-      null,
-      "b",
-      "b",
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      "b",
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      "b",
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      "b",
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      null,
-      null,
-      "b",
-      "b",
-      null,
-      "b",
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    "geomType": [
-      0,
-      7,
-      7,
-      7,
-      7,
-      7,
-      6,
-      5,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      7,
-      7,
-      7,
-      6,
-      5,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      7,
-      7,
-      5,
-      7,
-      7,
-      6,
-      7,
-      7,
-      5,
-      5,
-      7,
-      2,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      5,
-      5,
-      2,
-      5,
-      2,
-      5,
-      2,
-      5,
-      2,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6,
-      6
-    ],
-    "geomGroup": [
-      0,
-      2,
-      2,
-      2,
-      2,
-      2,
-      3,
-      3,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      2,
-      2,
-      2,
-      3,
-      3,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      2,
-      2,
-      3,
-      3,
-      2,
-      3,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2
-    ],
-    "geomContype": [
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      1,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      2,
-      2,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "geomConaffinity": [
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      2,
-      2,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      2,
-      0,
-      2,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      1,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      1,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "geomCondim": [
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      1,
-      1,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      1,
-      1,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      3,
-      3,
-      1,
-      1,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3
-    ],
-    "geomPriority": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "geomFriction": [
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        0.6,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      [
-        1.0,
-        0.005,
-        0.0001
-      ]
-    ],
-    "geomDataId": [
-      -1,
-      0,
-      1,
-      2,
-      3,
-      4,
-      -1,
-      -1,
-      -1,
-      5,
-      6,
-      -1,
-      7,
-      8,
-      -1,
-      11,
-      12,
-      -1,
-      -1,
-      15,
-      -1,
-      5,
-      6,
-      -1,
-      9,
-      10,
-      -1,
-      13,
-      14,
-      -1,
-      -1,
-      15,
-      -1,
-      5,
-      6,
-      -1,
-      7,
-      8,
-      -1,
-      11,
-      12,
-      -1,
-      -1,
-      15,
-      -1,
-      5,
-      6,
-      -1,
-      9,
-      10,
-      -1,
-      13,
-      14,
-      -1,
-      -1,
-      15,
-      -1,
-      16,
-      17,
-      18,
-      19,
-      20,
-      -1,
-      -1,
-      -1,
-      21,
-      22,
-      -1,
-      23,
-      24,
-      -1,
-      27,
-      28,
-      -1,
-      -1,
-      31,
-      -1,
-      21,
-      22,
-      -1,
-      25,
-      26,
-      -1,
-      29,
-      30,
-      -1,
-      -1,
-      31,
-      -1,
-      21,
-      22,
-      -1,
-      23,
-      24,
-      -1,
-      27,
-      28,
-      -1,
-      -1,
-      31,
-      -1,
-      21,
-      22,
-      -1,
-      25,
-      26,
-      -1,
-      29,
-      30,
-      -1,
-      -1,
-      31,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1
-    ],
-    "geomSize": [
-      [
-        0.0,
-        0.0,
-        0.01
-      ],
-      [
-        0.02297719681,
-        0.035003019141,
-        0.035049660919
-      ],
-      [
-        0.037657401249,
-        0.042010965258,
-        0.042026171214
-      ],
-      [
-        0.003252528567,
-        0.01300866204,
-        0.055060022229
-      ],
-      [
-        0.019468618181,
-        0.10286059636,
-        0.268704806624
-      ],
-      [
-        0.097942386171,
-        0.09758958106,
-        0.257627563864
-      ],
-      [
-        0.1881,
-        0.04675,
-        0.057
-      ],
-      [
-        0.05,
-        0.045,
-        0.0
-      ],
-      [
-        0.047,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037630067798,
-        0.051326620441,
-        0.186686037906
-      ],
-      [
-        0.05080583898,
-        0.057167799911,
-        0.06448252971
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018806510718,
-        0.029039043143,
-        0.157610435101
-      ],
-      [
-        0.014745576696,
-        0.019812303672,
-        0.022484602455
-      ],
-      [
-        0.012,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037280801387,
-        0.051250580325,
-        0.186456201603
-      ],
-      [
-        0.050702784607,
-        0.057119383401,
-        0.064541351744
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018805069148,
-        0.02906300522,
-        0.157603946082
-      ],
-      [
-        0.014745828261,
-        0.01981228486,
-        0.022484428773
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037630067798,
-        0.051326620441,
-        0.186686037906
-      ],
-      [
-        0.05080583898,
-        0.057167799911,
-        0.06448252971
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018806510718,
-        0.029039043143,
-        0.157610435101
-      ],
-      [
-        0.014745576696,
-        0.019812303672,
-        0.022484602455
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037280801387,
-        0.051250580325,
-        0.186456201603
-      ],
-      [
-        0.050702784607,
-        0.057119383401,
-        0.064541351744
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018805069148,
-        0.02906300522,
-        0.157603946082
-      ],
-      [
-        0.014745828261,
-        0.01981228486,
-        0.022484428773
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.02297719681,
-        0.035003019141,
-        0.035049660919
-      ],
-      [
-        0.037657401249,
-        0.042010965258,
-        0.042026171214
-      ],
-      [
-        0.003252528567,
-        0.01300866204,
-        0.055060022229
-      ],
-      [
-        0.019468618181,
-        0.10286059636,
-        0.268704806624
-      ],
-      [
-        0.097942386171,
-        0.09758958106,
-        0.257627563864
-      ],
-      [
-        0.1881,
-        0.04675,
-        0.057
-      ],
-      [
-        0.05,
-        0.045,
-        0.0
-      ],
-      [
-        0.047,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037630067798,
-        0.051326620441,
-        0.186686037906
-      ],
-      [
-        0.05080583898,
-        0.057167799911,
-        0.06448252971
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018806510718,
-        0.029039043143,
-        0.157610435101
-      ],
-      [
-        0.014745576696,
-        0.019812303672,
-        0.022484602455
-      ],
-      [
-        0.012,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037280801387,
-        0.051250580325,
-        0.186456201603
-      ],
-      [
-        0.050702784607,
-        0.057119383401,
-        0.064541351744
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018805069148,
-        0.02906300522,
-        0.157603946082
-      ],
-      [
-        0.014745828261,
-        0.01981228486,
-        0.022484428773
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037630067798,
-        0.051326620441,
-        0.186686037906
-      ],
-      [
-        0.05080583898,
-        0.057167799911,
-        0.06448252971
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018806510718,
-        0.029039043143,
-        0.157610435101
-      ],
-      [
-        0.014745576696,
-        0.019812303672,
-        0.022484602455
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.030118755038,
-        0.046326225411,
-        0.067418432368
-      ],
-      [
-        0.040318712811,
-        0.049385661558,
-        0.070346462401
-      ],
-      [
-        0.046,
-        0.02,
-        0.0
-      ],
-      [
-        0.037280801387,
-        0.051250580325,
-        0.186456201603
-      ],
-      [
-        0.050702784607,
-        0.057119383401,
-        0.064541351744
-      ],
-      [
-        0.1065,
-        0.01225,
-        0.017
-      ],
-      [
-        0.018805069148,
-        0.02906300522,
-        0.157603946082
-      ],
-      [
-        0.014745828261,
-        0.01981228486,
-        0.022484428773
-      ],
-      [
-        0.013,
-        0.06,
-        0.0
-      ],
-      [
-        0.011,
-        0.0325,
-        0.0
-      ],
-      [
-        0.01481185022,
-        0.019813696846,
-        0.022484809561
-      ],
-      [
-        0.022,
-        0.0,
-        0.0
-      ],
-      [
-        0.025,
-        1.5,
-        0.025
-      ],
-      [
-        0.025,
-        1.5,
-        0.025
-      ],
-      [
-        2.6,
-        0.025,
-        0.025
-      ],
-      [
-        2.6,
-        0.025,
-        0.025
-      ],
-      [
-        0.025,
-        1.5,
-        0.025
-      ],
-      [
-        0.45,
-        1.5,
-        0.004
-      ],
-      [
-        3.3,
-        2.2,
-        0.00075
-      ],
-      [
-        2.6,
-        1.5,
-        0.00075
-      ],
-      [
-        0.45,
-        1.5,
-        0.00075
-      ],
-      [
-        0.035,
-        1.5,
-        0.00075
-      ],
-      [
-        2.6,
-        0.04,
-        0.00075
-      ],
-      [
-        2.6,
-        0.04,
-        0.00075
-      ],
-      [
-        0.04,
-        1.5,
-        0.00075
-      ],
-      [
-        0.04,
-        1.5,
-        0.00075
-      ],
-      [
-        0.025,
-        1.5,
-        0.00075
-      ],
-      [
-        0.45,
-        0.00075,
-        0.0
-      ],
-      [
-        0.05,
-        0.26,
-        0.0
-      ],
-      [
-        0.065,
-        0.0,
-        0.0
-      ],
-      [
-        0.05,
-        0.26,
-        0.0
-      ],
-      [
-        0.065,
-        0.0,
-        0.0
-      ],
-      [
-        0.05,
-        0.26,
-        0.0
-      ],
-      [
-        0.065,
-        0.0,
-        0.0
-      ],
-      [
-        0.05,
-        0.26,
-        0.0
-      ],
-      [
-        0.065,
-        0.0,
-        0.0
-      ],
-      [
-        2.92,
-        0.05,
-        0.11
-      ],
-      [
-        2.92,
-        0.05,
-        0.012
-      ],
-      [
-        2.92,
-        0.05,
-        0.11
-      ],
-      [
-        2.92,
-        0.05,
-        0.012
-      ],
-      [
-        0.05,
-        1.82,
-        0.11
-      ],
-      [
-        0.05,
-        1.82,
-        0.012
-      ],
-      [
-        0.05,
-        1.82,
-        0.11
-      ],
-      [
-        0.05,
-        1.82,
-        0.012
-      ]
-    ],
-    "geomRgba": [
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.5,
-        0.5,
-        0.5,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.649999976158
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.649999976158
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.649999976158
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.649999976158
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        0.899999976158
-      ],
-      [
-        0.10000000149,
-        0.800000011921,
-        0.34999999404,
-        0.180000007153
-      ],
-      [
-        0.079999998212,
-        0.119999997318,
-        0.170000001788,
-        1.0
-      ],
-      [
-        0.159999996424,
-        0.239999994636,
-        0.330000013113,
-        1.0
-      ],
-      [
-        0.10000000149,
-        0.800000011921,
-        0.34999999404,
-        0.449999988079
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.949999988079
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.949999988079
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.949999988079
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.949999988079
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.949999988079
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        0.300000011921
-      ],
-      [
-        0.140000000596,
-        0.170000001788,
-        0.209999993443,
-        1.0
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        1.0
-      ],
-      [
-        0.140000000596,
-        0.170000001788,
-        0.209999993443,
-        1.0
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        1.0
-      ],
-      [
-        0.140000000596,
-        0.170000001788,
-        0.209999993443,
-        1.0
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        1.0
-      ],
-      [
-        0.140000000596,
-        0.170000001788,
-        0.209999993443,
-        1.0
-      ],
-      [
-        1.0,
-        0.280000001192,
-        0.140000000596,
-        1.0
-      ],
-      [
-        0.20000000298,
-        0.239999994636,
-        0.300000011921,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        1.0
-      ],
-      [
-        0.20000000298,
-        0.239999994636,
-        0.300000011921,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        1.0
-      ],
-      [
-        0.20000000298,
-        0.239999994636,
-        0.300000011921,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        1.0
-      ],
-      [
-        0.20000000298,
-        0.239999994636,
-        0.300000011921,
-        1.0
-      ],
-      [
-        0.920000016689,
-        0.920000016689,
-        0.879999995232,
-        1.0
-      ]
-    ],
-    "bodyParentId": [
-      0,
-      0,
-      0,
-      2,
-      3,
-      4,
-      2,
-      6,
-      7,
-      2,
-      9,
-      10,
-      2,
-      12,
-      13,
-      0,
-      15,
-      16,
-      17,
-      15,
-      19,
-      20,
-      15,
-      22,
-      23,
-      15,
-      25,
-      26,
-      0,
-      0
-    ],
-    "bodyMass": [
-      0.0,
-      0.0,
-      6.921,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      6.921,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      0.678,
-      1.152,
-      0.241352,
-      0.0,
-      0.0
-    ],
-    "meshNames": [
-      "a_base_0",
-      "a_base_1",
-      "a_base_2",
-      "a_base_3",
-      "a_base_4",
-      "a_hip_0",
-      "a_hip_1",
-      "a_thigh_0",
-      "a_thigh_1",
-      "a_thigh_mirror_0",
-      "a_thigh_mirror_1",
-      "a_calf_0",
-      "a_calf_1",
-      "a_calf_mirror_0",
-      "a_calf_mirror_1",
-      "a_foot",
-      "b_base_0",
-      "b_base_1",
-      "b_base_2",
-      "b_base_3",
-      "b_base_4",
-      "b_hip_0",
-      "b_hip_1",
-      "b_thigh_0",
-      "b_thigh_1",
-      "b_thigh_mirror_0",
-      "b_thigh_mirror_1",
-      "b_calf_0",
-      "b_calf_1",
-      "b_calf_mirror_0",
-      "b_calf_mirror_1",
-      "b_foot"
-    ],
-    "geomTypeEnum": {
-      "plane": 0,
-      "hfield": 1,
-      "sphere": 2,
-      "capsule": 3,
-      "ellipsoid": 4,
-      "cylinder": 5,
-      "box": 6,
-      "mesh": 7
-    }
-  },
-  "geomRobot": [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    "a",
-    "a",
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    "a",
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    "a",
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    "a",
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    null,
-    null,
-    "a",
-    "a",
-    null,
-    "a",
-    null,
-    null,
-    null,
-    null,
-    null,
-    "b",
-    "b",
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    "b",
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    "b",
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    "b",
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    null,
-    null,
-    "b",
-    "b",
-    null,
-    "b",
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
+ "schema": "s2c_web_play/scene@2",
+ "game": "asym",
+ "generatedBy": "tools/export_scene.py",
+ "provenance": {
+  "mjlabTask": "Game-Touchdown-Go2-Go2-WBC-Clean",
+  "twinTask": "Game-Touchdown-Go2-Go2-WBC-Clean-Filtered",
+  "twinPlantVerifiedIdentical": true,
+  "play": true,
+  "mjlabRepo": "/home/ray/Disk_ext/Go2/Project/unitree_rl_mjlab",
+  "robotXml": "/home/ray/Disk_ext/Go2/Project/unitree_rl_mjlab/src/assets/robots/unitree_go2/xmls/go2.xml",
+  "robotXmlMd5": "adf31ec76228ca36b1ff8935878ce098",
+  "mujocoVersion": "3.5.0",
+  "scenario": "TouchdownScenarioCfg",
+  "note": "Compiled from mjlab's own MjSpec; every array in tools/export_scene.py:_ARRAYS matches the mjlab compile (P1). The arena decoration and the reduced meshes are then proved physics-neutral by bit-identical rollouts (P2/P3)."
+ },
+ "files": {
+  "xml": "scene.xml",
+  "meshDir": "assets",
+  "meshFiles": [
+   "base_0.obj",
+   "base_1.obj",
+   "base_2.obj",
+   "base_3.obj",
+   "base_4.obj",
+   "calf_0.obj",
+   "calf_1.obj",
+   "calf_mirror_0.obj",
+   "calf_mirror_1.obj",
+   "foot.obj",
+   "hip_0.obj",
+   "hip_1.obj",
+   "thigh_0.obj",
+   "thigh_1.obj",
+   "thigh_mirror_0.obj",
+   "thigh_mirror_1.obj"
   ],
-  "qposLayout": {
-    "nq": 38,
-    "nv": 36,
-    "freeJointQpos": "x y z qw qx qy qz",
-    "robots": {
-      "a": {
-        "freeQposAdr": 0,
-        "freeDofAdr": 0,
-        "jointQposAdr": [
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18
-        ],
-        "jointDofAdr": [
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17
-        ]
-      },
-      "b": {
-        "freeQposAdr": 19,
-        "freeDofAdr": 18,
-        "jointQposAdr": [
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33,
-          34,
-          35,
-          36,
-          37
-        ],
-        "jointDofAdr": [
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33,
-          34,
-          35
-        ]
-      }
-    }
-  },
-  "robots": {
-    "a": {
-      "mjlabEntity": "attacker",
-      "seat": "attacker",
-      "prefix": "a_",
-      "freeJointName": "a_floating_base_joint",
-      "freeJointId": 0,
-      "freeQposAdr": 0,
-      "freeDofAdr": 0,
-      "jointNames": [
-        "a_FL_hip_joint",
-        "a_FL_thigh_joint",
-        "a_FL_calf_joint",
-        "a_FR_hip_joint",
-        "a_FR_thigh_joint",
-        "a_FR_calf_joint",
-        "a_RL_hip_joint",
-        "a_RL_thigh_joint",
-        "a_RL_calf_joint",
-        "a_RR_hip_joint",
-        "a_RR_thigh_joint",
-        "a_RR_calf_joint"
-      ],
-      "jointIds": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12
-      ],
-      "jointQposAdr": [
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18
-      ],
-      "jointDofAdr": [
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17
-      ],
-      "actuatorNames": [
-        "a_FL_hip_joint",
-        "a_FL_thigh_joint",
-        "a_FL_calf_joint",
-        "a_FR_hip_joint",
-        "a_FR_thigh_joint",
-        "a_FR_calf_joint",
-        "a_RL_hip_joint",
-        "a_RL_thigh_joint",
-        "a_RL_calf_joint",
-        "a_RR_hip_joint",
-        "a_RR_thigh_joint",
-        "a_RR_calf_joint"
-      ],
-      "actuatorIdsJointOrder": [
-        0,
-        4,
-        8,
-        1,
-        5,
-        9,
-        2,
-        6,
-        10,
-        3,
-        7,
-        11
-      ],
-      "baseBodyName": "a_base_link",
-      "baseBodyId": 2,
-      "bodyIds": [
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14
-      ],
-      "bodyNames": [
-        "a_base_link",
-        "a_FL_hip",
-        "a_FL_thigh",
-        "a_FL_calf",
-        "a_FR_hip",
-        "a_FR_thigh",
-        "a_FR_calf",
-        "a_RL_hip",
-        "a_RL_thigh",
-        "a_RL_calf",
-        "a_RR_hip",
-        "a_RR_thigh",
-        "a_RR_calf"
-      ],
-      "geomIds": [
-        6,
-        7,
-        8,
-        11,
-        14,
-        17,
-        18,
-        20,
-        23,
-        26,
-        29,
-        30,
-        32,
-        35,
-        38,
-        41,
-        42,
-        44,
-        47,
-        50,
-        53,
-        54,
-        56
-      ],
-      "collisionGeoms": [
-        "a_base1_collision",
-        "a_base2_collision",
-        "a_base3_collision",
-        "a_FL_hip_collision",
-        "a_FL_thigh_collision",
-        "a_FL_calf1_collision",
-        "a_FL_calf2_collision",
-        "a_FL_foot_collision",
-        "a_FR_hip_collision",
-        "a_FR_thigh_collision",
-        "a_FR_calf1_collision",
-        "a_FR_calf2_collision",
-        "a_FR_foot_collision",
-        "a_RL_hip_collision",
-        "a_RL_thigh_collision",
-        "a_RL_calf1_collision",
-        "a_RL_calf2_collision",
-        "a_RL_foot_collision",
-        "a_RR_hip_collision",
-        "a_RR_thigh_collision",
-        "a_RR_calf1_collision",
-        "a_RR_calf2_collision",
-        "a_RR_foot_collision"
-      ],
-      "footGeoms": [
-        "a_FL_foot_collision",
-        "a_FR_foot_collision",
-        "a_RL_foot_collision",
-        "a_RR_foot_collision"
-      ],
-      "contype": 1,
-      "conaffinity": 2
-    },
-    "b": {
-      "mjlabEntity": "defender",
-      "seat": "defender",
-      "prefix": "b_",
-      "freeJointName": "b_floating_base_joint",
-      "freeJointId": 13,
-      "freeQposAdr": 19,
-      "freeDofAdr": 18,
-      "jointNames": [
-        "b_FL_hip_joint",
-        "b_FL_thigh_joint",
-        "b_FL_calf_joint",
-        "b_FR_hip_joint",
-        "b_FR_thigh_joint",
-        "b_FR_calf_joint",
-        "b_RL_hip_joint",
-        "b_RL_thigh_joint",
-        "b_RL_calf_joint",
-        "b_RR_hip_joint",
-        "b_RR_thigh_joint",
-        "b_RR_calf_joint"
-      ],
-      "jointIds": [
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25
-      ],
-      "jointQposAdr": [
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37
-      ],
-      "jointDofAdr": [
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35
-      ],
-      "actuatorNames": [
-        "b_FL_hip_joint",
-        "b_FL_thigh_joint",
-        "b_FL_calf_joint",
-        "b_FR_hip_joint",
-        "b_FR_thigh_joint",
-        "b_FR_calf_joint",
-        "b_RL_hip_joint",
-        "b_RL_thigh_joint",
-        "b_RL_calf_joint",
-        "b_RR_hip_joint",
-        "b_RR_thigh_joint",
-        "b_RR_calf_joint"
-      ],
-      "actuatorIdsJointOrder": [
-        12,
-        16,
-        20,
-        13,
-        17,
-        21,
-        14,
-        18,
-        22,
-        15,
-        19,
-        23
-      ],
-      "baseBodyName": "b_base_link",
-      "baseBodyId": 15,
-      "bodyIds": [
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27
-      ],
-      "bodyNames": [
-        "b_base_link",
-        "b_FL_hip",
-        "b_FL_thigh",
-        "b_FL_calf",
-        "b_FR_hip",
-        "b_FR_thigh",
-        "b_FR_calf",
-        "b_RL_hip",
-        "b_RL_thigh",
-        "b_RL_calf",
-        "b_RR_hip",
-        "b_RR_thigh",
-        "b_RR_calf"
-      ],
-      "geomIds": [
-        62,
-        63,
-        64,
-        67,
-        70,
-        73,
-        74,
-        76,
-        79,
-        82,
-        85,
-        86,
-        88,
-        91,
-        94,
-        97,
-        98,
-        100,
-        103,
-        106,
-        109,
-        110,
-        112
-      ],
-      "collisionGeoms": [
-        "b_base1_collision",
-        "b_base2_collision",
-        "b_base3_collision",
-        "b_FL_hip_collision",
-        "b_FL_thigh_collision",
-        "b_FL_calf1_collision",
-        "b_FL_calf2_collision",
-        "b_FL_foot_collision",
-        "b_FR_hip_collision",
-        "b_FR_thigh_collision",
-        "b_FR_calf1_collision",
-        "b_FR_calf2_collision",
-        "b_FR_foot_collision",
-        "b_RL_hip_collision",
-        "b_RL_thigh_collision",
-        "b_RL_calf1_collision",
-        "b_RL_calf2_collision",
-        "b_RL_foot_collision",
-        "b_RR_hip_collision",
-        "b_RR_thigh_collision",
-        "b_RR_calf1_collision",
-        "b_RR_calf2_collision",
-        "b_RR_foot_collision"
-      ],
-      "footGeoms": [
-        "b_FL_foot_collision",
-        "b_FR_foot_collision",
-        "b_RL_foot_collision",
-        "b_RR_foot_collision"
-      ],
-      "contype": 2,
-      "conaffinity": 1
-    }
-  },
-  "joints": {
-    "order": [
-      "FL_hip_joint",
-      "FL_thigh_joint",
-      "FL_calf_joint",
-      "FR_hip_joint",
-      "FR_thigh_joint",
-      "FR_calf_joint",
-      "RL_hip_joint",
-      "RL_thigh_joint",
-      "RL_calf_joint",
-      "RR_hip_joint",
-      "RR_thigh_joint",
-      "RR_calf_joint"
-    ],
-    "orderNote": "entity-native JOINT order FL,FR,RL,RR x (hip,thigh,calf). The compiled mjModel ACTUATOR array is grouped hip x4 / thigh x4 / calf x4 -- use robots.<r>.actuatorIdsJointOrder to cross the two.",
-    "defaultJointPos": [
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8,
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8
-    ],
-    "hardLimitLo": [
-      -1.0472,
-      -1.5708,
-      -2.7227,
-      -1.0472,
-      -1.5708,
-      -2.7227,
-      -1.0472,
-      -0.5236,
-      -2.7227,
-      -1.0472,
-      -0.5236,
-      -2.7227
-    ],
-    "hardLimitHi": [
-      1.0472,
-      3.4907,
-      -0.83776,
-      1.0472,
-      3.4907,
-      -0.83776,
-      1.0472,
-      4.5379,
-      -0.83776,
-      1.0472,
-      4.5379,
-      -0.83776
-    ],
-    "softLimitFactor": 0.9,
-    "softLimitLo": [
-      -0.94248,
-      -1.317725,
-      -2.628453,
-      -0.94248,
-      -1.317725,
-      -2.628453,
-      -0.94248,
-      -0.270525,
-      -2.628453,
-      -0.94248,
-      -0.270525,
-      -2.628453
-    ],
-    "softLimitHi": [
-      0.94248,
-      3.237625,
-      -0.932007,
-      0.94248,
-      3.237625,
-      -0.932007,
-      0.94248,
-      4.284825,
-      -0.932007,
-      0.94248,
-      4.284825,
-      -0.932007
-    ],
-    "kp": [
-      20.0,
-      20.0,
-      40.0,
-      20.0,
-      20.0,
-      40.0,
-      20.0,
-      20.0,
-      40.0,
-      20.0,
-      20.0,
-      40.0
-    ],
-    "kd": [
-      1.0,
-      1.0,
-      2.0,
-      1.0,
-      1.0,
-      2.0,
-      1.0,
-      1.0,
-      2.0,
-      1.0,
-      1.0,
-      2.0
-    ],
-    "forceRange": [
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -45.0,
-        45.0
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -45.0,
-        45.0
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -45.0,
-        45.0
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -23.5,
-        23.5
-      ],
-      [
-        -45.0,
-        45.0
-      ]
-    ],
-    "ctrlRange": [
-      [
-        -2.2222,
-        2.2222
-      ],
-      [
-        -2.7458,
-        4.6657
-      ],
-      [
-        -3.8477,
-        0.28724
-      ],
-      [
-        -2.2222,
-        2.2222
-      ],
-      [
-        -2.7458,
-        4.6657
-      ],
-      [
-        -3.8477,
-        0.28724
-      ],
-      [
-        -2.2222,
-        2.2222
-      ],
-      [
-        -1.6986,
-        5.7129
-      ],
-      [
-        -3.8477,
-        0.28724
-      ],
-      [
-        -2.2222,
-        2.2222
-      ],
-      [
-        -1.6986,
-        5.7129
-      ],
-      [
-        -3.8477,
-        0.28724
-      ]
-    ],
-    "ctrlLimited": [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ],
-    "armature": [
-      0.01,
-      0.01,
-      0.02,
-      0.01,
-      0.01,
-      0.02,
-      0.01,
-      0.01,
-      0.02,
-      0.01,
-      0.01,
-      0.02
-    ],
-    "initialBaseHeight": 0.32
-  },
-  "field": {
-    "size": [
-      5.2,
-      3.0
-    ],
-    "center": [
-      0.2,
-      0.0
-    ],
-    "touchdownMargin": 0.9,
-    "lineX": 1.9,
-    "lineXB": null,
-    "lineXNote": "env-local, = field_center.x + scenario.line_x, the same expression game_env_cfg._field_marker_spec_fn uses.",
-    "oobHalfX": 2.6,
-    "oobHalfY": 1.5,
-    "oobX": [
-      -2.4,
-      2.8000000000000003
-    ],
-    "oobY": [
-      -1.5,
-      1.5
-    ],
-    "wallsNote": "NO physical walls. Every field/arena geom is contype=0 conaffinity=0 density=0 group=2. Out-of-bounds is a referee test on the trunk centre.",
-    "mjlabMarkers": [
-      {
-        "name": "field_x_min",
-        "type": 6,
-        "pos": [
-          -2.4,
-          0.0,
-          0.018
-        ],
-        "size": [
-          0.025,
-          1.5,
-          0.025
-        ],
-        "rgba": [
-          0.920000016689,
-          0.920000016689,
-          0.879999995232,
-          0.649999976158
-        ]
-      },
-      {
-        "name": "field_x_max",
-        "type": 6,
-        "pos": [
-          2.8,
-          0.0,
-          0.018
-        ],
-        "size": [
-          0.025,
-          1.5,
-          0.025
-        ],
-        "rgba": [
-          0.920000016689,
-          0.920000016689,
-          0.879999995232,
-          0.649999976158
-        ]
-      },
-      {
-        "name": "field_y_min",
-        "type": 6,
-        "pos": [
-          0.2,
-          -1.5,
-          0.018
-        ],
-        "size": [
-          2.6,
-          0.025,
-          0.025
-        ],
-        "rgba": [
-          0.920000016689,
-          0.920000016689,
-          0.879999995232,
-          0.649999976158
-        ]
-      },
-      {
-        "name": "field_y_max",
-        "type": 6,
-        "pos": [
-          0.2,
-          1.5,
-          0.018
-        ],
-        "size": [
-          2.6,
-          0.025,
-          0.025
-        ],
-        "rgba": [
-          0.920000016689,
-          0.920000016689,
-          0.879999995232,
-          0.649999976158
-        ]
-      },
-      {
-        "name": "touchdown_line",
-        "type": 6,
-        "pos": [
-          1.9,
-          0.0,
-          0.022
-        ],
-        "size": [
-          0.025,
-          1.5,
-          0.025
-        ],
-        "rgba": [
-          1.0,
-          0.280000001192,
-          0.140000000596,
-          0.899999976158
-        ]
-      },
-      {
-        "name": "touchdown_region",
-        "type": 6,
-        "pos": [
-          2.35,
-          0.0,
-          0.012
-        ],
-        "size": [
-          0.45,
-          1.5,
-          0.004
-        ],
-        "rgba": [
-          0.10000000149,
-          0.800000011921,
-          0.34999999404,
-          0.180000007153
-        ]
-      }
-    ],
-    "decor": {
-      "body": "arena_decor",
-      "firstGeomId": 119,
-      "geoms": [
-        {
-          "name": "decor_apron",
-          "type": 6,
-          "pos": [
-            0.2,
-            0.0,
-            0.00125
-          ],
-          "size": [
-            3.3,
-            2.2,
-            0.00075
-          ],
-          "rgba": [
-            0.079999998212,
-            0.119999997318,
-            0.170000001788,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_surface",
-          "type": 6,
-          "pos": [
-            0.2,
-            0.0,
-            0.00275
-          ],
-          "size": [
-            2.6,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            0.159999996424,
-            0.239999994636,
-            0.330000013113,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_endzone",
-          "type": 6,
-          "pos": [
-            2.35,
-            0.0,
-            0.00425
-          ],
-          "size": [
-            0.45,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            0.10000000149,
-            0.800000011921,
-            0.34999999404,
-            0.449999988079
-          ]
-        },
-        {
-          "name": "decor_line",
-          "type": 6,
-          "pos": [
-            1.9,
-            0.0,
-            0.00725
-          ],
-          "size": [
-            0.035,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            1.0,
-            0.280000001192,
-            0.140000000596,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_touchline_y_min",
-          "type": 6,
-          "pos": [
-            0.2,
-            -1.46,
-            0.00575
-          ],
-          "size": [
-            2.6,
-            0.04,
-            0.00075
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.949999988079
-          ]
-        },
-        {
-          "name": "decor_touchline_y_max",
-          "type": 6,
-          "pos": [
-            0.2,
-            1.46,
-            0.00575
-          ],
-          "size": [
-            2.6,
-            0.04,
-            0.00075
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.949999988079
-          ]
-        },
-        {
-          "name": "decor_goalline_x_min",
-          "type": 6,
-          "pos": [
-            -2.36,
-            0.0,
-            0.00575
-          ],
-          "size": [
-            0.04,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.949999988079
-          ]
-        },
-        {
-          "name": "decor_goalline_x_max",
-          "type": 6,
-          "pos": [
-            2.76,
-            0.0,
-            0.00575
-          ],
-          "size": [
-            0.04,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.949999988079
-          ]
-        },
-        {
-          "name": "decor_halfway",
-          "type": 6,
-          "pos": [
-            0.2,
-            0.0,
-            0.00575
-          ],
-          "size": [
-            0.025,
-            1.5,
-            0.00075
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.949999988079
-          ]
-        },
-        {
-          "name": "decor_centre_circle",
-          "type": 5,
-          "pos": [
-            0.2,
-            0.0,
-            0.00575
-          ],
-          "size": [
-            0.45,
-            0.00075,
-            0.0
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            0.300000011921
-          ]
-        },
-        {
-          "name": "decor_post_0",
-          "type": 5,
-          "pos": [
-            -2.6,
-            -1.7,
-            0.26
-          ],
-          "size": [
-            0.05,
-            0.26,
-            0.0
-          ],
-          "rgba": [
-            0.140000000596,
-            0.170000001788,
-            0.209999993443,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_cap_0",
-          "type": 2,
-          "pos": [
-            -2.6,
-            -1.7,
-            0.55
-          ],
-          "size": [
-            0.065,
-            0.0,
-            0.0
-          ],
-          "rgba": [
-            1.0,
-            0.280000001192,
-            0.140000000596,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_1",
-          "type": 5,
-          "pos": [
-            -2.6,
-            1.7,
-            0.26
-          ],
-          "size": [
-            0.05,
-            0.26,
-            0.0
-          ],
-          "rgba": [
-            0.140000000596,
-            0.170000001788,
-            0.209999993443,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_cap_1",
-          "type": 2,
-          "pos": [
-            -2.6,
-            1.7,
-            0.55
-          ],
-          "size": [
-            0.065,
-            0.0,
-            0.0
-          ],
-          "rgba": [
-            1.0,
-            0.280000001192,
-            0.140000000596,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_2",
-          "type": 5,
-          "pos": [
-            3.0,
-            -1.7,
-            0.26
-          ],
-          "size": [
-            0.05,
-            0.26,
-            0.0
-          ],
-          "rgba": [
-            0.140000000596,
-            0.170000001788,
-            0.209999993443,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_cap_2",
-          "type": 2,
-          "pos": [
-            3.0,
-            -1.7,
-            0.55
-          ],
-          "size": [
-            0.065,
-            0.0,
-            0.0
-          ],
-          "rgba": [
-            1.0,
-            0.280000001192,
-            0.140000000596,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_3",
-          "type": 5,
-          "pos": [
-            3.0,
-            1.7,
-            0.26
-          ],
-          "size": [
-            0.05,
-            0.26,
-            0.0
-          ],
-          "rgba": [
-            0.140000000596,
-            0.170000001788,
-            0.209999993443,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_post_cap_3",
-          "type": 2,
-          "pos": [
-            3.0,
-            1.7,
-            0.55
-          ],
-          "size": [
-            0.065,
-            0.0,
-            0.0
-          ],
-          "rgba": [
-            1.0,
-            0.280000001192,
-            0.140000000596,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_y_min",
-          "type": 6,
-          "pos": [
-            0.2,
-            -1.82,
-            0.11
-          ],
-          "size": [
-            2.92,
-            0.05,
-            0.11
-          ],
-          "rgba": [
-            0.20000000298,
-            0.239999994636,
-            0.300000011921,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_y_min_top",
-          "type": 6,
-          "pos": [
-            0.2,
-            -1.82,
-            0.232
-          ],
-          "size": [
-            2.92,
-            0.05,
-            0.012
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_y_max",
-          "type": 6,
-          "pos": [
-            0.2,
-            1.82,
-            0.11
-          ],
-          "size": [
-            2.92,
-            0.05,
-            0.11
-          ],
-          "rgba": [
-            0.20000000298,
-            0.239999994636,
-            0.300000011921,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_y_max_top",
-          "type": 6,
-          "pos": [
-            0.2,
-            1.82,
-            0.232
-          ],
-          "size": [
-            2.92,
-            0.05,
-            0.012
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_x_min",
-          "type": 6,
-          "pos": [
-            -2.72,
-            0.0,
-            0.11
-          ],
-          "size": [
-            0.05,
-            1.82,
-            0.11
-          ],
-          "rgba": [
-            0.20000000298,
-            0.239999994636,
-            0.300000011921,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_x_min_top",
-          "type": 6,
-          "pos": [
-            -2.72,
-            0.0,
-            0.232
-          ],
-          "size": [
-            0.05,
-            1.82,
-            0.012
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_x_max",
-          "type": 6,
-          "pos": [
-            3.12,
-            0.0,
-            0.11
-          ],
-          "size": [
-            0.05,
-            1.82,
-            0.11
-          ],
-          "rgba": [
-            0.20000000298,
-            0.239999994636,
-            0.300000011921,
-            1.0
-          ]
-        },
-        {
-          "name": "decor_barrier_x_max_top",
-          "type": 6,
-          "pos": [
-            3.12,
-            0.0,
-            0.232
-          ],
-          "size": [
-            0.05,
-            1.82,
-            0.012
-          ],
-          "rgba": [
-            0.920000016689,
-            0.920000016689,
-            0.879999995232,
-            1.0
-          ]
-        }
-      ],
-      "palette": {
-        "apron": [
-          0.08,
-          0.12,
-          0.17,
-          1.0
-        ],
-        "surface": [
-          0.16,
-          0.24,
-          0.33,
-          1.0
-        ],
-        "endzone": [
-          0.1,
-          0.8,
-          0.35,
-          0.45
-        ],
-        "line": [
-          1.0,
-          0.28,
-          0.14,
-          1.0
-        ],
-        "marking": [
-          0.92,
-          0.92,
-          0.88,
-          0.95
-        ],
-        "post": [
-          0.14,
-          0.17,
-          0.21,
-          1.0
-        ],
-        "post_cap": [
-          1.0,
-          0.28,
-          0.14,
-          1.0
-        ],
-        "barrier": [
-          0.2,
-          0.24,
-          0.3,
-          1.0
-        ],
-        "barrier_top": [
-          0.92,
-          0.92,
-          0.88,
-          1.0
-        ]
-      },
-      "paletteSource": "src/tasks/game/game_env_cfg.py:98-100 (boundary / touchdown / region rgba) + mjlab/terrains/terrain_entity.py:23-24 (ground checker rgb1/rgb2)",
-      "proof": {
-        "hold": {
-          "maxAbsDqpos": 0.0,
-          "maxAbsDqvel": 0.0
-        },
-        "wiggle": {
-          "maxAbsDqpos": 0.0,
-          "maxAbsDqvel": 0.0
-        }
-      }
-    },
-    "ground": {
-      "geom": "terrain",
-      "type": 0,
-      "condim": 3,
-      "friction": [
-        1.0,
-        0.005,
-        0.0001
-      ],
-      "contype": 1,
-      "conaffinity": 1
-    }
-  },
-  "spawn": {
-    "config": {
-      "a": {
-        "x": -1.4,
-        "y": 0.0,
-        "yaw": 0.0
-      },
-      "b": {
-        "x": 0.75,
-        "y": 0.0,
-        "yaw": 3.141592653589793
-      }
-    },
-    "configSource": "src/tasks/game/scenarios/touchdown.py:235-248 (training nominal == app/config.js GAMES.asym.spawn)",
-    "trainingNominal": {
-      "a": {
-        "x": -1.4,
-        "y": 0.0,
-        "z": 0.32,
-        "yaw": 0.0
-      },
-      "b": {
-        "x": 0.75,
-        "y": 0.0,
-        "z": 0.32,
-        "yaw": 3.141592653589793
-      }
-    },
-    "jitter": {
-      "a": {
-        "tight": [
-          0.15,
-          0.15,
-          0.1
-        ],
-        "wide": [
-          1.0,
-          1.2,
-          3.141592653589793
-        ]
-      },
-      "b": {
-        "tight": [
-          0.15,
-          0.15,
-          0.1
-        ],
-        "wide": [
-          1.0,
-          1.2,
-          3.141592653589793
-        ]
-      }
-    },
-    "keyframeQpos": [
-      -1.4,
-      0.0,
-      0.32,
-      1.0,
-      0.0,
-      0.0,
-      0.0,
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8,
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8,
-      0.75,
-      0.0,
-      0.32,
-      0.0,
-      0.0,
-      0.0,
-      1.0,
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8,
-      -0.1,
-      0.9,
-      -1.8,
-      0.1,
-      0.9,
-      -1.8
-    ],
-    "keyframeCtrl": [
-      -0.1,
-      0.1,
-      -0.1,
-      0.1,
-      0.9,
-      0.9,
-      0.9,
-      0.9,
-      -1.8,
-      -1.8,
-      -1.8,
-      -1.8,
-      -0.1,
-      0.1,
-      -0.1,
-      0.1,
-      0.9,
-      0.9,
-      0.9,
-      0.9,
-      -1.8,
-      -1.8,
-      -1.8,
-      -1.8
-    ],
-    "keyframeNote": "mjlab's own merged init keyframe (z = 0.32, default joints, the TRAINING nominal spawn)."
-  },
-  "rules": {
-    "note": "Measured off the live scenario object; app/referee.js owns the implementation. recon/05 \u00a75 (asym) / \u00a76 (sym) is the contract.",
-    "episodeLengthS": 10.0,
-    "episodeSteps": 500,
-    "terminalTimeout": true,
-    "fallLimitAngleRad": 1.2217304763960306,
-    "fallLimitAngleDeg": 70.0,
-    "trunkContactTerminal": true,
-    "trunkContactSurface": "trunk",
-    "safetyTerminal": true,
-    "hullTouchdown": false,
-    "pastLineFall": "strict",
-    "contactWinScale": 0.0,
-    "winWeight": 50.0,
-    "attackerRole": "attacker",
-    "defenderRole": "defender",
-    "directionA": 1.0,
-    "directionB": -1.0,
-    "terminationTerms": [
-      "attacker_fell",
-      "attacker_oob",
-      "defender_fell",
-      "defender_oob",
-      "time_out",
-      "touchdown",
-      "trunk_contact"
-    ],
-    "terminationTermsNote": "the live TerminationManager vocabulary for this task -- app/referee.js must reproduce exactly these and nothing else (recon/05 \u00a77).",
-    "directionNote": "sym: scenario.direction(role). asym has no direction() -- only the attacker scores, and A/+1 vs B/-1 is the convention app/config.js uses."
-  },
-  "keyframe": {
-    "file": "keyframe.json",
-    "settleSeconds": 2.0,
-    "baseZ": {
-      "config": {
-        "a": 0.23029734598132645,
-        "b": 0.23029734598132623
-      },
-      "trainingNominal": {
-        "a": 0.23029734598132645,
-        "b": 0.23029734598132623
-      }
-    },
-    "baseZWindow": [
-      0.2,
-      0.4
-    ],
-    "baseZWindowNote": "The task brief asked for z in [0.25, 0.40]; the walk-soft plant does not reach it. Measured on this model: the default pose is kinematically a 0.295017 m stand (lowest collision point with base z = 0) and the legs sag a further 0.0647 m under 15.206 kg at kp 20/20/40 (go2_constants.py:41-67), the rear shins resting on the floor, so 0.23029 m is the true settled height in both games. No gain was changed."
-  },
-  "sizes": {
-    "sceneXmlBytes": 54806,
-    "meshBytesShipped": 1283289,
-    "meshBytesShippedGz9": 413205,
-    "meshBytesFull": 28409145,
-    "meshBytesFullGz9": 4524919
-  },
-  "lite": {
-    "method": "weld coincident vertices at 1e-6 m, then quadric edge collapse (fast_simplification.simplify), target 0.15 of faces (floor 2000), aggression 3, coords written %.5g",
-    "note": "VISUAL ONLY. Every mesh geom in this model is contype=0 conaffinity=0 density=0 group=2; collision is 23 primitives per robot (recon/05 \u00a71.2). Proof P2: identical XML + reduced meshes gives bit-identical qpos/qvel after 2 s under two ctrl modes.",
-    "facesRaw": 196748,
-    "facesWelded": 196086,
-    "facesOut": 41938,
-    "proof": {
-      "maxMeshGeomWorldAabbShift_mm": 0.037,
-      "maxDrawnToOrigMean_mm": 1.8922,
-      "maxDrawnToOrigP95_mm": 3.817,
-      "maxBboxShift_mm": 0.3284,
-      "gates": {
-        "drawnToOrigP95_mm": 4.0,
-        "bboxShift_mm": 1.0
-      }
-    },
-    "perMesh": {
-      "base_0.obj": {
-        "facesRaw": 10130,
-        "vertsRaw": 8738,
-        "facesWelded": 10027,
-        "vertsWelded": 5016,
-        "facesOut": 1998,
-        "vertsOut": 1001,
-        "bytesIn": 1330465,
-        "bytesOut": 56551,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.3873,
-          "drawnToOrigP95_mm": 0.7835,
-          "origToDrawnMean_mm": 0.3856,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0235
-        }
-      },
-      "base_1.obj": {
-        "facesRaw": 3962,
-        "vertsRaw": 6389,
-        "facesWelded": 3932,
-        "vertsWelded": 1950,
-        "facesOut": 2000,
-        "vertsOut": 984,
-        "bytesIn": 811791,
-        "bytesOut": 56075,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.5224,
-          "drawnToOrigP95_mm": 1.0208,
-          "origToDrawnMean_mm": 0.521,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0699
-        }
-      },
-      "base_2.obj": {
-        "facesRaw": 2005,
-        "vertsRaw": 2120,
-        "facesWelded": 2005,
-        "vertsWelded": 1412,
-        "facesOut": 2000,
-        "vertsOut": 1407,
-        "bytesIn": 294090,
-        "bytesOut": 69437,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.0777,
-          "drawnToOrigP95_mm": 0.2713,
-          "origToDrawnMean_mm": 0.0789,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0
-        }
-      },
-      "base_3.obj": {
-        "facesRaw": 2320,
-        "vertsRaw": 2870,
-        "facesWelded": 2320,
-        "vertsWelded": 2161,
-        "facesOut": 1999,
-        "vertsOut": 1872,
-        "bytesIn": 379093,
-        "bytesOut": 84492,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.2747,
-          "drawnToOrigP95_mm": 0.5548,
-          "origToDrawnMean_mm": 0.3028,
-          "lostOver3mm_pct": 0.165,
-          "bboxShift_mm": 0.0
-        }
-      },
-      "base_4.obj": {
-        "facesRaw": 59511,
-        "vertsRaw": 46564,
-        "facesWelded": 59459,
-        "vertsWelded": 30997,
-        "facesOut": 8919,
-        "vertsOut": 4664,
-        "bytesIn": 7776234,
-        "bytesOut": 279117,
-        "deviation": {
-          "drawnToOrigMean_mm": 1.8922,
-          "drawnToOrigP95_mm": 3.817,
-          "origToDrawnMean_mm": 1.894,
-          "lostOver3mm_pct": 14.575,
-          "bboxShift_mm": 0.0794
-        }
-      },
-      "calf_0.obj": {
-        "facesRaw": 6512,
-        "vertsRaw": 5878,
-        "facesWelded": 6487,
-        "vertsWelded": 3248,
-        "facesOut": 2000,
-        "vertsOut": 1004,
-        "bytesIn": 877174,
-        "bytesOut": 58127,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.5729,
-          "drawnToOrigP95_mm": 1.1204,
-          "origToDrawnMean_mm": 0.5711,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0203
-        }
-      },
-      "calf_1.obj": {
-        "facesRaw": 2053,
-        "vertsRaw": 2396,
-        "facesWelded": 2034,
-        "vertsWelded": 1035,
-        "facesOut": 1999,
-        "vertsOut": 1016,
-        "bytesIn": 326865,
-        "bytesOut": 57690,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.1742,
-          "drawnToOrigP95_mm": 0.4772,
-          "origToDrawnMean_mm": 0.1731,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0
-        }
-      },
-      "calf_mirror_0.obj": {
-        "facesRaw": 6512,
-        "vertsRaw": 5877,
-        "facesWelded": 6487,
-        "vertsWelded": 3248,
-        "facesOut": 2000,
-        "vertsOut": 1004,
-        "bytesIn": 876538,
-        "bytesOut": 58066,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.5728,
-          "drawnToOrigP95_mm": 1.1287,
-          "origToDrawnMean_mm": 0.574,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0237
-        }
-      },
-      "calf_mirror_1.obj": {
-        "facesRaw": 2053,
-        "vertsRaw": 2399,
-        "facesWelded": 2033,
-        "vertsWelded": 1034,
-        "facesOut": 2000,
-        "vertsOut": 1016,
-        "bytesIn": 327261,
-        "bytesOut": 57753,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.1271,
-          "drawnToOrigP95_mm": 0.4538,
-          "origToDrawnMean_mm": 0.1253,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0
-        }
-      },
-      "foot.obj": {
-        "facesRaw": 4404,
-        "vertsRaw": 13190,
-        "facesWelded": 4404,
-        "vertsWelded": 2205,
-        "facesOut": 2000,
-        "vertsOut": 1002,
-        "bytesIn": 1144729,
-        "bytesOut": 59124,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.262,
-          "drawnToOrigP95_mm": 0.5153,
-          "origToDrawnMean_mm": 0.2621,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0122
-        }
-      },
-      "hip_0.obj": {
-        "facesRaw": 18056,
-        "vertsRaw": 19634,
-        "facesWelded": 18010,
-        "vertsWelded": 9008,
-        "facesOut": 2702,
-        "vertsOut": 1349,
-        "bytesIn": 2863864,
-        "bytesOut": 80810,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.7633,
-          "drawnToOrigP95_mm": 1.4845,
-          "origToDrawnMean_mm": 0.7632,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.166
-        }
-      },
-      "hip_1.obj": {
-        "facesRaw": 18972,
-        "vertsRaw": 18329,
-        "facesWelded": 18772,
-        "vertsWelded": 9409,
-        "facesOut": 2816,
-        "vertsOut": 1417,
-        "bytesIn": 2767918,
-        "bytesOut": 85001,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.751,
-          "drawnToOrigP95_mm": 1.474,
-          "origToDrawnMean_mm": 0.7522,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.0941
-        }
-      },
-      "thigh_0.obj": {
-        "facesRaw": 18425,
-        "vertsRaw": 19093,
-        "facesWelded": 18354,
-        "vertsWelded": 9223,
-        "facesOut": 2753,
-        "vertsOut": 1380,
-        "bytesIn": 2841868,
-        "bytesOut": 82849,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.9461,
-          "drawnToOrigP95_mm": 1.8327,
-          "origToDrawnMean_mm": 0.8905,
-          "lostOver3mm_pct": 0.03,
-          "bboxShift_mm": 0.3284
-        }
-      },
-      "thigh_1.obj": {
-        "facesRaw": 11708,
-        "vertsRaw": 9591,
-        "facesWelded": 11706,
-        "vertsWelded": 5859,
-        "facesOut": 2000,
-        "vertsOut": 1006,
-        "bytesIn": 1491320,
-        "bytesOut": 58488,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.5692,
-          "drawnToOrigP95_mm": 1.1036,
-          "origToDrawnMean_mm": 0.5706,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.1504
-        }
-      },
-      "thigh_mirror_0.obj": {
-        "facesRaw": 18417,
-        "vertsRaw": 19051,
-        "facesWelded": 18350,
-        "vertsWelded": 9221,
-        "facesOut": 2752,
-        "vertsOut": 1381,
-        "bytesIn": 2817674,
-        "bytesOut": 81841,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.8899,
-          "drawnToOrigP95_mm": 1.7817,
-          "origToDrawnMean_mm": 0.8732,
-          "lostOver3mm_pct": 0.01,
-          "bboxShift_mm": 0.2937
-        }
-      },
-      "thigh_mirror_1.obj": {
-        "facesRaw": 11708,
-        "vertsRaw": 9580,
-        "facesWelded": 11706,
-        "vertsWelded": 5859,
-        "facesOut": 2000,
-        "vertsOut": 1006,
-        "bytesIn": 1482261,
-        "bytesOut": 57868,
-        "deviation": {
-          "drawnToOrigMean_mm": 0.5709,
-          "drawnToOrigP95_mm": 1.1153,
-          "origToDrawnMean_mm": 0.568,
-          "lostOver3mm_pct": 0.0,
-          "bboxShift_mm": 0.1504
-        }
-      }
-    }
+  "meshNote": "The two games ship identical copies of the same 16 reduced meshes so each scene directory is self-contained; app code may point both at one copy via createSim's assetsBase if it prefers.",
+  "meshPack": "meshes.json"
+ },
+ "physics": {
+  "timestep": 0.005,
+  "decimation": 4,
+  "controlDt": 0.02,
+  "episodeLengthS": 10.0,
+  "episodeSteps": 500,
+  "integrator": "implicitfast",
+  "solver": "newton",
+  "iterations": 10,
+  "tolerance": 1e-08,
+  "lsIterations": 20,
+  "lsTolerance": 0.01,
+  "ccdIterations": 100,
+  "cone": "pyramidal",
+  "impratio": 1.0,
+  "jacobian": "auto",
+  "gravity": [
+   0.0,
+   0.0,
+   -9.81
+  ],
+  "disableflags": 0,
+  "enableflags": 0
+ },
+ "model": {
+  "nq": 38,
+  "nv": 36,
+  "nu": 24,
+  "nbody": 30,
+  "njnt": 26,
+  "ngeom": 145,
+  "nsite": 53,
+  "nmesh": 32,
+  "nsensor": 109,
+  "nkey": 1,
+  "na": 0,
+  "nmocap": 0,
+  "bodyNames": [
+   "world",
+   "terrain",
+   "a_base_link",
+   "a_FL_hip",
+   "a_FL_thigh",
+   "a_FL_calf",
+   "a_FR_hip",
+   "a_FR_thigh",
+   "a_FR_calf",
+   "a_RL_hip",
+   "a_RL_thigh",
+   "a_RL_calf",
+   "a_RR_hip",
+   "a_RR_thigh",
+   "a_RR_calf",
+   "b_base_link",
+   "b_FL_hip",
+   "b_FL_thigh",
+   "b_FL_calf",
+   "b_FR_hip",
+   "b_FR_thigh",
+   "b_FR_calf",
+   "b_RL_hip",
+   "b_RL_thigh",
+   "b_RL_calf",
+   "b_RR_hip",
+   "b_RR_thigh",
+   "b_RR_calf",
+   "touchdown_field_markers",
+   "arena_decor"
+  ],
+  "geomNames": [
+   "terrain",
+   null,
+   null,
+   null,
+   null,
+   null,
+   "a_base1_collision",
+   "a_base2_collision",
+   "a_base3_collision",
+   null,
+   null,
+   "a_FL_hip_collision",
+   null,
+   null,
+   "a_FL_thigh_collision",
+   null,
+   null,
+   "a_FL_calf1_collision",
+   "a_FL_calf2_collision",
+   null,
+   "a_FL_foot_collision",
+   null,
+   null,
+   "a_FR_hip_collision",
+   null,
+   null,
+   "a_FR_thigh_collision",
+   null,
+   null,
+   "a_FR_calf1_collision",
+   "a_FR_calf2_collision",
+   null,
+   "a_FR_foot_collision",
+   null,
+   null,
+   "a_RL_hip_collision",
+   null,
+   null,
+   "a_RL_thigh_collision",
+   null,
+   null,
+   "a_RL_calf1_collision",
+   "a_RL_calf2_collision",
+   null,
+   "a_RL_foot_collision",
+   null,
+   null,
+   "a_RR_hip_collision",
+   null,
+   null,
+   "a_RR_thigh_collision",
+   null,
+   null,
+   "a_RR_calf1_collision",
+   "a_RR_calf2_collision",
+   null,
+   "a_RR_foot_collision",
+   null,
+   null,
+   null,
+   null,
+   null,
+   "b_base1_collision",
+   "b_base2_collision",
+   "b_base3_collision",
+   null,
+   null,
+   "b_FL_hip_collision",
+   null,
+   null,
+   "b_FL_thigh_collision",
+   null,
+   null,
+   "b_FL_calf1_collision",
+   "b_FL_calf2_collision",
+   null,
+   "b_FL_foot_collision",
+   null,
+   null,
+   "b_FR_hip_collision",
+   null,
+   null,
+   "b_FR_thigh_collision",
+   null,
+   null,
+   "b_FR_calf1_collision",
+   "b_FR_calf2_collision",
+   null,
+   "b_FR_foot_collision",
+   null,
+   null,
+   "b_RL_hip_collision",
+   null,
+   null,
+   "b_RL_thigh_collision",
+   null,
+   null,
+   "b_RL_calf1_collision",
+   "b_RL_calf2_collision",
+   null,
+   "b_RL_foot_collision",
+   null,
+   null,
+   "b_RR_hip_collision",
+   null,
+   null,
+   "b_RR_thigh_collision",
+   null,
+   null,
+   "b_RR_calf1_collision",
+   "b_RR_calf2_collision",
+   null,
+   "b_RR_foot_collision",
+   "field_x_min",
+   "field_x_max",
+   "field_y_min",
+   "field_y_max",
+   "touchdown_line",
+   "touchdown_region",
+   "decor_apron",
+   "decor_surface",
+   "decor_endzone",
+   "decor_line",
+   "decor_touchline_y_min",
+   "decor_touchline_y_max",
+   "decor_goalline_x_min",
+   "decor_goalline_x_max",
+   "decor_halfway",
+   "decor_centre_circle",
+   "decor_post_0",
+   "decor_post_cap_0",
+   "decor_post_1",
+   "decor_post_cap_1",
+   "decor_post_2",
+   "decor_post_cap_2",
+   "decor_post_3",
+   "decor_post_cap_3",
+   "decor_barrier_y_min",
+   "decor_barrier_y_min_top",
+   "decor_barrier_y_max",
+   "decor_barrier_y_max_top",
+   "decor_barrier_x_min",
+   "decor_barrier_x_min_top",
+   "decor_barrier_x_max",
+   "decor_barrier_x_max_top"
+  ],
+  "jointNames": [
+   "a_floating_base_joint",
+   "a_FL_hip_joint",
+   "a_FL_thigh_joint",
+   "a_FL_calf_joint",
+   "a_FR_hip_joint",
+   "a_FR_thigh_joint",
+   "a_FR_calf_joint",
+   "a_RL_hip_joint",
+   "a_RL_thigh_joint",
+   "a_RL_calf_joint",
+   "a_RR_hip_joint",
+   "a_RR_thigh_joint",
+   "a_RR_calf_joint",
+   "b_floating_base_joint",
+   "b_FL_hip_joint",
+   "b_FL_thigh_joint",
+   "b_FL_calf_joint",
+   "b_FR_hip_joint",
+   "b_FR_thigh_joint",
+   "b_FR_calf_joint",
+   "b_RL_hip_joint",
+   "b_RL_thigh_joint",
+   "b_RL_calf_joint",
+   "b_RR_hip_joint",
+   "b_RR_thigh_joint",
+   "b_RR_calf_joint"
+  ],
+  "actuatorNames": [
+   "a_FL_hip_joint",
+   "a_FR_hip_joint",
+   "a_RL_hip_joint",
+   "a_RR_hip_joint",
+   "a_FL_thigh_joint",
+   "a_FR_thigh_joint",
+   "a_RL_thigh_joint",
+   "a_RR_thigh_joint",
+   "a_FL_calf_joint",
+   "a_FR_calf_joint",
+   "a_RL_calf_joint",
+   "a_RR_calf_joint",
+   "b_FL_hip_joint",
+   "b_FR_hip_joint",
+   "b_RL_hip_joint",
+   "b_RR_hip_joint",
+   "b_FL_thigh_joint",
+   "b_FR_thigh_joint",
+   "b_RL_thigh_joint",
+   "b_RR_thigh_joint",
+   "b_FL_calf_joint",
+   "b_FR_calf_joint",
+   "b_RL_calf_joint",
+   "b_RR_calf_joint"
+  ],
+  "sensorNames": [
+   "a_imu_ang_vel",
+   "a_imu_lin_vel",
+   "a_imu_lin_acc",
+   "a_root_angmom",
+   "b_imu_ang_vel",
+   "b_imu_lin_vel",
+   "b_imu_lin_acc",
+   "b_root_angmom",
+   "a_feet_ground_contact_FL_foot_collision_found",
+   "a_feet_ground_contact_FL_foot_collision_force",
+   "a_feet_ground_contact_FR_foot_collision_found",
+   "a_feet_ground_contact_FR_foot_collision_force",
+   "a_feet_ground_contact_RL_foot_collision_found",
+   "a_feet_ground_contact_RL_foot_collision_force",
+   "a_feet_ground_contact_RR_foot_collision_found",
+   "a_feet_ground_contact_RR_foot_collision_force",
+   "a_limb_ground_contact_FL_thigh_collision_found",
+   "a_limb_ground_contact_FL_calf1_collision_found",
+   "a_limb_ground_contact_FR_thigh_collision_found",
+   "a_limb_ground_contact_FR_calf1_collision_found",
+   "a_limb_ground_contact_RL_thigh_collision_found",
+   "a_limb_ground_contact_RL_calf1_collision_found",
+   "a_limb_ground_contact_RR_thigh_collision_found",
+   "a_limb_ground_contact_RR_calf1_collision_found",
+   "b_feet_ground_contact_FL_foot_collision_found",
+   "b_feet_ground_contact_FL_foot_collision_force",
+   "b_feet_ground_contact_FR_foot_collision_found",
+   "b_feet_ground_contact_FR_foot_collision_force",
+   "b_feet_ground_contact_RL_foot_collision_found",
+   "b_feet_ground_contact_RL_foot_collision_force",
+   "b_feet_ground_contact_RR_foot_collision_found",
+   "b_feet_ground_contact_RR_foot_collision_force",
+   "b_limb_ground_contact_FL_thigh_collision_found",
+   "b_limb_ground_contact_FL_calf1_collision_found",
+   "b_limb_ground_contact_FR_thigh_collision_found",
+   "b_limb_ground_contact_FR_calf1_collision_found",
+   "b_limb_ground_contact_RL_thigh_collision_found",
+   "b_limb_ground_contact_RL_calf1_collision_found",
+   "b_limb_ground_contact_RR_thigh_collision_found",
+   "b_limb_ground_contact_RR_calf1_collision_found",
+   "a_vs_b_trunk_base1_collision_found",
+   "a_vs_b_trunk_base2_collision_found",
+   "a_vs_b_trunk_base3_collision_found",
+   "a_vs_b_trunk_FL_hip_collision_found",
+   "a_vs_b_trunk_FL_thigh_collision_found",
+   "a_vs_b_trunk_FL_calf1_collision_found",
+   "a_vs_b_trunk_FL_calf2_collision_found",
+   "a_vs_b_trunk_FL_foot_collision_found",
+   "a_vs_b_trunk_FR_hip_collision_found",
+   "a_vs_b_trunk_FR_thigh_collision_found",
+   "a_vs_b_trunk_FR_calf1_collision_found",
+   "a_vs_b_trunk_FR_calf2_collision_found",
+   "a_vs_b_trunk_FR_foot_collision_found",
+   "a_vs_b_trunk_RL_hip_collision_found",
+   "a_vs_b_trunk_RL_thigh_collision_found",
+   "a_vs_b_trunk_RL_calf1_collision_found",
+   "a_vs_b_trunk_RL_calf2_collision_found",
+   "a_vs_b_trunk_RL_foot_collision_found",
+   "a_vs_b_trunk_RR_hip_collision_found",
+   "a_vs_b_trunk_RR_thigh_collision_found",
+   "a_vs_b_trunk_RR_calf1_collision_found",
+   "a_vs_b_trunk_RR_calf2_collision_found",
+   "a_vs_b_trunk_RR_foot_collision_found",
+   "b_vs_a_trunk_base1_collision_found",
+   "b_vs_a_trunk_base2_collision_found",
+   "b_vs_a_trunk_base3_collision_found",
+   "b_vs_a_trunk_FL_hip_collision_found",
+   "b_vs_a_trunk_FL_thigh_collision_found",
+   "b_vs_a_trunk_FL_calf1_collision_found",
+   "b_vs_a_trunk_FL_calf2_collision_found",
+   "b_vs_a_trunk_FL_foot_collision_found",
+   "b_vs_a_trunk_FR_hip_collision_found",
+   "b_vs_a_trunk_FR_thigh_collision_found",
+   "b_vs_a_trunk_FR_calf1_collision_found",
+   "b_vs_a_trunk_FR_calf2_collision_found",
+   "b_vs_a_trunk_FR_foot_collision_found",
+   "b_vs_a_trunk_RL_hip_collision_found",
+   "b_vs_a_trunk_RL_thigh_collision_found",
+   "b_vs_a_trunk_RL_calf1_collision_found",
+   "b_vs_a_trunk_RL_calf2_collision_found",
+   "b_vs_a_trunk_RL_foot_collision_found",
+   "b_vs_a_trunk_RR_hip_collision_found",
+   "b_vs_a_trunk_RR_thigh_collision_found",
+   "b_vs_a_trunk_RR_calf1_collision_found",
+   "b_vs_a_trunk_RR_calf2_collision_found",
+   "b_vs_a_trunk_RR_foot_collision_found",
+   "a_vs_b_base1_collision_found",
+   "a_vs_b_base2_collision_found",
+   "a_vs_b_base3_collision_found",
+   "a_vs_b_FL_hip_collision_found",
+   "a_vs_b_FL_thigh_collision_found",
+   "a_vs_b_FL_calf1_collision_found",
+   "a_vs_b_FL_calf2_collision_found",
+   "a_vs_b_FL_foot_collision_found",
+   "a_vs_b_FR_hip_collision_found",
+   "a_vs_b_FR_thigh_collision_found",
+   "a_vs_b_FR_calf1_collision_found",
+   "a_vs_b_FR_calf2_collision_found",
+   "a_vs_b_FR_foot_collision_found",
+   "a_vs_b_RL_hip_collision_found",
+   "a_vs_b_RL_thigh_collision_found",
+   "a_vs_b_RL_calf1_collision_found",
+   "a_vs_b_RL_calf2_collision_found",
+   "a_vs_b_RL_foot_collision_found",
+   "a_vs_b_RR_hip_collision_found",
+   "a_vs_b_RR_thigh_collision_found",
+   "a_vs_b_RR_calf1_collision_found",
+   "a_vs_b_RR_calf2_collision_found",
+   "a_vs_b_RR_foot_collision_found"
+  ],
+  "geomBodyId": [
+   1,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   4,
+   4,
+   4,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   6,
+   6,
+   6,
+   7,
+   7,
+   7,
+   8,
+   8,
+   8,
+   8,
+   8,
+   8,
+   9,
+   9,
+   9,
+   10,
+   10,
+   10,
+   11,
+   11,
+   11,
+   11,
+   11,
+   11,
+   12,
+   12,
+   12,
+   13,
+   13,
+   13,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   15,
+   15,
+   15,
+   15,
+   15,
+   15,
+   15,
+   15,
+   16,
+   16,
+   16,
+   17,
+   17,
+   17,
+   18,
+   18,
+   18,
+   18,
+   18,
+   18,
+   19,
+   19,
+   19,
+   20,
+   20,
+   20,
+   21,
+   21,
+   21,
+   21,
+   21,
+   21,
+   22,
+   22,
+   22,
+   23,
+   23,
+   23,
+   24,
+   24,
+   24,
+   24,
+   24,
+   24,
+   25,
+   25,
+   25,
+   26,
+   26,
+   26,
+   27,
+   27,
+   27,
+   27,
+   27,
+   27,
+   28,
+   28,
+   28,
+   28,
+   28,
+   28,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29,
+   29
+  ],
+  "geomRobot": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "a",
+   "a",
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   "a",
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   "a",
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   "a",
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   null,
+   null,
+   "a",
+   "a",
+   null,
+   "a",
+   null,
+   null,
+   null,
+   null,
+   null,
+   "b",
+   "b",
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   "b",
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   "b",
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   "b",
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   null,
+   null,
+   "b",
+   "b",
+   null,
+   "b",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "geomType": [
+   0,
+   7,
+   7,
+   7,
+   7,
+   7,
+   6,
+   5,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   7,
+   7,
+   7,
+   6,
+   5,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   7,
+   7,
+   5,
+   7,
+   7,
+   6,
+   7,
+   7,
+   5,
+   5,
+   7,
+   2,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   5,
+   5,
+   2,
+   5,
+   2,
+   5,
+   2,
+   5,
+   2,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6
+  ],
+  "geomGroup": [
+   0,
+   2,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   2,
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2
+  ],
+  "geomContype": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   2,
+   2,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "geomConaffinity": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   2,
+   2,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   0,
+   0,
+   2,
+   2,
+   0,
+   2,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "geomCondim": [
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   1,
+   1,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   1,
+   1,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   3,
+   3,
+   1,
+   1,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "geomPriority": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "geomFriction": [
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    0.6,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   [
+    1.0,
+    0.005,
+    0.0001
+   ]
+  ],
+  "geomDataId": [
+   -1,
+   0,
+   1,
+   2,
+   3,
+   4,
+   -1,
+   -1,
+   -1,
+   5,
+   6,
+   -1,
+   7,
+   8,
+   -1,
+   11,
+   12,
+   -1,
+   -1,
+   15,
+   -1,
+   5,
+   6,
+   -1,
+   9,
+   10,
+   -1,
+   13,
+   14,
+   -1,
+   -1,
+   15,
+   -1,
+   5,
+   6,
+   -1,
+   7,
+   8,
+   -1,
+   11,
+   12,
+   -1,
+   -1,
+   15,
+   -1,
+   5,
+   6,
+   -1,
+   9,
+   10,
+   -1,
+   13,
+   14,
+   -1,
+   -1,
+   15,
+   -1,
+   16,
+   17,
+   18,
+   19,
+   20,
+   -1,
+   -1,
+   -1,
+   21,
+   22,
+   -1,
+   23,
+   24,
+   -1,
+   27,
+   28,
+   -1,
+   -1,
+   31,
+   -1,
+   21,
+   22,
+   -1,
+   25,
+   26,
+   -1,
+   29,
+   30,
+   -1,
+   -1,
+   31,
+   -1,
+   21,
+   22,
+   -1,
+   23,
+   24,
+   -1,
+   27,
+   28,
+   -1,
+   -1,
+   31,
+   -1,
+   21,
+   22,
+   -1,
+   25,
+   26,
+   -1,
+   29,
+   30,
+   -1,
+   -1,
+   31,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1
+  ],
+  "geomSize": [
+   [
+    0.0,
+    0.0,
+    0.01
+   ],
+   [
+    0.02297719681,
+    0.035003019141,
+    0.035049660919
+   ],
+   [
+    0.037657401249,
+    0.042010965258,
+    0.042026171214
+   ],
+   [
+    0.003252528567,
+    0.01300866204,
+    0.055060022229
+   ],
+   [
+    0.019468618181,
+    0.10286059636,
+    0.268704806624
+   ],
+   [
+    0.097942386171,
+    0.09758958106,
+    0.257627563864
+   ],
+   [
+    0.1881,
+    0.04675,
+    0.057
+   ],
+   [
+    0.05,
+    0.045,
+    0.0
+   ],
+   [
+    0.047,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037630067798,
+    0.051326620441,
+    0.186686037906
+   ],
+   [
+    0.05080583898,
+    0.057167799911,
+    0.06448252971
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018806510718,
+    0.029039043143,
+    0.157610435101
+   ],
+   [
+    0.014745576696,
+    0.019812303672,
+    0.022484602455
+   ],
+   [
+    0.012,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037280801387,
+    0.051250580325,
+    0.186456201603
+   ],
+   [
+    0.050702784607,
+    0.057119383401,
+    0.064541351744
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018805069148,
+    0.02906300522,
+    0.157603946082
+   ],
+   [
+    0.014745828261,
+    0.01981228486,
+    0.022484428773
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037630067798,
+    0.051326620441,
+    0.186686037906
+   ],
+   [
+    0.05080583898,
+    0.057167799911,
+    0.06448252971
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018806510718,
+    0.029039043143,
+    0.157610435101
+   ],
+   [
+    0.014745576696,
+    0.019812303672,
+    0.022484602455
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037280801387,
+    0.051250580325,
+    0.186456201603
+   ],
+   [
+    0.050702784607,
+    0.057119383401,
+    0.064541351744
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018805069148,
+    0.02906300522,
+    0.157603946082
+   ],
+   [
+    0.014745828261,
+    0.01981228486,
+    0.022484428773
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.02297719681,
+    0.035003019141,
+    0.035049660919
+   ],
+   [
+    0.037657401249,
+    0.042010965258,
+    0.042026171214
+   ],
+   [
+    0.003252528567,
+    0.01300866204,
+    0.055060022229
+   ],
+   [
+    0.019468618181,
+    0.10286059636,
+    0.268704806624
+   ],
+   [
+    0.097942386171,
+    0.09758958106,
+    0.257627563864
+   ],
+   [
+    0.1881,
+    0.04675,
+    0.057
+   ],
+   [
+    0.05,
+    0.045,
+    0.0
+   ],
+   [
+    0.047,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037630067798,
+    0.051326620441,
+    0.186686037906
+   ],
+   [
+    0.05080583898,
+    0.057167799911,
+    0.06448252971
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018806510718,
+    0.029039043143,
+    0.157610435101
+   ],
+   [
+    0.014745576696,
+    0.019812303672,
+    0.022484602455
+   ],
+   [
+    0.012,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037280801387,
+    0.051250580325,
+    0.186456201603
+   ],
+   [
+    0.050702784607,
+    0.057119383401,
+    0.064541351744
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018805069148,
+    0.02906300522,
+    0.157603946082
+   ],
+   [
+    0.014745828261,
+    0.01981228486,
+    0.022484428773
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037630067798,
+    0.051326620441,
+    0.186686037906
+   ],
+   [
+    0.05080583898,
+    0.057167799911,
+    0.06448252971
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018806510718,
+    0.029039043143,
+    0.157610435101
+   ],
+   [
+    0.014745576696,
+    0.019812303672,
+    0.022484602455
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.030118755038,
+    0.046326225411,
+    0.067418432368
+   ],
+   [
+    0.040318712811,
+    0.049385661558,
+    0.070346462401
+   ],
+   [
+    0.046,
+    0.02,
+    0.0
+   ],
+   [
+    0.037280801387,
+    0.051250580325,
+    0.186456201603
+   ],
+   [
+    0.050702784607,
+    0.057119383401,
+    0.064541351744
+   ],
+   [
+    0.1065,
+    0.01225,
+    0.017
+   ],
+   [
+    0.018805069148,
+    0.02906300522,
+    0.157603946082
+   ],
+   [
+    0.014745828261,
+    0.01981228486,
+    0.022484428773
+   ],
+   [
+    0.013,
+    0.06,
+    0.0
+   ],
+   [
+    0.011,
+    0.0325,
+    0.0
+   ],
+   [
+    0.01481185022,
+    0.019813696846,
+    0.022484809561
+   ],
+   [
+    0.022,
+    0.0,
+    0.0
+   ],
+   [
+    0.025,
+    1.5,
+    0.025
+   ],
+   [
+    0.025,
+    1.5,
+    0.025
+   ],
+   [
+    2.6,
+    0.025,
+    0.025
+   ],
+   [
+    2.6,
+    0.025,
+    0.025
+   ],
+   [
+    0.025,
+    1.5,
+    0.025
+   ],
+   [
+    0.45,
+    1.5,
+    0.004
+   ],
+   [
+    3.3,
+    2.2,
+    0.00075
+   ],
+   [
+    2.6,
+    1.5,
+    0.00075
+   ],
+   [
+    0.45,
+    1.5,
+    0.00075
+   ],
+   [
+    0.035,
+    1.5,
+    0.00075
+   ],
+   [
+    2.6,
+    0.04,
+    0.00075
+   ],
+   [
+    2.6,
+    0.04,
+    0.00075
+   ],
+   [
+    0.04,
+    1.5,
+    0.00075
+   ],
+   [
+    0.04,
+    1.5,
+    0.00075
+   ],
+   [
+    0.025,
+    1.5,
+    0.00075
+   ],
+   [
+    0.45,
+    0.00075,
+    0.0
+   ],
+   [
+    0.05,
+    0.26,
+    0.0
+   ],
+   [
+    0.065,
+    0.0,
+    0.0
+   ],
+   [
+    0.05,
+    0.26,
+    0.0
+   ],
+   [
+    0.065,
+    0.0,
+    0.0
+   ],
+   [
+    0.05,
+    0.26,
+    0.0
+   ],
+   [
+    0.065,
+    0.0,
+    0.0
+   ],
+   [
+    0.05,
+    0.26,
+    0.0
+   ],
+   [
+    0.065,
+    0.0,
+    0.0
+   ],
+   [
+    2.92,
+    0.05,
+    0.11
+   ],
+   [
+    2.92,
+    0.05,
+    0.012
+   ],
+   [
+    2.92,
+    0.05,
+    0.11
+   ],
+   [
+    2.92,
+    0.05,
+    0.012
+   ],
+   [
+    0.05,
+    1.82,
+    0.11
+   ],
+   [
+    0.05,
+    1.82,
+    0.012
+   ],
+   [
+    0.05,
+    1.82,
+    0.11
+   ],
+   [
+    0.05,
+    1.82,
+    0.012
+   ]
+  ],
+  "geomRgba": [
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.5,
+    0.5,
+    0.5,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.649999976158
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.649999976158
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.649999976158
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.649999976158
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    0.899999976158
+   ],
+   [
+    0.10000000149,
+    0.800000011921,
+    0.34999999404,
+    0.180000007153
+   ],
+   [
+    0.079999998212,
+    0.119999997318,
+    0.170000001788,
+    1.0
+   ],
+   [
+    0.159999996424,
+    0.239999994636,
+    0.330000013113,
+    1.0
+   ],
+   [
+    0.10000000149,
+    0.800000011921,
+    0.34999999404,
+    0.449999988079
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.949999988079
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.949999988079
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.949999988079
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.949999988079
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.949999988079
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    0.300000011921
+   ],
+   [
+    0.140000000596,
+    0.170000001788,
+    0.209999993443,
+    1.0
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    1.0
+   ],
+   [
+    0.140000000596,
+    0.170000001788,
+    0.209999993443,
+    1.0
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    1.0
+   ],
+   [
+    0.140000000596,
+    0.170000001788,
+    0.209999993443,
+    1.0
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    1.0
+   ],
+   [
+    0.140000000596,
+    0.170000001788,
+    0.209999993443,
+    1.0
+   ],
+   [
+    1.0,
+    0.280000001192,
+    0.140000000596,
+    1.0
+   ],
+   [
+    0.20000000298,
+    0.239999994636,
+    0.300000011921,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    1.0
+   ],
+   [
+    0.20000000298,
+    0.239999994636,
+    0.300000011921,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    1.0
+   ],
+   [
+    0.20000000298,
+    0.239999994636,
+    0.300000011921,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    1.0
+   ],
+   [
+    0.20000000298,
+    0.239999994636,
+    0.300000011921,
+    1.0
+   ],
+   [
+    0.920000016689,
+    0.920000016689,
+    0.879999995232,
+    1.0
+   ]
+  ],
+  "bodyParentId": [
+   0,
+   0,
+   0,
+   2,
+   3,
+   4,
+   2,
+   6,
+   7,
+   2,
+   9,
+   10,
+   2,
+   12,
+   13,
+   0,
+   15,
+   16,
+   17,
+   15,
+   19,
+   20,
+   15,
+   22,
+   23,
+   15,
+   25,
+   26,
+   0,
+   0
+  ],
+  "bodyMass": [
+   0.0,
+   0.0,
+   6.921,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   6.921,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   0.678,
+   1.152,
+   0.241352,
+   0.0,
+   0.0
+  ],
+  "meshNames": [
+   "a_base_0",
+   "a_base_1",
+   "a_base_2",
+   "a_base_3",
+   "a_base_4",
+   "a_hip_0",
+   "a_hip_1",
+   "a_thigh_0",
+   "a_thigh_1",
+   "a_thigh_mirror_0",
+   "a_thigh_mirror_1",
+   "a_calf_0",
+   "a_calf_1",
+   "a_calf_mirror_0",
+   "a_calf_mirror_1",
+   "a_foot",
+   "b_base_0",
+   "b_base_1",
+   "b_base_2",
+   "b_base_3",
+   "b_base_4",
+   "b_hip_0",
+   "b_hip_1",
+   "b_thigh_0",
+   "b_thigh_1",
+   "b_thigh_mirror_0",
+   "b_thigh_mirror_1",
+   "b_calf_0",
+   "b_calf_1",
+   "b_calf_mirror_0",
+   "b_calf_mirror_1",
+   "b_foot"
+  ],
+  "geomTypeEnum": {
+   "plane": 0,
+   "hfield": 1,
+   "sphere": 2,
+   "capsule": 3,
+   "ellipsoid": 4,
+   "cylinder": 5,
+   "box": 6,
+   "mesh": 7
   }
+ },
+ "geomRobot": [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  "a",
+  "a",
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  "a",
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  "a",
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  "a",
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  null,
+  null,
+  "a",
+  "a",
+  null,
+  "a",
+  null,
+  null,
+  null,
+  null,
+  null,
+  "b",
+  "b",
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  "b",
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  "b",
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  "b",
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  null,
+  null,
+  "b",
+  "b",
+  null,
+  "b",
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "qposLayout": {
+  "nq": 38,
+  "nv": 36,
+  "freeJointQpos": "x y z qw qx qy qz",
+  "robots": {
+   "a": {
+    "freeQposAdr": 0,
+    "freeDofAdr": 0,
+    "jointQposAdr": [
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "jointDofAdr": [
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17
+    ]
+   },
+   "b": {
+    "freeQposAdr": 19,
+    "freeDofAdr": 18,
+    "jointQposAdr": [
+     26,
+     27,
+     28,
+     29,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37
+    ],
+    "jointDofAdr": [
+     24,
+     25,
+     26,
+     27,
+     28,
+     29,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35
+    ]
+   }
+  }
+ },
+ "robots": {
+  "a": {
+   "mjlabEntity": "attacker",
+   "seat": "attacker",
+   "prefix": "a_",
+   "freeJointName": "a_floating_base_joint",
+   "freeJointId": 0,
+   "freeQposAdr": 0,
+   "freeDofAdr": 0,
+   "jointNames": [
+    "a_FL_hip_joint",
+    "a_FL_thigh_joint",
+    "a_FL_calf_joint",
+    "a_FR_hip_joint",
+    "a_FR_thigh_joint",
+    "a_FR_calf_joint",
+    "a_RL_hip_joint",
+    "a_RL_thigh_joint",
+    "a_RL_calf_joint",
+    "a_RR_hip_joint",
+    "a_RR_thigh_joint",
+    "a_RR_calf_joint"
+   ],
+   "jointIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "jointQposAdr": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "jointDofAdr": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   "actuatorNames": [
+    "a_FL_hip_joint",
+    "a_FL_thigh_joint",
+    "a_FL_calf_joint",
+    "a_FR_hip_joint",
+    "a_FR_thigh_joint",
+    "a_FR_calf_joint",
+    "a_RL_hip_joint",
+    "a_RL_thigh_joint",
+    "a_RL_calf_joint",
+    "a_RR_hip_joint",
+    "a_RR_thigh_joint",
+    "a_RR_calf_joint"
+   ],
+   "actuatorIdsJointOrder": [
+    0,
+    4,
+    8,
+    1,
+    5,
+    9,
+    2,
+    6,
+    10,
+    3,
+    7,
+    11
+   ],
+   "baseBodyName": "a_base_link",
+   "baseBodyId": 2,
+   "bodyIds": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+   ],
+   "bodyNames": [
+    "a_base_link",
+    "a_FL_hip",
+    "a_FL_thigh",
+    "a_FL_calf",
+    "a_FR_hip",
+    "a_FR_thigh",
+    "a_FR_calf",
+    "a_RL_hip",
+    "a_RL_thigh",
+    "a_RL_calf",
+    "a_RR_hip",
+    "a_RR_thigh",
+    "a_RR_calf"
+   ],
+   "geomIds": [
+    6,
+    7,
+    8,
+    11,
+    14,
+    17,
+    18,
+    20,
+    23,
+    26,
+    29,
+    30,
+    32,
+    35,
+    38,
+    41,
+    42,
+    44,
+    47,
+    50,
+    53,
+    54,
+    56
+   ],
+   "collisionGeoms": [
+    "a_base1_collision",
+    "a_base2_collision",
+    "a_base3_collision",
+    "a_FL_hip_collision",
+    "a_FL_thigh_collision",
+    "a_FL_calf1_collision",
+    "a_FL_calf2_collision",
+    "a_FL_foot_collision",
+    "a_FR_hip_collision",
+    "a_FR_thigh_collision",
+    "a_FR_calf1_collision",
+    "a_FR_calf2_collision",
+    "a_FR_foot_collision",
+    "a_RL_hip_collision",
+    "a_RL_thigh_collision",
+    "a_RL_calf1_collision",
+    "a_RL_calf2_collision",
+    "a_RL_foot_collision",
+    "a_RR_hip_collision",
+    "a_RR_thigh_collision",
+    "a_RR_calf1_collision",
+    "a_RR_calf2_collision",
+    "a_RR_foot_collision"
+   ],
+   "footGeoms": [
+    "a_FL_foot_collision",
+    "a_FR_foot_collision",
+    "a_RL_foot_collision",
+    "a_RR_foot_collision"
+   ],
+   "contype": 1,
+   "conaffinity": 2
+  },
+  "b": {
+   "mjlabEntity": "defender",
+   "seat": "defender",
+   "prefix": "b_",
+   "freeJointName": "b_floating_base_joint",
+   "freeJointId": 13,
+   "freeQposAdr": 19,
+   "freeDofAdr": 18,
+   "jointNames": [
+    "b_FL_hip_joint",
+    "b_FL_thigh_joint",
+    "b_FL_calf_joint",
+    "b_FR_hip_joint",
+    "b_FR_thigh_joint",
+    "b_FR_calf_joint",
+    "b_RL_hip_joint",
+    "b_RL_thigh_joint",
+    "b_RL_calf_joint",
+    "b_RR_hip_joint",
+    "b_RR_thigh_joint",
+    "b_RR_calf_joint"
+   ],
+   "jointIds": [
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+   ],
+   "jointQposAdr": [
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37
+   ],
+   "jointDofAdr": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+   ],
+   "actuatorNames": [
+    "b_FL_hip_joint",
+    "b_FL_thigh_joint",
+    "b_FL_calf_joint",
+    "b_FR_hip_joint",
+    "b_FR_thigh_joint",
+    "b_FR_calf_joint",
+    "b_RL_hip_joint",
+    "b_RL_thigh_joint",
+    "b_RL_calf_joint",
+    "b_RR_hip_joint",
+    "b_RR_thigh_joint",
+    "b_RR_calf_joint"
+   ],
+   "actuatorIdsJointOrder": [
+    12,
+    16,
+    20,
+    13,
+    17,
+    21,
+    14,
+    18,
+    22,
+    15,
+    19,
+    23
+   ],
+   "baseBodyName": "b_base_link",
+   "baseBodyId": 15,
+   "bodyIds": [
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+   ],
+   "bodyNames": [
+    "b_base_link",
+    "b_FL_hip",
+    "b_FL_thigh",
+    "b_FL_calf",
+    "b_FR_hip",
+    "b_FR_thigh",
+    "b_FR_calf",
+    "b_RL_hip",
+    "b_RL_thigh",
+    "b_RL_calf",
+    "b_RR_hip",
+    "b_RR_thigh",
+    "b_RR_calf"
+   ],
+   "geomIds": [
+    62,
+    63,
+    64,
+    67,
+    70,
+    73,
+    74,
+    76,
+    79,
+    82,
+    85,
+    86,
+    88,
+    91,
+    94,
+    97,
+    98,
+    100,
+    103,
+    106,
+    109,
+    110,
+    112
+   ],
+   "collisionGeoms": [
+    "b_base1_collision",
+    "b_base2_collision",
+    "b_base3_collision",
+    "b_FL_hip_collision",
+    "b_FL_thigh_collision",
+    "b_FL_calf1_collision",
+    "b_FL_calf2_collision",
+    "b_FL_foot_collision",
+    "b_FR_hip_collision",
+    "b_FR_thigh_collision",
+    "b_FR_calf1_collision",
+    "b_FR_calf2_collision",
+    "b_FR_foot_collision",
+    "b_RL_hip_collision",
+    "b_RL_thigh_collision",
+    "b_RL_calf1_collision",
+    "b_RL_calf2_collision",
+    "b_RL_foot_collision",
+    "b_RR_hip_collision",
+    "b_RR_thigh_collision",
+    "b_RR_calf1_collision",
+    "b_RR_calf2_collision",
+    "b_RR_foot_collision"
+   ],
+   "footGeoms": [
+    "b_FL_foot_collision",
+    "b_FR_foot_collision",
+    "b_RL_foot_collision",
+    "b_RR_foot_collision"
+   ],
+   "contype": 2,
+   "conaffinity": 1
+  }
+ },
+ "joints": {
+  "order": [
+   "FL_hip_joint",
+   "FL_thigh_joint",
+   "FL_calf_joint",
+   "FR_hip_joint",
+   "FR_thigh_joint",
+   "FR_calf_joint",
+   "RL_hip_joint",
+   "RL_thigh_joint",
+   "RL_calf_joint",
+   "RR_hip_joint",
+   "RR_thigh_joint",
+   "RR_calf_joint"
+  ],
+  "orderNote": "entity-native JOINT order FL,FR,RL,RR x (hip,thigh,calf). The compiled mjModel ACTUATOR array is grouped hip x4 / thigh x4 / calf x4 -- use robots.<r>.actuatorIdsJointOrder to cross the two.",
+  "defaultJointPos": [
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8,
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8
+  ],
+  "hardLimitLo": [
+   -1.0472,
+   -1.5708,
+   -2.7227,
+   -1.0472,
+   -1.5708,
+   -2.7227,
+   -1.0472,
+   -0.5236,
+   -2.7227,
+   -1.0472,
+   -0.5236,
+   -2.7227
+  ],
+  "hardLimitHi": [
+   1.0472,
+   3.4907,
+   -0.83776,
+   1.0472,
+   3.4907,
+   -0.83776,
+   1.0472,
+   4.5379,
+   -0.83776,
+   1.0472,
+   4.5379,
+   -0.83776
+  ],
+  "softLimitFactor": 0.9,
+  "softLimitLo": [
+   -0.94248,
+   -1.317725,
+   -2.628453,
+   -0.94248,
+   -1.317725,
+   -2.628453,
+   -0.94248,
+   -0.270525,
+   -2.628453,
+   -0.94248,
+   -0.270525,
+   -2.628453
+  ],
+  "softLimitHi": [
+   0.94248,
+   3.237625,
+   -0.932007,
+   0.94248,
+   3.237625,
+   -0.932007,
+   0.94248,
+   4.284825,
+   -0.932007,
+   0.94248,
+   4.284825,
+   -0.932007
+  ],
+  "kp": [
+   20.0,
+   20.0,
+   40.0,
+   20.0,
+   20.0,
+   40.0,
+   20.0,
+   20.0,
+   40.0,
+   20.0,
+   20.0,
+   40.0
+  ],
+  "kd": [
+   1.0,
+   1.0,
+   2.0,
+   1.0,
+   1.0,
+   2.0,
+   1.0,
+   1.0,
+   2.0,
+   1.0,
+   1.0,
+   2.0
+  ],
+  "forceRange": [
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -45.0,
+    45.0
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -45.0,
+    45.0
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -45.0,
+    45.0
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -23.5,
+    23.5
+   ],
+   [
+    -45.0,
+    45.0
+   ]
+  ],
+  "ctrlRange": [
+   [
+    -2.2222,
+    2.2222
+   ],
+   [
+    -2.7458,
+    4.6657
+   ],
+   [
+    -3.8477,
+    0.28724
+   ],
+   [
+    -2.2222,
+    2.2222
+   ],
+   [
+    -2.7458,
+    4.6657
+   ],
+   [
+    -3.8477,
+    0.28724
+   ],
+   [
+    -2.2222,
+    2.2222
+   ],
+   [
+    -1.6986,
+    5.7129
+   ],
+   [
+    -3.8477,
+    0.28724
+   ],
+   [
+    -2.2222,
+    2.2222
+   ],
+   [
+    -1.6986,
+    5.7129
+   ],
+   [
+    -3.8477,
+    0.28724
+   ]
+  ],
+  "ctrlLimited": [
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "armature": [
+   0.01,
+   0.01,
+   0.02,
+   0.01,
+   0.01,
+   0.02,
+   0.01,
+   0.01,
+   0.02,
+   0.01,
+   0.01,
+   0.02
+  ],
+  "initialBaseHeight": 0.32
+ },
+ "field": {
+  "size": [
+   5.2,
+   3.0
+  ],
+  "center": [
+   0.2,
+   0.0
+  ],
+  "touchdownMargin": 0.9,
+  "lineX": 1.9,
+  "lineXB": null,
+  "lineXNote": "env-local, = field_center.x + scenario.line_x, the same expression game_env_cfg._field_marker_spec_fn uses.",
+  "oobHalfX": 2.6,
+  "oobHalfY": 1.5,
+  "oobX": [
+   -2.4,
+   2.8000000000000003
+  ],
+  "oobY": [
+   -1.5,
+   1.5
+  ],
+  "wallsNote": "NO physical walls. Every field/arena geom is contype=0 conaffinity=0 density=0 group=2. Out-of-bounds is a referee test on the trunk centre.",
+  "mjlabMarkers": [
+   {
+    "name": "field_x_min",
+    "type": 6,
+    "pos": [
+     -2.4,
+     0.0,
+     0.018
+    ],
+    "size": [
+     0.025,
+     1.5,
+     0.025
+    ],
+    "rgba": [
+     0.920000016689,
+     0.920000016689,
+     0.879999995232,
+     0.649999976158
+    ]
+   },
+   {
+    "name": "field_x_max",
+    "type": 6,
+    "pos": [
+     2.8,
+     0.0,
+     0.018
+    ],
+    "size": [
+     0.025,
+     1.5,
+     0.025
+    ],
+    "rgba": [
+     0.920000016689,
+     0.920000016689,
+     0.879999995232,
+     0.649999976158
+    ]
+   },
+   {
+    "name": "field_y_min",
+    "type": 6,
+    "pos": [
+     0.2,
+     -1.5,
+     0.018
+    ],
+    "size": [
+     2.6,
+     0.025,
+     0.025
+    ],
+    "rgba": [
+     0.920000016689,
+     0.920000016689,
+     0.879999995232,
+     0.649999976158
+    ]
+   },
+   {
+    "name": "field_y_max",
+    "type": 6,
+    "pos": [
+     0.2,
+     1.5,
+     0.018
+    ],
+    "size": [
+     2.6,
+     0.025,
+     0.025
+    ],
+    "rgba": [
+     0.920000016689,
+     0.920000016689,
+     0.879999995232,
+     0.649999976158
+    ]
+   },
+   {
+    "name": "touchdown_line",
+    "type": 6,
+    "pos": [
+     1.9,
+     0.0,
+     0.022
+    ],
+    "size": [
+     0.025,
+     1.5,
+     0.025
+    ],
+    "rgba": [
+     1.0,
+     0.280000001192,
+     0.140000000596,
+     0.899999976158
+    ]
+   },
+   {
+    "name": "touchdown_region",
+    "type": 6,
+    "pos": [
+     2.35,
+     0.0,
+     0.012
+    ],
+    "size": [
+     0.45,
+     1.5,
+     0.004
+    ],
+    "rgba": [
+     0.10000000149,
+     0.800000011921,
+     0.34999999404,
+     0.180000007153
+    ]
+   }
+  ],
+  "decor": {
+   "body": "arena_decor",
+   "firstGeomId": 119,
+   "geoms": [
+    {
+     "name": "decor_apron",
+     "type": 6,
+     "pos": [
+      0.2,
+      0.0,
+      0.00125
+     ],
+     "size": [
+      3.3,
+      2.2,
+      0.00075
+     ],
+     "rgba": [
+      0.079999998212,
+      0.119999997318,
+      0.170000001788,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_surface",
+     "type": 6,
+     "pos": [
+      0.2,
+      0.0,
+      0.00275
+     ],
+     "size": [
+      2.6,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      0.159999996424,
+      0.239999994636,
+      0.330000013113,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_endzone",
+     "type": 6,
+     "pos": [
+      2.35,
+      0.0,
+      0.00425
+     ],
+     "size": [
+      0.45,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      0.10000000149,
+      0.800000011921,
+      0.34999999404,
+      0.449999988079
+     ]
+    },
+    {
+     "name": "decor_line",
+     "type": 6,
+     "pos": [
+      1.9,
+      0.0,
+      0.00725
+     ],
+     "size": [
+      0.035,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      1.0,
+      0.280000001192,
+      0.140000000596,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_touchline_y_min",
+     "type": 6,
+     "pos": [
+      0.2,
+      -1.46,
+      0.00575
+     ],
+     "size": [
+      2.6,
+      0.04,
+      0.00075
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.949999988079
+     ]
+    },
+    {
+     "name": "decor_touchline_y_max",
+     "type": 6,
+     "pos": [
+      0.2,
+      1.46,
+      0.00575
+     ],
+     "size": [
+      2.6,
+      0.04,
+      0.00075
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.949999988079
+     ]
+    },
+    {
+     "name": "decor_goalline_x_min",
+     "type": 6,
+     "pos": [
+      -2.36,
+      0.0,
+      0.00575
+     ],
+     "size": [
+      0.04,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.949999988079
+     ]
+    },
+    {
+     "name": "decor_goalline_x_max",
+     "type": 6,
+     "pos": [
+      2.76,
+      0.0,
+      0.00575
+     ],
+     "size": [
+      0.04,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.949999988079
+     ]
+    },
+    {
+     "name": "decor_halfway",
+     "type": 6,
+     "pos": [
+      0.2,
+      0.0,
+      0.00575
+     ],
+     "size": [
+      0.025,
+      1.5,
+      0.00075
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.949999988079
+     ]
+    },
+    {
+     "name": "decor_centre_circle",
+     "type": 5,
+     "pos": [
+      0.2,
+      0.0,
+      0.00575
+     ],
+     "size": [
+      0.45,
+      0.00075,
+      0.0
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      0.300000011921
+     ]
+    },
+    {
+     "name": "decor_post_0",
+     "type": 5,
+     "pos": [
+      -2.6,
+      -1.7,
+      0.26
+     ],
+     "size": [
+      0.05,
+      0.26,
+      0.0
+     ],
+     "rgba": [
+      0.140000000596,
+      0.170000001788,
+      0.209999993443,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_cap_0",
+     "type": 2,
+     "pos": [
+      -2.6,
+      -1.7,
+      0.55
+     ],
+     "size": [
+      0.065,
+      0.0,
+      0.0
+     ],
+     "rgba": [
+      1.0,
+      0.280000001192,
+      0.140000000596,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_1",
+     "type": 5,
+     "pos": [
+      -2.6,
+      1.7,
+      0.26
+     ],
+     "size": [
+      0.05,
+      0.26,
+      0.0
+     ],
+     "rgba": [
+      0.140000000596,
+      0.170000001788,
+      0.209999993443,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_cap_1",
+     "type": 2,
+     "pos": [
+      -2.6,
+      1.7,
+      0.55
+     ],
+     "size": [
+      0.065,
+      0.0,
+      0.0
+     ],
+     "rgba": [
+      1.0,
+      0.280000001192,
+      0.140000000596,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_2",
+     "type": 5,
+     "pos": [
+      3.0,
+      -1.7,
+      0.26
+     ],
+     "size": [
+      0.05,
+      0.26,
+      0.0
+     ],
+     "rgba": [
+      0.140000000596,
+      0.170000001788,
+      0.209999993443,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_cap_2",
+     "type": 2,
+     "pos": [
+      3.0,
+      -1.7,
+      0.55
+     ],
+     "size": [
+      0.065,
+      0.0,
+      0.0
+     ],
+     "rgba": [
+      1.0,
+      0.280000001192,
+      0.140000000596,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_3",
+     "type": 5,
+     "pos": [
+      3.0,
+      1.7,
+      0.26
+     ],
+     "size": [
+      0.05,
+      0.26,
+      0.0
+     ],
+     "rgba": [
+      0.140000000596,
+      0.170000001788,
+      0.209999993443,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_post_cap_3",
+     "type": 2,
+     "pos": [
+      3.0,
+      1.7,
+      0.55
+     ],
+     "size": [
+      0.065,
+      0.0,
+      0.0
+     ],
+     "rgba": [
+      1.0,
+      0.280000001192,
+      0.140000000596,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_y_min",
+     "type": 6,
+     "pos": [
+      0.2,
+      -1.82,
+      0.11
+     ],
+     "size": [
+      2.92,
+      0.05,
+      0.11
+     ],
+     "rgba": [
+      0.20000000298,
+      0.239999994636,
+      0.300000011921,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_y_min_top",
+     "type": 6,
+     "pos": [
+      0.2,
+      -1.82,
+      0.232
+     ],
+     "size": [
+      2.92,
+      0.05,
+      0.012
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_y_max",
+     "type": 6,
+     "pos": [
+      0.2,
+      1.82,
+      0.11
+     ],
+     "size": [
+      2.92,
+      0.05,
+      0.11
+     ],
+     "rgba": [
+      0.20000000298,
+      0.239999994636,
+      0.300000011921,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_y_max_top",
+     "type": 6,
+     "pos": [
+      0.2,
+      1.82,
+      0.232
+     ],
+     "size": [
+      2.92,
+      0.05,
+      0.012
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_x_min",
+     "type": 6,
+     "pos": [
+      -2.72,
+      0.0,
+      0.11
+     ],
+     "size": [
+      0.05,
+      1.82,
+      0.11
+     ],
+     "rgba": [
+      0.20000000298,
+      0.239999994636,
+      0.300000011921,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_x_min_top",
+     "type": 6,
+     "pos": [
+      -2.72,
+      0.0,
+      0.232
+     ],
+     "size": [
+      0.05,
+      1.82,
+      0.012
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_x_max",
+     "type": 6,
+     "pos": [
+      3.12,
+      0.0,
+      0.11
+     ],
+     "size": [
+      0.05,
+      1.82,
+      0.11
+     ],
+     "rgba": [
+      0.20000000298,
+      0.239999994636,
+      0.300000011921,
+      1.0
+     ]
+    },
+    {
+     "name": "decor_barrier_x_max_top",
+     "type": 6,
+     "pos": [
+      3.12,
+      0.0,
+      0.232
+     ],
+     "size": [
+      0.05,
+      1.82,
+      0.012
+     ],
+     "rgba": [
+      0.920000016689,
+      0.920000016689,
+      0.879999995232,
+      1.0
+     ]
+    }
+   ],
+   "palette": {
+    "apron": [
+     0.08,
+     0.12,
+     0.17,
+     1.0
+    ],
+    "surface": [
+     0.16,
+     0.24,
+     0.33,
+     1.0
+    ],
+    "endzone": [
+     0.1,
+     0.8,
+     0.35,
+     0.45
+    ],
+    "line": [
+     1.0,
+     0.28,
+     0.14,
+     1.0
+    ],
+    "marking": [
+     0.92,
+     0.92,
+     0.88,
+     0.95
+    ],
+    "post": [
+     0.14,
+     0.17,
+     0.21,
+     1.0
+    ],
+    "post_cap": [
+     1.0,
+     0.28,
+     0.14,
+     1.0
+    ],
+    "barrier": [
+     0.2,
+     0.24,
+     0.3,
+     1.0
+    ],
+    "barrier_top": [
+     0.92,
+     0.92,
+     0.88,
+     1.0
+    ]
+   },
+   "paletteSource": "src/tasks/game/game_env_cfg.py:98-100 (boundary / touchdown / region rgba) + mjlab/terrains/terrain_entity.py:23-24 (ground checker rgb1/rgb2)",
+   "proof": {
+    "hold": {
+     "maxAbsDqpos": 0.0,
+     "maxAbsDqvel": 0.0
+    },
+    "wiggle": {
+     "maxAbsDqpos": 0.0,
+     "maxAbsDqvel": 0.0
+    }
+   }
+  },
+  "ground": {
+   "geom": "terrain",
+   "type": 0,
+   "condim": 3,
+   "friction": [
+    1.0,
+    0.005,
+    0.0001
+   ],
+   "contype": 1,
+   "conaffinity": 1
+  }
+ },
+ "spawn": {
+  "config": {
+   "a": {
+    "x": -1.4,
+    "y": 0.0,
+    "yaw": 0.0
+   },
+   "b": {
+    "x": 0.75,
+    "y": 0.0,
+    "yaw": 3.141592653589793
+   }
+  },
+  "configSource": "src/tasks/game/scenarios/touchdown.py:235-248 (training nominal == app/config.js GAMES.asym.spawn)",
+  "trainingNominal": {
+   "a": {
+    "x": -1.4,
+    "y": 0.0,
+    "z": 0.32,
+    "yaw": 0.0
+   },
+   "b": {
+    "x": 0.75,
+    "y": 0.0,
+    "z": 0.32,
+    "yaw": 3.141592653589793
+   }
+  },
+  "jitter": {
+   "a": {
+    "tight": [
+     0.15,
+     0.15,
+     0.1
+    ],
+    "wide": [
+     1.0,
+     1.2,
+     3.141592653589793
+    ]
+   },
+   "b": {
+    "tight": [
+     0.15,
+     0.15,
+     0.1
+    ],
+    "wide": [
+     1.0,
+     1.2,
+     3.141592653589793
+    ]
+   }
+  },
+  "keyframeQpos": [
+   -1.4,
+   0.0,
+   0.32,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8,
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8,
+   0.75,
+   0.0,
+   0.32,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8,
+   -0.1,
+   0.9,
+   -1.8,
+   0.1,
+   0.9,
+   -1.8
+  ],
+  "keyframeCtrl": [
+   -0.1,
+   0.1,
+   -0.1,
+   0.1,
+   0.9,
+   0.9,
+   0.9,
+   0.9,
+   -1.8,
+   -1.8,
+   -1.8,
+   -1.8,
+   -0.1,
+   0.1,
+   -0.1,
+   0.1,
+   0.9,
+   0.9,
+   0.9,
+   0.9,
+   -1.8,
+   -1.8,
+   -1.8,
+   -1.8
+  ],
+  "keyframeNote": "mjlab's own merged init keyframe (z = 0.32, default joints, the TRAINING nominal spawn)."
+ },
+ "rules": {
+  "note": "Measured off the live scenario object; app/referee.js owns the implementation. recon/05 \u00a75 (asym) / \u00a76 (sym) is the contract.",
+  "episodeLengthS": 10.0,
+  "episodeSteps": 500,
+  "terminalTimeout": true,
+  "fallLimitAngleRad": 1.2217304763960306,
+  "fallLimitAngleDeg": 70.0,
+  "trunkContactTerminal": true,
+  "trunkContactSurface": "trunk",
+  "safetyTerminal": true,
+  "hullTouchdown": false,
+  "pastLineFall": "strict",
+  "contactWinScale": 0.0,
+  "winWeight": 50.0,
+  "attackerRole": "attacker",
+  "defenderRole": "defender",
+  "directionA": 1.0,
+  "directionB": -1.0,
+  "terminationTerms": [
+   "attacker_fell",
+   "attacker_oob",
+   "defender_fell",
+   "defender_oob",
+   "time_out",
+   "touchdown",
+   "trunk_contact"
+  ],
+  "terminationTermsNote": "the live TerminationManager vocabulary for this task -- app/referee.js must reproduce exactly these and nothing else (recon/05 \u00a77).",
+  "directionNote": "sym: scenario.direction(role). asym has no direction() -- only the attacker scores, and A/+1 vs B/-1 is the convention app/config.js uses."
+ },
+ "keyframe": {
+  "file": "keyframe.json",
+  "settleSeconds": 2.0,
+  "baseZ": {
+   "config": {
+    "a": 0.23029734598132645,
+    "b": 0.23029734598132623
+   },
+   "trainingNominal": {
+    "a": 0.23029734598132645,
+    "b": 0.23029734598132623
+   }
+  },
+  "baseZWindow": [
+   0.2,
+   0.4
+  ],
+  "baseZWindowNote": "The task brief asked for z in [0.25, 0.40]; the walk-soft plant does not reach it. Measured on this model: the default pose is kinematically a 0.295017 m stand (lowest collision point with base z = 0) and the legs sag a further 0.0647 m under 15.206 kg at kp 20/20/40 (go2_constants.py:41-67), the rear shins resting on the floor, so 0.23029 m is the true settled height in both games. No gain was changed."
+ },
+ "sizes": {
+  "sceneXmlBytes": 54806,
+  "meshBytesShipped": 1283289,
+  "meshBytesShippedGz9": 413205,
+  "meshBytesFull": 28409145,
+  "meshBytesFullGz9": 4524919
+ },
+ "lite": {
+  "method": "weld coincident vertices at 1e-6 m, then quadric edge collapse (fast_simplification.simplify), target 0.15 of faces (floor 2000), aggression 3, coords written %.5g",
+  "note": "VISUAL ONLY. Every mesh geom in this model is contype=0 conaffinity=0 density=0 group=2; collision is 23 primitives per robot (recon/05 \u00a71.2). Proof P2: identical XML + reduced meshes gives bit-identical qpos/qvel after 2 s under two ctrl modes.",
+  "facesRaw": 196748,
+  "facesWelded": 196086,
+  "facesOut": 41938,
+  "proof": {
+   "maxMeshGeomWorldAabbShift_mm": 0.037,
+   "maxDrawnToOrigMean_mm": 1.8922,
+   "maxDrawnToOrigP95_mm": 3.817,
+   "maxBboxShift_mm": 0.3284,
+   "gates": {
+    "drawnToOrigP95_mm": 4.0,
+    "bboxShift_mm": 1.0
+   }
+  },
+  "perMesh": {
+   "base_0.obj": {
+    "facesRaw": 10130,
+    "vertsRaw": 8738,
+    "facesWelded": 10027,
+    "vertsWelded": 5016,
+    "facesOut": 1998,
+    "vertsOut": 1001,
+    "bytesIn": 1330465,
+    "bytesOut": 56551,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.3873,
+     "drawnToOrigP95_mm": 0.7835,
+     "origToDrawnMean_mm": 0.3856,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0235
+    }
+   },
+   "base_1.obj": {
+    "facesRaw": 3962,
+    "vertsRaw": 6389,
+    "facesWelded": 3932,
+    "vertsWelded": 1950,
+    "facesOut": 2000,
+    "vertsOut": 984,
+    "bytesIn": 811791,
+    "bytesOut": 56075,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.5224,
+     "drawnToOrigP95_mm": 1.0208,
+     "origToDrawnMean_mm": 0.521,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0699
+    }
+   },
+   "base_2.obj": {
+    "facesRaw": 2005,
+    "vertsRaw": 2120,
+    "facesWelded": 2005,
+    "vertsWelded": 1412,
+    "facesOut": 2000,
+    "vertsOut": 1407,
+    "bytesIn": 294090,
+    "bytesOut": 69437,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.0777,
+     "drawnToOrigP95_mm": 0.2713,
+     "origToDrawnMean_mm": 0.0789,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0
+    }
+   },
+   "base_3.obj": {
+    "facesRaw": 2320,
+    "vertsRaw": 2870,
+    "facesWelded": 2320,
+    "vertsWelded": 2161,
+    "facesOut": 1999,
+    "vertsOut": 1872,
+    "bytesIn": 379093,
+    "bytesOut": 84492,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.2747,
+     "drawnToOrigP95_mm": 0.5548,
+     "origToDrawnMean_mm": 0.3028,
+     "lostOver3mm_pct": 0.165,
+     "bboxShift_mm": 0.0
+    }
+   },
+   "base_4.obj": {
+    "facesRaw": 59511,
+    "vertsRaw": 46564,
+    "facesWelded": 59459,
+    "vertsWelded": 30997,
+    "facesOut": 8919,
+    "vertsOut": 4664,
+    "bytesIn": 7776234,
+    "bytesOut": 279117,
+    "deviation": {
+     "drawnToOrigMean_mm": 1.8922,
+     "drawnToOrigP95_mm": 3.817,
+     "origToDrawnMean_mm": 1.894,
+     "lostOver3mm_pct": 14.575,
+     "bboxShift_mm": 0.0794
+    }
+   },
+   "calf_0.obj": {
+    "facesRaw": 6512,
+    "vertsRaw": 5878,
+    "facesWelded": 6487,
+    "vertsWelded": 3248,
+    "facesOut": 2000,
+    "vertsOut": 1004,
+    "bytesIn": 877174,
+    "bytesOut": 58127,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.5729,
+     "drawnToOrigP95_mm": 1.1204,
+     "origToDrawnMean_mm": 0.5711,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0203
+    }
+   },
+   "calf_1.obj": {
+    "facesRaw": 2053,
+    "vertsRaw": 2396,
+    "facesWelded": 2034,
+    "vertsWelded": 1035,
+    "facesOut": 1999,
+    "vertsOut": 1016,
+    "bytesIn": 326865,
+    "bytesOut": 57690,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.1742,
+     "drawnToOrigP95_mm": 0.4772,
+     "origToDrawnMean_mm": 0.1731,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0
+    }
+   },
+   "calf_mirror_0.obj": {
+    "facesRaw": 6512,
+    "vertsRaw": 5877,
+    "facesWelded": 6487,
+    "vertsWelded": 3248,
+    "facesOut": 2000,
+    "vertsOut": 1004,
+    "bytesIn": 876538,
+    "bytesOut": 58066,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.5728,
+     "drawnToOrigP95_mm": 1.1287,
+     "origToDrawnMean_mm": 0.574,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0237
+    }
+   },
+   "calf_mirror_1.obj": {
+    "facesRaw": 2053,
+    "vertsRaw": 2399,
+    "facesWelded": 2033,
+    "vertsWelded": 1034,
+    "facesOut": 2000,
+    "vertsOut": 1016,
+    "bytesIn": 327261,
+    "bytesOut": 57753,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.1271,
+     "drawnToOrigP95_mm": 0.4538,
+     "origToDrawnMean_mm": 0.1253,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0
+    }
+   },
+   "foot.obj": {
+    "facesRaw": 4404,
+    "vertsRaw": 13190,
+    "facesWelded": 4404,
+    "vertsWelded": 2205,
+    "facesOut": 2000,
+    "vertsOut": 1002,
+    "bytesIn": 1144729,
+    "bytesOut": 59124,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.262,
+     "drawnToOrigP95_mm": 0.5153,
+     "origToDrawnMean_mm": 0.2621,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0122
+    }
+   },
+   "hip_0.obj": {
+    "facesRaw": 18056,
+    "vertsRaw": 19634,
+    "facesWelded": 18010,
+    "vertsWelded": 9008,
+    "facesOut": 2702,
+    "vertsOut": 1349,
+    "bytesIn": 2863864,
+    "bytesOut": 80810,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.7633,
+     "drawnToOrigP95_mm": 1.4845,
+     "origToDrawnMean_mm": 0.7632,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.166
+    }
+   },
+   "hip_1.obj": {
+    "facesRaw": 18972,
+    "vertsRaw": 18329,
+    "facesWelded": 18772,
+    "vertsWelded": 9409,
+    "facesOut": 2816,
+    "vertsOut": 1417,
+    "bytesIn": 2767918,
+    "bytesOut": 85001,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.751,
+     "drawnToOrigP95_mm": 1.474,
+     "origToDrawnMean_mm": 0.7522,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.0941
+    }
+   },
+   "thigh_0.obj": {
+    "facesRaw": 18425,
+    "vertsRaw": 19093,
+    "facesWelded": 18354,
+    "vertsWelded": 9223,
+    "facesOut": 2753,
+    "vertsOut": 1380,
+    "bytesIn": 2841868,
+    "bytesOut": 82849,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.9461,
+     "drawnToOrigP95_mm": 1.8327,
+     "origToDrawnMean_mm": 0.8905,
+     "lostOver3mm_pct": 0.03,
+     "bboxShift_mm": 0.3284
+    }
+   },
+   "thigh_1.obj": {
+    "facesRaw": 11708,
+    "vertsRaw": 9591,
+    "facesWelded": 11706,
+    "vertsWelded": 5859,
+    "facesOut": 2000,
+    "vertsOut": 1006,
+    "bytesIn": 1491320,
+    "bytesOut": 58488,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.5692,
+     "drawnToOrigP95_mm": 1.1036,
+     "origToDrawnMean_mm": 0.5706,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.1504
+    }
+   },
+   "thigh_mirror_0.obj": {
+    "facesRaw": 18417,
+    "vertsRaw": 19051,
+    "facesWelded": 18350,
+    "vertsWelded": 9221,
+    "facesOut": 2752,
+    "vertsOut": 1381,
+    "bytesIn": 2817674,
+    "bytesOut": 81841,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.8899,
+     "drawnToOrigP95_mm": 1.7817,
+     "origToDrawnMean_mm": 0.8732,
+     "lostOver3mm_pct": 0.01,
+     "bboxShift_mm": 0.2937
+    }
+   },
+   "thigh_mirror_1.obj": {
+    "facesRaw": 11708,
+    "vertsRaw": 9580,
+    "facesWelded": 11706,
+    "vertsWelded": 5859,
+    "facesOut": 2000,
+    "vertsOut": 1006,
+    "bytesIn": 1482261,
+    "bytesOut": 57868,
+    "deviation": {
+     "drawnToOrigMean_mm": 0.5709,
+     "drawnToOrigP95_mm": 1.1153,
+     "origToDrawnMean_mm": 0.568,
+     "lostOver3mm_pct": 0.0,
+     "bboxShift_mm": 0.1504
+    }
+   }
+  }
+ }
 }
