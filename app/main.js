@@ -223,7 +223,11 @@ export async function boot() {
     config: CONFIG,
     // The Q-CBF certificate is wired (app/filter.js). app/ui.js clears this
     // again if assets/policies/manifest.json ships no `filter` block.
-    capabilities: { filter: true },
+    // OFF until the QCBF port is right: with it on the AI intervenes on 44 % of
+    // steps and topples itself (tests/fall_study.mjs, 2026-09-25) — unshielded it
+    // scores clean touchdowns at 12 deg max tilt. Training says interventions are
+    // sparse, so the port, not the certificate, is wrong.
+    capabilities: { filter: false },
     cameraModes: CAMERA_MODES,
     // What this build ships. The engine runs both games (tests/node_match.mjs
     // covers sym too); only the asymmetric one is published for now.
