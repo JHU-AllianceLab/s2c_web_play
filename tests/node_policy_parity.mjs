@@ -615,8 +615,8 @@ async function sectionGroundTruth() {
       `vx ${symCmd.vx.join('..')} cruise ${symCmd.cruiseFrac}`,
     );
     ok(
-      Math.abs(symCmd.vx[1] * symCmd.cruiseFrac - 1.15) < 0.02,
-      'sym: a held W asks for 1.15 m/s (the speed the opponents survive head-on)',
+      Math.abs(symCmd.vx[1] * symCmd.cruiseFrac - 1.5) < 0.02,
+      'sym: a held W asks for 1.5 m/s (tests/head_on.mjs: the speed the roster plays best at)',
     );
 
     let worst = 0;
@@ -917,7 +917,7 @@ async function sectionPlumbing(loaded) {
   // Rotation: every A-half member seated at B must be flagged, every B-half one not.
   const rot = man.list().filter((r) => r.rotation_baked).map((r) => r.name).sort();
   ok(
-    JSON.stringify(rot) === JSON.stringify(['sym_et_B', 'sym_nom_B', 'sym_s2c_B']),
+    JSON.stringify(rot) === JSON.stringify(['sym_et_B', 'sym_lag_B', 'sym_nom_B', 'sym_s2c_B']),
     'exactly the A-half members carry the baked pi-rotation',
     rot.join(','),
   );

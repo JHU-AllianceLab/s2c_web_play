@@ -195,8 +195,8 @@
    "json": "sym_lag_B.json",
    "obs_dim": 60,
    "act_dim": 12,
-   "native_half": "B",
-   "rotation_baked": false,
+   "native_half": "A",
+   "rotation_baked": true,
    "action_path": "increment_integrator",
    "bin_bytes": 788016
   },

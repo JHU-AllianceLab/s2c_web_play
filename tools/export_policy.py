@@ -214,156 +214,107 @@ POLICIES: list[dict] = [
     dict(
         name="sym_s2c_B",
         corroborate=None,
-        expect_bytes=9555531,
+        expect_bytes=9554571,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="s2c",
         display=DISPLAY["s2c"],
-        # Pool member F_v7g2000A -- the STRONGEST S2C member of the symmetric
-        # pool's final table (Meeting/10th_meeting/data_sym_final): 72.5 % macro
-        # over the four baseline arms across 9,780 episodes, both seats, with a
-        # 6.18 % fall rate. It replaces S_v5s17g3200B, which was picked on ten
-        # episodes from one fixed opening against one opponent and is not a pool
-        # member at all. 5080-only original, pulled byte-identical into .cache/.
-        source=CACHE / "F_v7g2000A.pt",
-        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc/2026-08-21_03-35-40_sym_v7_s41/"
-                 "game_2000.pt",
-        upstream_md5="5e8a3ae437556732ce2896aa15bbfaa0",
+        # Pool member F_v8g1800A. S2C / Shield. Chosen for the GAME, in tests/head_on.mjs: as hard to beat as the pool leader (you win 25% at 1.4 m/s, 50% at 1.6) and by far the steadiest -- 0 falls and a 28 deg worst tilt over eight head-on approaches, against 70 deg for F_v7g2000A. Pool: 71.3% win, 5.15% fall.
+        source=CACHE / "F_v8g1800A.pt",
+        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc/2026-08-22_01-34-41_sym_v8_s59/game_1800.pt",
+        upstream_md5="67dd9bdda02871d14717e6d2d252579f",
         provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
-        ckpt_seat="attacker",      # the A half
+        ckpt_seat="attacker",
         obs_dim=60,
         act_dim=12,
         native_half="A",
         action_path="increment_integrator",
-        notes=(
-            "S2C / Shield, pool member F_v7g2000A, the A half of sym_v7_s41 "
-            "game_2000 (checkpoint key seats['attacker']). Seated at B, the "
-            "OPPOSITE half, so the pi-rotation IS baked into the weights. "
-            "Trained behind the v5prox agent_15000 62-D QCBF "
-            "(projected_gradient); running the bare 60-D MLP gives the "
-            "UNSHIELDED policy -- the certificate is a separate 62-D network "
-            "stack between q_des and the plant."
-        ),
+        notes="F_v8g1800A, the A half; seated at B, pi-rotation baked in.",
     ),
     dict(
         name="sym_et_B",
         corroborate=None,
-        expect_bytes=9554763,
+        expect_bytes=9555531,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="et",
         display=DISPLAY["et"],
-        # DESIGN.md 3.4, pool member ET_v2g1700A. Local original.
-        source=MJLAB / "logs/rsl_rl/game_sym_touchdown_go2_go2_wbc"
-                       "/2026-08-21_07-46-57_sym_n_v2_s23/game_1700.pt",
-        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc/2026-08-21_07-46-57_sym_n_v2_s23/"
-                 "game_1700.pt",
-        upstream_md5="83eb4e3c7918b312dca834cdbe6f47e9",
-        provenance="local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-        ckpt_seat="attacker",      # the A half
+        # Pool member ET_v3s31g1900A. ET / early termination. The only one of the five ET members that stays on its feet when a person walks into it: 13-25% falls against 75% for ET_v2g1700A, ET_g3700A and ET_v5s71g2100A. It is also the hardest baseline to beat, which is what an early-termination arm looks like when it does not topple.
+        source=CACHE / "ET_v3s31g1900A.pt",
+        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/game_sym_touchdown_go2_go2_wbc/2026-08-27_02-33-54_sym_n_v3_s31/game_1900.pt",
+        upstream_md5="260971c5c80e44845ee5559710befef8",
+        provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
+        ckpt_seat="attacker",
         obs_dim=60,
         act_dim=12,
         native_half="A",
         action_path="increment_integrator",
-        notes=(
-            "ET / TERM (early-termination baseline), pool member ET_v2g1700A, "
-            "the A half of sym_n_v2_s23 game_1700 (seats['attacker']). Seated at "
-            "B, which is NOT its native half, so the pi-rotation IS baked into "
-            "obs_normalizer._mean[42:46] and mlp.0.weight[:, 42:46]. The browser "
-            "must feed a plain seat-B 60-D obs and must NOT rotate again."
-        ),
+        notes="ET_v3s31g1900A, the A half; seated at B, pi-rotation baked in.",
     ),
     dict(
         name="sym_nom_B",
         corroborate=None,
-        expect_bytes=9560971,
+        expect_bytes=9553547,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="nom",
         display=DISPLAY["nom"],
-        # DESIGN.md 3.4, pool member Px_v3s29g3300A. 5080-only original.
-        source=CACHE / "sym_p_v3_s29_game_3300.pt",
-        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc_penalty/"
-                 "2026-08-27_07-17-18_sym_p_v3_s29/game_3300.pt",
-        # recon/02 never downloaded this file, so it records no md5. This one was
-        # taken with `md5sum` on the 5080 (2026-09-24) and matches the pulled copy.
-        upstream_md5="9217118a22a36c3ec3f5c6cf8159c865",
-        provenance="pulled from the 5080 into .cache/; md5 verified byte-identical "
-                   "against a remote md5sum of the original",
-        ckpt_seat="attacker",      # the A half
+        # Pool member P_g1600A. Nominal / safety penalty. The beatable one that keeps its feet: at 1.6 m/s you win 5 of 8, every win a clean touchdown, 0 falls, 39 deg worst tilt. The stronger P members win by falling over (P_v2s59g3700A topples in 8 of 8).
+        source=CACHE / "P_g1600.pt",
+        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/archive/sym_anchors/P_g1600.pt",
+        upstream_md5="425bb3cf7d73e14b28a42010befb09a1",
+        provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
+        ckpt_seat="attacker",
         obs_dim=60,
         act_dim=12,
         native_half="A",
         action_path="increment_integrator",
-        notes=(
-            "Nom / Penalty (P), pool member Px_v3s29g3300A, the A half of "
-            "sym_p_v3_s29 game_3300 (seats['attacker']). This is the opponent in "
-            "the fixed-opening 0.68 m touchdown clip. Seated at B, so the "
-            "pi-rotation IS baked in. Never filtered."
-        ),
+        notes="P_g1600A, the A half; seated at B, pi-rotation baked in.",
     ),
     dict(
         name="sym_cpo_B",
         corroborate=None,
-        expect_bytes=11182283,
+        expect_bytes=11186763,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="cpo",
         display=DISPLAY["cpo"],
-        # DESIGN.md 3.4, pool member C_v3s59g2700B. Local original.
-        source=MJLAB / "logs/rsl_rl/game_sym_touchdown_go2_go2_wbc_cpo"
-                       "/2026-08-21_21-42-19_sym_c_v3_s59/game_2700.pt",
-        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc_cpo/"
-                 "2026-08-21_21-42-19_sym_c_v3_s59/game_2700.pt",
-        upstream_md5="bc6c8cbfe220abe77fe319bc381ff82b",
-        provenance="local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-        ckpt_seat="defender",      # the B half
+        # Pool member C_v2s41g3700B. CPO / constrained policy optimisation. Beatable and steady: 75% of the head-on lines go to the player at 1.6 m/s, five of them on a touchdown, with 0-13% falls against 13% and a 74 deg tilt for C_v3s59g2700B.
+        source=CACHE / "C_v2s41g3700B.pt",
+        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/archive/sym_anchors/C_v2s41g3700.pt",
+        upstream_md5="4163bee804721494da21a37dd2bbc868",
+        provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
+        ckpt_seat="defender",
         obs_dim=60,
         act_dim=12,
         native_half="B",
         action_path="increment_integrator",
-        notes=(
-            "CPO, pool member C_v3s59g2700B, the B half of sym_c_v3_s59 "
-            "game_2700 (seats['defender']). Native half B -- NO rotation. The "
-            "checkpoint also carries a cost critic; inference does not use it."
-        ),
+        notes="C_v2s41g3700B, the B half; seated at B, its native half, no rotation.",
     ),
     dict(
         name="sym_lag_B",
         corroborate=None,
-        expect_bytes=14344011,
+        expect_bytes=14351627,
         role="ai_opponent",
         game="sym",
         seat="B",
         method="lag",
         display=DISPLAY["lag"],
-        # DESIGN.md 3.4, pool member L_v8s103g1000B. Local original.
-        source=MJLAB / "logs/rsl_rl/game_sym_touchdown_go2_go2_wbc_lag"
-                       "/2026-08-22_18-35-30_sym_l_v8_s103/game_1000.pt",
-        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/logs/rsl_rl/"
-                 "game_sym_touchdown_go2_go2_wbc_lag/"
-                 "2026-08-22_18-35-30_sym_l_v8_s103/game_1000.pt",
-        upstream_md5="4ce9ec2a1786d9e1d62ad3ed521ddaf1",
-        provenance="local original; md5 matches the 5080 copy (recon/02 section 2.1)",
-        ckpt_seat="defender",      # the B half
+        # Pool member L_v3s41g2800A. Lagrangian. Beatable at 63% of the head-on lines at 1.6 m/s on clean touchdowns, 0-13% falls. L_v8s103g1000B was steadier still but the player only took 38% off it.
+        source=CACHE / "L_v3s41g2800A.pt",
+        upstream="/home/ray/Go2/Project/unitree_rl_mjlab/archive/sym_anchors/L_v3s41g2800.pt",
+        upstream_md5="da8b5e8e3acb6e1209dda2b1c63cd697",
+        provenance="pulled from the 5080 into .cache/; md5 verified byte-identical",
+        ckpt_seat="attacker",
         obs_dim=60,
         act_dim=12,
-        native_half="B",
+        native_half="A",
         action_path="increment_integrator",
-        notes=(
-            "Lagrangian, pool member L_v8s103g1000B, the B half of "
-            "sym_l_v8_s103 game_1000 (seats['defender']). Native half B -- NO "
-            "rotation. The checkpoint also carries a cost critic and the "
-            "lagrangian multiplier; inference uses neither."
-        ),
+        notes="L_v3s41g2800A, the A half; seated at B, pi-rotation baked in.",
     ),
 
     # ---- ASYMMETRIC: the human picks a role, so both seats ship -------------

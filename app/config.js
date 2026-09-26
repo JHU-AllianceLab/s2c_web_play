@@ -402,30 +402,33 @@ export const GAMES = deepFreeze({
      * through a head-on charge and read S2C at 1.12 — that is the speed of a
      * policy working around a dog in its path, not its pace.)
      *
-     * The cap is set by what the OPPONENTS can survive, measured. Sixteen
-     * head-on approach lines against the shipped S2C member, counting what
-     * happens to IT:
+     * The cap is set by the game it produces, measured with tests/head_on.mjs
+     * (eight head-on approach lines per opponent, counting who wins and what
+     * happens to the AI). At 1.6 m/s, against the shipped roster:
      *
-     *   player 1.15 m/s -> 0/16 falls, worst tilt 47 deg
-     *   player 1.43 m/s -> 1/16 falls, worst tilt 72 deg
-     *   player 1.80 m/s -> 3/16 falls, worst tilt 74 deg   (the old cruise)
+     *   S2C   you win 50%, AI falls 0/8, worst tilt 28 deg
+     *   CPO   you win 75%, AI falls 1/8
+     *   Lag   you win 63%, AI falls 1/8
+     *   Nom   you win 63%, AI falls 0/8, every win a clean touchdown
+     *   ET    you win 25%, AI falls 2/8   (the hard one; see sym_et_B)
      *
-     * 1/16 is 6.3%, which is exactly this member's own fall rate in the
-     * symmetric pool (6.18% over 9,780 episodes), so 1.43 is the point where we
-     * stop adding falls of our own and 1.8 was well past it. The training league
-     * also carried a walking opponent, and its speed range is in the checkpoint:
-     * `frozen_walk_speed_range = (0.45, 0.65)` m/s. Nothing in that league ever
-     * walked at a shielded dog at 1.8 m/s.
+     * Slower than that and the baselines stop being beatable (at 1.4 CPO drops
+     * to 38%); faster and everyone starts toppling (at 1.8 Lagrangian falls in
+     * 5 of 8, and a win you get by watching the other dog fall over is not a
+     * win anyone enjoys). So W gives 1.5 m/s and Shift 1.8 m/s: the sprint is
+     * there to force a line, and it costs you — sprinting into contact makes
+     * you the faster closer, which is the collision the referee charges to you.
      *
-     * So: vx 1.5 with a 0.77 cruise fraction — W gives 1.15 m/s (clean) and
-     * Shift 1.5 m/s (at the member's own rate, and still enough to out-race
-     * Nominal and to take the line off S2C). Strictly inside CMD_BOX, so the
-     * walk policy is never asked for a command it was not trained on.
+     * For scale, the training league's own walking opponent ran at
+     * `frozen_walk_speed_range = (0.45, 0.65)` m/s (it is in the checkpoint),
+     * so a person is always the fastest walker these policies have met.
+     * Strictly inside CMD_BOX, so the walk policy is never asked for a command
+     * it was not trained on.
      *
      * The asymmetric game keeps the full box: there the roles are not
      * symmetric, the attacker has a clock, and speed is the attacker's job.
      */
-    playerCmd: { vx: [-0.9, 1.5], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.77 },
+    playerCmd: { vx: [-1.0, 1.8], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.833 },
 
     // --- rules --------------------------------------------------------------
     /** The live TerminationManager vocabulary. scene.json rules.terminationTerms */

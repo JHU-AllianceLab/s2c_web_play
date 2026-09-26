@@ -504,7 +504,7 @@ export async function createUI(options = {}) {
       h('p.hero-org', null, [
         'JHU Alliance Lab',
         h('span.dot-sep', { text: '·' }),
-        h('a.link', { href: 'https://github.com/JHU-AllianceLab', target: '_blank', rel: 'noopener' }, ['GitHub']),
+        h('a.link', { href: 'http://alliance-ai.cs.jhu.edu/s2c/', target: '_blank', rel: 'noopener' }, ['Project page']),
       ]),
     ]),
     h('div.setup-grid', null, [
