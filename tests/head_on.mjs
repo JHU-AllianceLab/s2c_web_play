@@ -35,8 +35,17 @@ const SHIELD = flag('--shield', 'on') !== 'off';
  * of it and runs the clock out is the failure this catches.
  */
 const PARK = Number(flag('--park', '0'));
+/**
+ * `--block` is what a person actually does: chase the AI down, plant yourself
+ * between it and its line, and stand there. A dog that cannot get round a
+ * standing obstacle looks broken however good its win rate is, so this reports
+ * how far it still travels and whether it ever scores.
+ */
+const BLOCK = argv.includes('--block');
 
 let nSteps = () => 0;
+let readInput = () => ({ vx: 0, vy: 0, wz: 0 });
+const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 const g = gameCfg(GAME);
 const PLAYER_SEAT = flag('--seat', GAME === 'sym' ? 'A' : 'defender');
 const AI_SEAT = otherSeat(g, PLAYER_SEAT);
@@ -46,7 +55,7 @@ const man = await loadManifest(`${ROOT}/assets/policies/manifest.json`);
 const walk = await man.load(man.playerWalk().name);
 
 let falls = 0, over45 = 0, worst = 0, youWin = 0, draw = 0;
-const tally = {}, dec = {};
+const tally = {}, dec = {}; const lateTravel = [], lateSpeed = [];
 for (let k = 0; k < LINES; k++) {
   const sim = await createSim({ sceneUrl: `${ROOT}/assets/scene/${GAME}/scene.xml` });
   const ai = FILE
@@ -66,18 +75,51 @@ for (let k = 0; k < LINES; k++) {
     sim, game: GAME, playerSeat: PLAYER_SEAT,
     opponent: FILE ? { name: FILE, display: FILE, method: 'candidate' } : man.entry(OPP),
     policies: { walk, ai },
-    input: { read: () => (PARK && nSteps() > PARK ? { vx: 0, vy: 0, wz: 0 } : { vx: VX, vy, wz: 0 }) },
+    input: { read: () => readInput(vy) },
     actionPaths, config: { countdownMs: 0 },
   });
   match.reset();
-  let hud = match.hud(), n = 0, tilt = 0;
+  let hud = match.hud(), n = 0, tilt = 0, travel = 0;
+  let prevP = null; const lastSpeeds = [];
   nSteps = () => n;
+  const meRob = seatRobot(g, PLAYER_SEAT), aiRob = seatRobot(g, AI_SEAT);
+  const aiGoal = goalDir(GAME, AI_SEAT) || -1;
+  readInput = (lateral) => {
+    if (PARK && n > PARK) return { vx: 0, vy: 0, wz: 0 };
+    if (!BLOCK) return { vx: VX, vy: lateral, wz: 0 };
+    // stand 0.55 m on the AI's goal side of it, facing it
+    const me = sim.getBase(meRob), ai = sim.getBase(aiRob);
+    const tx = ai.pos[0] + aiGoal * 0.55, ty = ai.pos[1];
+    const dx = tx - me.pos[0], dy = ty - me.pos[1];
+    const yaw = sim.yaw(meRob);
+    const fx = Math.cos(yaw) * dx + Math.sin(yaw) * dy;      // into the body frame
+    const fy = -Math.sin(yaw) * dx + Math.cos(yaw) * dy;
+    const d = Math.hypot(dx, dy);
+    const face = wrap(Math.atan2(ai.pos[1] - me.pos[1], ai.pos[0] - me.pos[0]) - yaw);
+    // Hold position, do not charge: a person blocking stands still and only
+    // shuffles to stay in the way. Ramming would make US the faster closer and
+    // hand the collision to us, which says nothing about whether the AI can
+    // get round a standing dog.
+    const speed = d < 0.25 ? 0 : Math.min(0.6, 1.2 * d);
+    const k = speed / Math.max(d, 1e-6);
+    return { vx: k * fx, vy: k * fy, wz: Math.max(-1, Math.min(1, 1.5 * face)) };
+  };
   while (!hud.verdict && n < g.episodeSteps) {
     hud = match.tick(20); n += 1;
     const t = sim.tiltAngle(seatRobot(g, AI_SEAT));
     if (t > tilt) tilt = t;
     const i = hud.filter && hud.filter[AI_SEAT];
     if (i) dec[DECISION_NAME[i.decision]] = (dec[DECISION_NAME[i.decision]] || 0) + 1;
+    {
+      const p = sim.getBase(seatRobot(g, AI_SEAT)).pos;
+      if (prevP) {
+        const d = Math.hypot(p[0] - prevP[0], p[1] - prevP[1]);
+        travel += d;
+        lastSpeeds.push(d / 0.02);
+        if (lastSpeeds.length > 100) lastSpeeds.shift();
+      }
+      prevP = [p[0], p[1]];
+    }
   }
   const term = `${hud.verdict?.terminal}/${hud.verdict?.winner}`;
   const w = hud.verdict?.winnerSeat ?? hud.verdict?.winner;
@@ -88,6 +130,11 @@ for (let k = 0; k < LINES; k++) {
   if (/(^|_)fell/.test(term)) falls += 1;
   if (deg > 45) over45 += 1;
   if (deg > worst) worst = deg;
+  if (BLOCK) {
+    // how much ground the AI covered over the whole episode, and at the end
+    lateTravel.push(travel);
+    lateSpeed.push(lastSpeeds.reduce((a, b) => a + b, 0) / Math.max(lastSpeeds.length, 1));
+  }
   sim.dispose?.();
 }
 const pct = (x) => `${((100 * x) / LINES).toFixed(0)}%`;
@@ -96,4 +143,9 @@ console.log(
   `YOU win ${youWin}/${LINES} (${pct(youWin)})  draw ${draw}   ` +
   `AI fell ${falls}/${LINES} (${pct(falls)})   worst tilt ${worst.toFixed(1)} deg`);
 console.log(`  verdicts ${JSON.stringify(tally)}`);
+if (BLOCK) {
+  const m = (a) => a.reduce((x, y) => x + y, 0) / Math.max(a.length, 1);
+  console.log(`  blocked: AI covered ${m(lateTravel).toFixed(2)} m per episode, ` +
+    `moving ${m(lateSpeed).toFixed(2)} m/s at the end`);
+}
 if (SHIELD) console.log(`  decisions ${JSON.stringify(dec)}`);

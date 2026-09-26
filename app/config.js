@@ -428,7 +428,7 @@ export const GAMES = deepFreeze({
      * The asymmetric game keeps the full box: there the roles are not
      * symmetric, the attacker has a clock, and speed is the attacker's job.
      */
-    playerCmd: { vx: [-1.0, 1.8], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.833 },
+    playerCmd: { vx: [-1.0, 1.7], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.824 },
 
     // --- rules --------------------------------------------------------------
     /** The live TerminationManager vocabulary. scene.json rules.terminationTerms */
