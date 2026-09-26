@@ -480,6 +480,31 @@ export function rollPitchFromQuat(q) {
  * @param {Float32Array} [out]        length 62
  * @returns {Float32Array}
  */
+/**
+ * The certificate is world-anchored: it was trained on a robot whose goal is at
+ * +x, and only obs[48:52] (wall margins, world-ordered) and obs[52:54] (world
+ * heading) carry that frame. A seat that scores at -x therefore hands it a
+ * MIRRORED world and gets a value for a situation it is not in.
+ *
+ * mjlab has exactly this correction, for a shielded seat whose scoring
+ * direction is negative: `sym_game/eval/harness.py:1413-1447` swaps the two
+ * margin pairs and negates the heading. It lives in the EVAL harness, is
+ * opt-in, and its own comment calls it forensics — TRAINING never applies it,
+ * so the symmetric members are adapted to the mirrored view, not to this one.
+ *
+ * Measured on eight head-on approaches: applying it puts the shipped member on
+ * the floor 5 times out of 8 (worst tilt 75.4 deg) against 0 out of 8 without.
+ * It stays OFF in play and exists so that pool numbers measured with
+ * `canonicalize_shield_obs: true` can be reproduced.
+ */
+export function canonicalizeFilterObs(o) {
+  const px = o[48], nx = o[49], py = o[50], ny = o[51];
+  o[48] = nx; o[49] = px; o[50] = ny; o[51] = py;
+  o[52] = -o[52];
+  o[53] = -o[53];
+  return o;
+}
+
 export function filterObs(sim, robot, opp, prevCtrl12, feet4, field, out) {
   const o = out ?? new Float32Array(FILTER_OBS_DIM);
   if (o.length !== FILTER_OBS_DIM) throw new Error('filter.js: out must be 62 long');
@@ -1268,6 +1293,12 @@ export async function loadFilter(opts = {}) {
  */
 export function makeShieldPath({
   filter, sim, robot, opponentRobot, gainBlend = true, footContacts = null,
+  /**
+   * Reproduce the eval harness's `canonicalize_shield_obs` for a seat that
+   * scores at -x. OFF by default: training does not do it, and with it the
+   * shipped member falls (see canonicalizeFilterObs).
+   */
+  canonicalize = false,
 }) {
   if (!filter || !filter.nets) throw new Error('makeShieldPath: pass the loadFilter() result');
   if (robot !== 'a' && robot !== 'b') throw new Error(`makeShieldPath: bad robot "${robot}"`);
@@ -1320,6 +1351,7 @@ export function makeShieldPath({
       const t0 = now();
       const f4 = feet.read(robot);
       filterObs(sim, robot, opponentRobot, prevCtrl, f4, filter.field, obs);
+      if (canonicalize) canonicalizeFilterObs(obs);
       integ.taskIncrement(a12, uTask);
       const r = shield.step(obs, uTask);
       const ctrl = integ.applyIncrement(r.u);

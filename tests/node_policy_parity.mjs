@@ -615,8 +615,8 @@ async function sectionGroundTruth() {
       `vx ${symCmd.vx.join('..')} cruise ${symCmd.cruiseFrac}`,
     );
     ok(
-      Math.abs(symCmd.vx[1] * symCmd.cruiseFrac - 1.43) < 0.02,
-      'sym: a held W asks for 1.43 m/s (measured against the opponents: 1.0-1.9)',
+      Math.abs(symCmd.vx[1] * symCmd.cruiseFrac - 1.15) < 0.02,
+      'sym: a held W asks for 1.15 m/s (the speed the opponents survive head-on)',
     );
 
     let worst = 0;

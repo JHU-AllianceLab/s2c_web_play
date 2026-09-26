@@ -402,17 +402,30 @@ export const GAMES = deepFreeze({
      * through a head-on charge and read S2C at 1.12 — that is the speed of a
      * policy working around a dog in its path, not its pace.)
      *
-     * Narrowed to vx 2.2 with a 0.65 cruise fraction: W gives 1.43 m/s and
-     * Shift 2.2 m/s. At cruise you are mid-pack — faster than Nominal, slower
-     * than S2C, CPO and ET — and only the sprint out-runs the field, which is
-     * also what makes you the faster closer and puts the collision at your
-     * fault. Still strictly inside CMD_BOX, so the walk policy is never asked
-     * for a command it was not trained on.
+     * The cap is set by what the OPPONENTS can survive, measured. Sixteen
+     * head-on approach lines against the shipped S2C member, counting what
+     * happens to IT:
+     *
+     *   player 1.15 m/s -> 0/16 falls, worst tilt 47 deg
+     *   player 1.43 m/s -> 1/16 falls, worst tilt 72 deg
+     *   player 1.80 m/s -> 3/16 falls, worst tilt 74 deg   (the old cruise)
+     *
+     * 1/16 is 6.3%, which is exactly this member's own fall rate in the
+     * symmetric pool (6.18% over 9,780 episodes), so 1.43 is the point where we
+     * stop adding falls of our own and 1.8 was well past it. The training league
+     * also carried a walking opponent, and its speed range is in the checkpoint:
+     * `frozen_walk_speed_range = (0.45, 0.65)` m/s. Nothing in that league ever
+     * walked at a shielded dog at 1.8 m/s.
+     *
+     * So: vx 1.5 with a 0.77 cruise fraction — W gives 1.15 m/s (clean) and
+     * Shift 1.5 m/s (at the member's own rate, and still enough to out-race
+     * Nominal and to take the line off S2C). Strictly inside CMD_BOX, so the
+     * walk policy is never asked for a command it was not trained on.
      *
      * The asymmetric game keeps the full box: there the roles are not
      * symmetric, the attacker has a clock, and speed is the attacker's job.
      */
-    playerCmd: { vx: [-1.1, 2.2], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.65 },
+    playerCmd: { vx: [-0.9, 1.5], vy: [-0.8, 0.8], wz: [-2.0, 2.0], cruiseFrac: 0.77 },
 
     // --- rules --------------------------------------------------------------
     /** The live TerminationManager vocabulary. scene.json rules.terminationTerms */

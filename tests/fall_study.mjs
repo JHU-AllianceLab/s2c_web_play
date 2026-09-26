@@ -35,7 +35,7 @@ import { createSim } from '../app/physics.js';
 import { loadManifest } from '../app/policy.js';
 import { createMatch } from '../app/match.js';
 import { loadFilter, makeShieldPath, DECISION_NAME } from '../app/filter.js';
-import { seatRobot, otherSeat, gameCfg } from '../app/config.js';
+import { seatRobot, otherSeat, gameCfg, goalDir } from '../app/config.js';
 
 const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
 const argv = process.argv.slice(2);
